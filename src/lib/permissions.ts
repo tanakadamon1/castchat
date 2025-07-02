@@ -245,6 +245,150 @@ export class PermissionManager {
     
     return role1Index > role2Index
   }
+
+  // Category management permissions
+  canCreateCategory(userProfile: UserProfile | null): boolean {
+    return this.hasPermission(userProfile, Permission.MANAGE_SYSTEM)
+  }
+
+  canUpdateCategory(userProfile: UserProfile | null): boolean {
+    return this.hasPermission(userProfile, Permission.MANAGE_SYSTEM)
+  }
+
+  canDeleteCategory(userProfile: UserProfile | null): boolean {
+    return this.hasPermission(userProfile, Permission.MANAGE_SYSTEM)
+  }
+
+  // Tag management permissions
+  canCreateTag(userProfile: UserProfile | null): boolean {
+    return this.hasPermission(userProfile, Permission.MODERATE_CONTENT) ||
+           this.hasPermission(userProfile, Permission.MANAGE_SYSTEM)
+  }
+
+  canUpdateTag(userProfile: UserProfile | null): boolean {
+    return this.hasPermission(userProfile, Permission.MODERATE_CONTENT) ||
+           this.hasPermission(userProfile, Permission.MANAGE_SYSTEM)
+  }
+
+  canDeleteTag(userProfile: UserProfile | null): boolean {
+    return this.hasPermission(userProfile, Permission.MODERATE_CONTENT) ||
+           this.hasPermission(userProfile, Permission.MANAGE_SYSTEM)
+  }
+
+  // Image upload permissions
+  canUploadImage(userProfile: UserProfile | null): boolean {
+    return this.hasPermission(userProfile, Permission.CREATE_POSTS)
+  }
+
+  canDeleteUnusedImages(userProfile: UserProfile | null): boolean {
+    return this.hasPermission(userProfile, Permission.MANAGE_SYSTEM)
+  }
+
+  // Statistics and analytics permissions
+  canViewSystemStatistics(userProfile: UserProfile | null): boolean {
+    return this.hasPermission(userProfile, Permission.VIEW_ANALYTICS)
+  }
+
+  canViewPostAnalytics(userProfile: UserProfile | null, postOwnerId: string): boolean {
+    if (!userProfile) return false
+    
+    // Post owner can view their own analytics
+    if (userProfile.id === postOwnerId) {
+      return true
+    }
+    
+    // Admins and moderators can view analytics
+    return this.hasPermission(userProfile, Permission.VIEW_ANALYTICS)
+  }
+
+  // Notification permissions
+  canViewNotification(userProfile: UserProfile | null, notificationOwnerId: string): boolean {
+    if (!userProfile) return false
+    
+    // Notification owner can view their notifications
+    if (userProfile.id === notificationOwnerId) {
+      return true
+    }
+    
+    // Admins can view any notifications
+    return this.hasPermission(userProfile, Permission.MANAGE_SYSTEM)
+  }
+
+  // Message permissions
+  canSendMessage(userProfile: UserProfile | null): boolean {
+    if (!userProfile) return false
+    
+    // 認証済みユーザーは基本的にメッセージを送信可能
+    return true
+  }
+
+  canViewMessage(userProfile: UserProfile | null, senderId: string, recipientId: string): boolean {
+    if (!userProfile) return false
+    
+    // 送信者または受信者の場合
+    if (userProfile.id === senderId || userProfile.id === recipientId) {
+      return true
+    }
+    
+    // 管理者の場合
+    return this.hasPermission(userProfile, Permission.MANAGE_SYSTEM)
+  }
+
+  canDeleteMessage(userProfile: UserProfile | null, senderId: string): boolean {
+    if (!userProfile) return false
+    
+    // 送信者本人または管理者
+    return userProfile.id === senderId || 
+           this.hasPermission(userProfile, Permission.MANAGE_SYSTEM)
+  }
+
+  // Rate limiting and security
+  canPerformAction(userProfile: UserProfile | null, action: string, timeWindow: number = 60000): boolean {
+    if (!userProfile) return false
+    
+    // 管理者は制限なし
+    if (this.hasPermission(userProfile, Permission.MANAGE_SYSTEM)) {
+      return true
+    }
+    
+    // 基本的なレート制限チェック（実装は簡略化）
+    // 実際の実装ではRedisやメモリキャッシュを使用
+    return true
+  }
+
+  canManageNotification(userProfile: UserProfile | null, notificationOwnerId: string): boolean {
+    if (!userProfile) return false
+    
+    // Notification owner can manage their notifications
+    if (userProfile.id === notificationOwnerId) {
+      return true
+    }
+    
+    // Admins can manage any notifications
+    return this.hasPermission(userProfile, Permission.MANAGE_SYSTEM)
+  }
+
+  canCreateNotification(userProfile: UserProfile | null): boolean {
+    // System can create notifications, users generally cannot
+    return this.hasPermission(userProfile, Permission.MANAGE_SYSTEM)
+  }
+
+  canDeleteNotification(userProfile: UserProfile | null, notificationOwnerId: string): boolean {
+    if (!userProfile) return false
+    
+    // Notification owner can delete their notifications
+    if (userProfile.id === notificationOwnerId) {
+      return true
+    }
+    
+    // Admins can delete any notifications
+    return this.hasPermission(userProfile, Permission.MANAGE_SYSTEM)
+  }
+
+  // Advanced analytics for premium users
+  canViewAdvancedAnalytics(userProfile: UserProfile | null): boolean {
+    return this.hasPermission(userProfile, Permission.ADVANCED_ANALYTICS)
+  }
 }
 
 export const permissionManager = PermissionManager.getInstance()

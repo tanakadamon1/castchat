@@ -20,6 +20,16 @@ const router = createRouter({
       component: () => import('../views/RegisterView.vue'),
     },
     {
+      path: '/auth/callback',
+      name: 'auth-callback',
+      component: () => import('../views/AuthCallbackView.vue'),
+    },
+    {
+      path: '/reset-password',
+      name: 'reset-password',
+      component: () => import('../views/ResetPasswordView.vue'),
+    },
+    {
       path: '/posts',
       name: 'posts',
       component: () => import('../views/PostsView.vue'),
@@ -32,7 +42,12 @@ const router = createRouter({
     {
       path: '/posts/create',
       name: 'post-create',
-      component: () => import('../views/PostCreateView.vue'),
+      component: () => import('../views/CreatePostView.vue'),
+    },
+    {
+      path: '/posts/:id/edit',
+      name: 'post-edit',
+      component: () => import('../views/CreatePostView.vue'),
     },
     {
       path: '/profile',
@@ -43,6 +58,11 @@ const router = createRouter({
       path: '/applications',
       name: 'applications',
       component: () => import('../views/ApplicationsView.vue'),
+    },
+    {
+      path: '/demo',
+      name: 'demo',
+      component: () => import('../views/ComponentDemoView.vue'),
     },
   ],
 })

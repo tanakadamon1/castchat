@@ -41,9 +41,46 @@ Content-Type: application/json
 }
 ```
 
-#### Google OAuth
-```http
-GET /auth/v1/authorize?provider=google&redirect_to=<redirect_url>
+#### Google OAuth (Sprint 1 Implementation)
+```javascript
+// フロントエンド実装（JavaScript/TypeScript）
+import { supabase } from './supabase'
+
+// Google OAuth ログイン
+const { data, error } = await supabase.auth.signInWithOAuth({
+  provider: 'google',
+  options: {
+    redirectTo: `${window.location.origin}/auth/callback`,
+    queryParams: {
+      access_type: 'offline',
+      prompt: 'consent'
+    }
+  }
+})
+
+// セッション取得
+const { data: { session } } = await supabase.auth.getSession()
+
+// セッション更新
+const { data, error } = await supabase.auth.refreshSession()
+
+// ログアウト
+const { error } = await supabase.auth.signOut()
+
+// 認証状態変更の監視
+supabase.auth.onAuthStateChange((event, session) => {
+  console.log(event, session)
+  // イベント: SIGNED_IN, SIGNED_OUT, TOKEN_REFRESHED, USER_UPDATED
+})
+```
+
+#### 認証設定（Supabase config）
+```toml
+[auth.external.google]
+enabled = true
+client_id = "your-google-client-id"
+secret = "your-google-client-secret"
+redirect_uri = "http://localhost:54321/auth/v1/callback"
 ```
 
 ## Database API
@@ -464,5 +501,171 @@ supabase db reset
 - Current version: v1
 - Backwards compatibility maintained
 - Deprecation notices provided for breaking changes
+
+## 権限システム (Sprint 1 Implementation)
+
+### ユーザー役割
+```typescript
+type UserRole = 'user' | 'moderator' | 'admin'
+```
+
+### 権限定義
+```typescript
+enum Permission {
+  // 基本権限
+  READ_POSTS = 'read_posts',
+  CREATE_POSTS = 'create_posts',
+  UPDATE_OWN_POSTS = 'update_own_posts',
+  DELETE_OWN_POSTS = 'delete_own_posts',
+  
+  // プロフィール権限
+  UPDATE_OWN_PROFILE = 'update_own_profile',
+  VIEW_PROFILES = 'view_profiles',
+  
+  // 応募権限
+  CREATE_APPLICATIONS = 'create_applications',
+  VIEW_OWN_APPLICATIONS = 'view_own_applications',
+  VIEW_POST_APPLICATIONS = 'view_post_applications',
+  MANAGE_POST_APPLICATIONS = 'manage_post_applications',
+  
+  // モデレーター権限
+  UPDATE_ANY_POSTS = 'update_any_posts',
+  DELETE_ANY_POSTS = 'delete_any_posts',
+  MODERATE_CONTENT = 'moderate_content',
+  
+  // 管理者権限
+  MANAGE_USERS = 'manage_users',
+  MANAGE_ROLES = 'manage_roles',
+  VIEW_ANALYTICS = 'view_analytics'
+}
+```
+
+### 役割別権限
+```javascript
+// 権限チェック例
+import { usePermissions } from '@/lib/permissions'
+
+const permissions = usePermissions(userProfile)
+
+// 投稿作成権限チェック
+if (permissions.canCreatePost()) {
+  // 投稿作成フォーム表示
+}
+
+// 投稿編集権限チェック
+if (permissions.canUpdatePost(postOwnerId)) {
+  // 編集ボタン表示
+}
+
+// プロフィール編集権限チェック
+if (permissions.canUpdateProfile(targetUserId)) {
+  // プロフィール編集フォーム表示
+}
+```
+
+### ルートガード
+```typescript
+import { requireAuth, requirePermission, Permission } from '@/lib/guards'
+
+// 認証が必要なルート
+{
+  path: '/profile',
+  beforeEnter: requireAuth
+}
+
+// 特定の権限が必要なルート
+{
+  path: '/posts/create',
+  beforeEnter: requirePermission(Permission.CREATE_POSTS)
+}
+
+// 管理者のみアクセス可能
+{
+  path: '/admin',
+  beforeEnter: requireAdmin
+}
+```
+
+## セッション管理 (Sprint 1 Implementation)
+
+### セッション自動監視
+```javascript
+import { sessionManager } from '@/lib/session'
+
+// セッション監視開始（1分間隔）
+sessionManager.startSessionMonitoring()
+
+// セッション状態確認
+const sessionState = await sessionManager.getCurrentSession()
+console.log('Session valid:', sessionState.isValid)
+console.log('Expires at:', sessionState.expiresAt)
+
+// 手動セッション更新
+const { session, error } = await sessionManager.refreshSession()
+```
+
+### セッション設定
+- **自動リフレッシュ**: 有効期限5分前
+- **監視間隔**: 1分
+- **セッション有効期限**: 1時間
+- **リフレッシュトークン**: 無期限（使用時更新）
+
+## エラーハンドリング (Sprint 1 Implementation)
+
+### 認証エラー
+```typescript
+interface AuthError {
+  code: string
+  message: string
+  details?: string
+}
+
+// エラーコード
+const AUTH_ERRORS = {
+  INVALID_TOKEN: 'AUTH_001',
+  SESSION_EXPIRED: 'AUTH_002',
+  INSUFFICIENT_PERMISSION: 'AUTH_003',
+  USER_NOT_FOUND: 'AUTH_004'
+}
+```
+
+### エラーハンドリング例
+```javascript
+try {
+  await authStore.signInWithGoogle()
+} catch (error) {
+  if (error.code === 'AUTH_001') {
+    // トークン無効エラー処理
+    await authStore.refreshSession()
+  } else if (error.code === 'AUTH_002') {
+    // セッション期限切れ
+    router.push('/login')
+  }
+}
+```
+
+## Sprint 1 実装状況
+
+### ✅ 完了済み
+- データベーススキーマ設計・実装
+- Google OAuth認証機能
+- セッション管理システム
+- 権限管理システム
+- ユーザープロフィール管理
+- 基本的なエラーハンドリング
+- 認証ガード・ルート保護
+
+### 🚧 Sprint 2以降で実装予定
+- 投稿CRUD API
+- 応募管理API
+- 検索・フィルターAPI
+- 通知機能
+- ファイルアップロード
+- メール送信機能
+
+---
+
+**最終更新**: 2025-01-01  
+**Sprint 1 完了状況**: 認証・権限システム実装済み
 
 For more detailed information, refer to the [Supabase Documentation](https://supabase.com/docs).

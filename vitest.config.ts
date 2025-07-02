@@ -1,12 +1,14 @@
 import { defineConfig } from 'vitest/config'
 import { fileURLToPath } from 'node:url'
+import vue from '@vitejs/plugin-vue'
 
 export default defineConfig({
+  plugins: [vue() as any],
   test: {
     globals: true,
     environment: 'jsdom',
     setupFiles: ['./tests/integration/setup.ts'],
-    include: ['tests/**/*.test.ts'],
+    include: ['tests/**/*.test.ts', 'src/tests/**/*.test.ts'],
     coverage: {
       provider: 'v8',
       reporter: ['text', 'json', 'html'],
@@ -17,9 +19,7 @@ export default defineConfig({
         '**/*.d.ts',
         '**/*.config.*'
       ]
-    },
-    timeout: 10000, // 10 seconds for integration tests
-    testTimeout: 10000
+    }
   },
   resolve: {
     alias: {

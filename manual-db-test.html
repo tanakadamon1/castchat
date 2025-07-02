@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Database Connection Test</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; }
+        .result { margin: 10px 0; padding: 10px; border-radius: 5px; }
+        .success { background-color: #d4edda; color: #155724; }
+        .error { background-color: #f8d7da; color: #721c24; }
+        .info { background-color: #d1ecf1; color: #0c5460; }
+        pre { background: #f8f9fa; padding: 10px; border-radius: 5px; overflow-x: auto; }
+    </style>
+</head>
+<body>
+    <h1>🔧 バックエンドAPI緊急テスト</h1>
+    
+    <button onclick="runAllTests()">📊 全テスト実行</button>
+    <button onclick="clearResults()">🧹 結果クリア</button>
+    
+    <div id="results"></div>
+
+    <script type="module">
+        import { createClient } from 'https://cdn.skypack.dev/@supabase/supabase-js@2'
+        
+        const supabaseUrl = 'https://lbjrzswfnwhiwtxflxal.supabase.co'
+        const supabaseAnonKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImxianJ6c3dmbndoaXd0eGZseGFsIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MzUyMTE5NzAsImV4cCI6MjA1MDc4Nzk3MH0.A_5PjA1vQ6TLl9lB_hJe-wpDNLcMZSV7fFZiRQIuJIk'
+        
+        const supabase = createClient(supabaseUrl, supabaseAnonKey)
+        
+        function addResult(type, title, content) {
+            const results = document.getElementById('results')
+            const div = document.createElement('div')
+            div.className = `result ${type}`
+            div.innerHTML = `
+                <h3>${title}</h3>
+                <pre>${typeof content === 'object' ? JSON.stringify(content, null, 2) : content}</pre>
+            `
+            results.appendChild(div)
+        }
+
+        async function testDatabaseConnection() {
+            addResult('info', '🔄 データベース接続テスト', '開始中...')
+            
+            try {
+                const { data, error } = await supabase
+                    .from('users')
+                    .select('count(*)')
+                    .limit(1)
+                
+                if (error) {
+                    addResult('error', '❌ 基本接続失敗', error.message)
+                    return false
+                }
+                
+                addResult('success', '✅ 基本接続成功', 'データベースに正常に接続できました')
+                return true
+            } catch (err) {
+                addResult('error', '❌ 接続エラー', err.message)
+                return false
+            }
+        }
+
+        async function testTablesExistence() {
+            addResult('info', '🔍 テーブル存在確認', '重要テーブルをチェック中...')
+            
+            const tables = ['users', 'posts', 'post_categories', 'tags', 'applications']
+            const results = {}
+            
+            for (const table of tables) {
+                try {
+                    const { data, error } = await supabase
+                        .from(table)
+                        .select('count(*)')
+                        .limit(1)
+                    
+                    if (error) {
+                        results[table] = `❌ ${error.message}`
+                    } else {
+                        results[table] = '✅ 正常'
+                    }
+                } catch (err) {
+                    results[table] = `❌ ${err.message}`
+                }
+            }
+            
+            addResult('info', '📋 テーブルチェック結果', results)
+        }
+
+        async function testPostsAPI() {
+            addResult('info', '📝 投稿API テスト', '投稿データの取得をテスト中...')
+            
+            try {
+                const { data: posts, error } = await supabase
+                    .from('posts')
+                    .select(`
+                        *,
+                        users!posts_user_id_fkey(username, display_name),
+                        post_categories!posts_category_id_fkey(name)
+                    `)
+                    .eq('status', 'published')
+                    .limit(3)
+                
+                if (error) {
+                    addResult('error', '❌ 投稿取得失敗', error.message)
+                    return
+                }
+                
+                addResult('success', '✅ 投稿データ取得成功', {
+                    取得件数: posts?.length || 0,
+                    サンプル: posts?.length > 0 ? {
+                        id: posts[0].id,
+                        title: posts[0].title,
+                        user: posts[0].users?.username,
+                        category: posts[0].post_categories?.name
+                    } : 'データなし'
+                })
+                
+            } catch (err) {
+                addResult('error', '❌ 投稿APIエラー', err.message)
+            }
+        }
+
+        async function testSearchAPI() {
+            addResult('info', '🔍 検索API テスト', '検索機能をテスト中...')
+            
+            try {
+                const { data: searchResults, error } = await supabase
+                    .from('posts')
+                    .select('id, title, description')
+                    .ilike('title', '%VRChat%')
+                    .eq('status', 'published')
+                    .limit(3)
+                
+                if (error) {
+                    addResult('error', '❌ 検索失敗', error.message)
+                    return
+                }
+                
+                addResult('success', '✅ 検索機能正常', {
+                    検索結果件数: searchResults?.length || 0,
+                    検索キーワード: 'VRChat'
+                })
+                
+            } catch (err) {
+                addResult('error', '❌ 検索APIエラー', err.message)
+            }
+        }
+
+        async function testCategoriesAPI() {
+            addResult('info', '📂 カテゴリAPI テスト', 'カテゴリデータをテスト中...')
+            
+            try {
+                const { data: categories, error } = await supabase
+                    .from('post_categories')
+                    .select('*')
+                    .limit(5)
+                
+                if (error) {
+                    addResult('error', '❌ カテゴリ取得失敗', error.message)
+                    return
+                }
+                
+                addResult('success', '✅ カテゴリAPI正常', {
+                    カテゴリ数: categories?.length || 0,
+                    サンプル: categories?.length > 0 ? categories[0] : 'データなし'
+                })
+                
+            } catch (err) {
+                addResult('error', '❌ カテゴリAPIエラー', err.message)
+            }
+        }
+
+        window.runAllTests = async function() {
+            document.getElementById('results').innerHTML = ''
+            
+            addResult('info', '🚀 統合テスト開始', '第2-3スプリント緊急確認')
+            
+            const success1 = await testDatabaseConnection()
+            if (success1) {
+                await testTablesExistence()
+                await testPostsAPI()
+                await testSearchAPI()
+                await testCategoriesAPI()
+            }
+            
+            addResult('info', '📊 テスト完了', '結果を確認してください')
+        }
+
+        window.clearResults = function() {
+            document.getElementById('results').innerHTML = ''
+        }
+    </script>
+</body>
+</html>

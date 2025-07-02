@@ -80,7 +80,7 @@ export class SessionManager {
       return { session: data.session, error: null }
     } catch (error) {
       console.error('Refresh session error:', error)
-      return { session: null, error }
+      return { session: null, error: error instanceof Error ? error : new Error(String(error)) }
     }
   }
 
@@ -151,7 +151,7 @@ export class SessionManager {
       return { error: null }
     } catch (error) {
       console.error('Sign out error:', error)
-      return { error }
+      return { error: error instanceof Error ? error : new Error(String(error)) }
     }
   }
 

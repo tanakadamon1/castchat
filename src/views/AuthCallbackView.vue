@@ -39,33 +39,75 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted } from 'vue'
-import { useRouter } from 'vue-router'
+import { ref, onMounted, computed } from 'vue'
+import { useRouter, useRoute } from 'vue-router'
 import { useAuthStore } from '@/stores/auth'
+import { useToast } from '@/composables/useToast'
+import { supabase } from '@/lib/supabase'
 
 const router = useRouter()
+const route = useRoute()
 const authStore = useAuthStore()
+const toast = useToast()
 
 const loading = ref(true)
 const error = ref<string | null>(null)
+
+const isRecovery = computed(() => route.query.type === 'recovery')
 
 const handleAuthCallback = async () => {
   try {
     loading.value = true
     error.value = null
 
+    // URLフラグメントからトークンを取得
+    const hashParams = new URLSearchParams(window.location.hash.substring(1))
+    const accessToken = hashParams.get('access_token')
+    const refreshToken = hashParams.get('refresh_token')
+    const type = hashParams.get('type')
+
+    if (accessToken && refreshToken) {
+      // セッションを設定
+      const { data, error: sessionError } = await supabase.auth.setSession({
+        access_token: accessToken,
+        refresh_token: refreshToken
+      })
+
+      if (sessionError) throw sessionError
+
+      if (type === 'recovery') {
+        // パスワードリセットの場合
+        toast.success('パスワードリセットが完了しました。新しいパスワードを設定してください。')
+        setTimeout(() => {
+          router.push('/profile?tab=security')
+        }, 1500)
+        return
+      }
+    }
+
+    // 通常の認証処理
     await authStore.initialize()
     
     if (authStore.isAuthenticated) {
-      setTimeout(() => {
-        router.push('/')
-      }, 1500)
+      if (isRecovery.value) {
+        toast.success('パスワードリセットが完了しました')
+        setTimeout(() => {
+          router.push('/profile?tab=security')
+        }, 1500)
+      } else {
+        toast.success('ログインしました')
+        setTimeout(() => {
+          const redirectTo = route.query.redirect as string || '/'
+          router.push(redirectTo)
+        }, 1500)
+      }
     } else {
       throw new Error('認証に失敗しました')
     }
   } catch (err) {
     console.error('Auth callback error:', err)
     error.value = err instanceof Error ? err.message : '認証処理でエラーが発生しました'
+    toast.error('認証に失敗しました')
   } finally {
     loading.value = false
   }

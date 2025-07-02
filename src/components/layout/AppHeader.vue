@@ -32,6 +32,13 @@
           >
             募集投稿
           </router-link>
+          <router-link 
+            to="/demo" 
+            class="text-gray-600 hover:text-gray-900 px-3 py-2 rounded-md text-sm font-medium"
+            active-class="text-indigo-600 bg-indigo-50"
+          >
+            Demo
+          </router-link>
         </nav>
 
         <!-- User menu -->

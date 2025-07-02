@@ -1,0 +1,75 @@
+{
+  "name": "VRChatキャスト募集掲示板",
+  "short_name": "CastChat",
+  "description": "VRChatコミュニティのためのキャスト募集・応募プラットフォーム",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#FFFFFF",
+  "theme_color": "#3B82F6",
+  "orientation": "portrait-primary",
+  "categories": ["social", "entertainment", "lifestyle"],
+  "lang": "ja",
+  "dir": "ltr",
+  "scope": "/",
+  "icons": [
+    {
+      "src": "/icons/icon-16x16.png",
+      "sizes": "16x16",
+      "type": "image/png"
+    },
+    {
+      "src": "/icons/icon-32x32.png",
+      "sizes": "32x32",
+      "type": "image/png"
+    },
+    {
+      "src": "/icons/icon-180x180.png",
+      "sizes": "180x180",
+      "type": "image/png"
+    },
+    {
+      "src": "/icons/icon-192x192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/icons/icon-512x512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/icons/maskable-icon-512x512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
+    }
+  ],
+  "shortcuts": [
+    {
+      "name": "新規投稿",
+      "short_name": "投稿",
+      "description": "新しい募集を投稿する",
+      "url": "/posts/create",
+      "icons": [
+        {
+          "src": "/icons/shortcut-create.png",
+          "sizes": "96x96"
+        }
+      ]
+    },
+    {
+      "name": "応募履歴",
+      "short_name": "履歴",
+      "description": "応募履歴を確認する",
+      "url": "/applications",
+      "icons": [
+        {
+          "src": "/icons/shortcut-applications.png",
+          "sizes": "96x96"
+        }
+      ]
+    }
+  ]
+}

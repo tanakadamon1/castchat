@@ -72,7 +72,7 @@ import { computed, useId } from 'vue'
 
 interface Props {
   modelValue?: string | number
-  type?: 'text' | 'email' | 'password' | 'number' | 'tel' | 'url' | 'search'
+  type?: 'text' | 'email' | 'password' | 'number' | 'tel' | 'url' | 'search' | 'datetime-local' | 'date' | 'time'
   label?: string
   placeholder?: string
   error?: string

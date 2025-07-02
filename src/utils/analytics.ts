@@ -244,7 +244,7 @@ class Analytics {
       new PerformanceObserver((list) => {
         const entries = list.getEntries()
         const lastEntry = entries[entries.length - 1]
-        this.trackTiming('web_vitals', 'LCP', lastEntry.renderTime || lastEntry.loadTime)
+        this.trackTiming('web_vitals', 'LCP', (lastEntry as any).renderTime || (lastEntry as any).loadTime)
       }).observe({ entryTypes: ['largest-contentful-paint'] })
 
       // First Input Delay (FID)
@@ -252,7 +252,7 @@ class Analytics {
         const entries = list.getEntries()
         entries.forEach(entry => {
           if (entry.name === 'first-input') {
-            this.trackTiming('web_vitals', 'FID', entry.processingStart - entry.startTime)
+            this.trackTiming('web_vitals', 'FID', (entry as any).processingStart - entry.startTime)
           }
         })
       }).observe({ entryTypes: ['first-input'] })
@@ -261,8 +261,8 @@ class Analytics {
       let clsValue = 0
       new PerformanceObserver((list) => {
         list.getEntries().forEach(entry => {
-          if (!entry.hadRecentInput) {
-            clsValue += entry.value
+          if (!(entry as any).hadRecentInput) {
+            clsValue += (entry as any).value
           }
         })
         this.trackTiming('web_vitals', 'CLS', clsValue * 1000) // Convert to milliseconds
