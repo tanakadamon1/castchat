@@ -26,7 +26,7 @@
 
     <div class="h-96 flex flex-col">
       <!-- メッセージリスト -->
-      <div class="flex-1 overflow-y-auto p-4 space-y-4">
+      <div ref="messagesContainer" class="flex-1 overflow-y-auto p-4 space-y-4">
         <div v-if="loading" class="flex justify-center">
           <LoadingSpinner size="sm" />
         </div>
@@ -59,14 +59,18 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted, watch } from 'vue'
+import { ref, onMounted, watch, onUnmounted, nextTick } from 'vue'
 import { User, MessageCircle } from 'lucide-vue-next'
 import { useAuthStore } from '@/stores/auth'
 import { useToast } from '@/composables/useToast'
+import { messageApi } from '@/lib/messageApi'
+import { supabase } from '@/lib/supabase'
+import { uploadMessageImage } from '@/lib/imageUpload'
 import BaseModal from '@/components/ui/BaseModal.vue'
 import LoadingSpinner from '@/components/ui/LoadingSpinner.vue'
 import MessageBubble from './MessageBubble.vue'
 import MessageInput from './MessageInput.vue'
+import type { RealtimePostgresChangesPayload } from '@supabase/supabase-js'
 
 interface Recipient {
   id: string
@@ -110,21 +114,29 @@ const messages = ref<Message[]>([])
 const newMessage = ref('')
 const loading = ref(false)
 const sending = ref(false)
+const realtimeSubscription = ref<any>(null)
+const messagesContainer = ref<HTMLElement>()
 
 const currentUserId = authStore.user?.id
 
 // メッセージ読み込み
 const loadMessages = async () => {
-  if (!props.recipient) return
+  if (!props.recipient || !currentUserId) return
 
   loading.value = true
   try {
-    // TODO: 実際のAPI呼び出しに置き換え
-    // const result = await messageApi.getConversation(props.recipient.id)
-    // messages.value = result.data || []
+    const result = await messageApi.getConversation(props.recipient.id)
+    if (result.error) {
+      throw new Error(result.error)
+    }
+    messages.value = result.data || []
     
-    // 暫定的にダミーデータ
-    messages.value = []
+    // 未読メッセージを既読にする
+    await markMessagesAsRead()
+    
+    // メッセージリストの一番下にスクロール
+    await nextTick()
+    scrollToBottom()
   } catch (error) {
     console.error('Failed to load messages:', error)
     toast.error('メッセージの読み込みに失敗しました')
@@ -133,32 +145,54 @@ const loadMessages = async () => {
   }
 }
 
+// 未読メッセージを既読にする
+const markMessagesAsRead = async () => {
+  if (!props.recipient || !currentUserId) return
+  
+  try {
+    await messageApi.markConversationAsRead(props.recipient.id)
+  } catch (error) {
+    console.error('Failed to mark messages as read:', error)
+  }
+}
+
+// メッセージリストの一番下にスクロール
+const scrollToBottom = () => {
+  if (messagesContainer.value) {
+    messagesContainer.value.scrollTop = messagesContainer.value.scrollHeight
+  }
+}
+
 // メッセージ送信
 const handleSendMessage = async () => {
-  if (!newMessage.value.trim() || !props.recipient) return
+  if (!newMessage.value.trim() || !props.recipient || !currentUserId) return
 
   sending.value = true
   try {
-    // TODO: 実際のAPI呼び出しに置き換え
-    // const result = await messageApi.sendMessage({
-    //   recipient_id: props.recipient.id,
-    //   content: newMessage.value,
-    //   message_type: 'text',
-    //   related_application_id: props.relatedApplication?.id
-    // })
-
-    // 暫定的にローカルに追加
-    const mockMessage: Message = {
-      id: Date.now().toString(),
+    const result = await messageApi.sendMessage({
+      recipientId: props.recipient.id,
       content: newMessage.value,
-      sender_id: currentUserId!,
-      recipient_id: props.recipient.id,
-      message_type: 'text',
-      created_at: new Date().toISOString()
+      messageType: 'text',
+      relatedApplicationId: props.relatedApplication?.id
+    })
+
+    if (result.error) {
+      throw new Error(result.error)
+    }
+
+    // メッセージをローカルリストに追加（リアルタイムで受信される場合は重複回避）
+    if (result.data) {
+      const existingMessage = messages.value.find(msg => msg.id === result.data!.id)
+      if (!existingMessage) {
+        messages.value.push(result.data)
+      }
     }
     
-    messages.value.push(mockMessage)
     newMessage.value = ''
+    
+    // 送信後にスクロール
+    await nextTick()
+    scrollToBottom()
     
     toast.success('メッセージを送信しました')
   } catch (error) {
@@ -171,27 +205,153 @@ const handleSendMessage = async () => {
 
 // ファイル選択
 const handleFileSelect = async (file: File) => {
-  if (!props.recipient) return
+  if (!props.recipient || !currentUserId) return
 
+  sending.value = true
   try {
-    // TODO: 画像アップロード実装
-    toast.info('画像送信機能は準備中です')
+    // 画像をアップロード
+    const uploadResult = await uploadMessageImage(file, currentUserId)
+    if (uploadResult.error) {
+      throw new Error(uploadResult.error)
+    }
+
+    if (uploadResult.data) {
+      // 画像メッセージを送信
+      const result = await messageApi.sendMessage({
+        recipientId: props.recipient.id,
+        content: uploadResult.data.url,
+        messageType: 'image',
+        relatedApplicationId: props.relatedApplication?.id
+      })
+
+      if (result.error) {
+        throw new Error(result.error)
+      }
+
+      // メッセージをローカルリストに追加
+      if (result.data) {
+        const existingMessage = messages.value.find(msg => msg.id === result.data!.id)
+        if (!existingMessage) {
+          messages.value.push(result.data)
+        }
+      }
+
+      // 送信後にスクロール
+      await nextTick()
+      scrollToBottom()
+
+      toast.success('画像を送信しました')
+    }
   } catch (error) {
     console.error('Failed to send image:', error)
     toast.error('画像の送信に失敗しました')
+  } finally {
+    sending.value = false
   }
 }
 
-// モーダル表示時にメッセージ読み込み
+// リアルタイムメッセージ購読設定
+const setupRealtimeSubscription = () => {
+  if (!props.recipient || !currentUserId) return
+
+  const channelName = `messages:${[currentUserId, props.recipient.id].sort().join('-')}`
+  
+  realtimeSubscription.value = supabase
+    .channel(channelName)
+    .on(
+      'postgres_changes',
+      {
+        event: 'INSERT',
+        schema: 'public',
+        table: 'messages',
+        filter: `or(and(sender_id.eq.${currentUserId},recipient_id.eq.${props.recipient.id}),and(sender_id.eq.${props.recipient.id},recipient_id.eq.${currentUserId}))`
+      },
+      (payload: RealtimePostgresChangesPayload<any>) => {
+        if (payload.new) {
+          const newMessage = payload.new as Message
+          
+          // 重複チェック
+          const existingMessage = messages.value.find(msg => msg.id === newMessage.id)
+          if (!existingMessage) {
+            messages.value.push(newMessage)
+            
+            // 新しいメッセージにスクロール
+            nextTick(() => {
+              scrollToBottom()
+            })
+            
+            // 受信したメッセージを既読にする（自分が送信者でない場合）
+            if (newMessage.sender_id !== currentUserId) {
+              markMessagesAsRead()
+              
+              // 通知表示
+              if ('Notification' in window && Notification.permission === 'granted') {
+                new Notification(`${props.recipient?.display_name}からメッセージ`, {
+                  body: newMessage.message_type === 'image' ? '画像が送信されました' : newMessage.content.substring(0, 50),
+                  icon: props.recipient?.avatar_url
+                })
+              }
+            }
+          }
+        }
+      }
+    )
+    .on(
+      'postgres_changes',
+      {
+        event: 'UPDATE',
+        schema: 'public',
+        table: 'messages',
+        filter: `or(and(sender_id.eq.${currentUserId},recipient_id.eq.${props.recipient.id}),and(sender_id.eq.${props.recipient.id},recipient_id.eq.${currentUserId}))`
+      },
+      (payload: RealtimePostgresChangesPayload<any>) => {
+        if (payload.new) {
+          const updatedMessage = payload.new as Message
+          const index = messages.value.findIndex(msg => msg.id === updatedMessage.id)
+          if (index !== -1) {
+            messages.value[index] = updatedMessage
+          }
+        }
+      }
+    )
+    .subscribe()
+}
+
+// リアルタイム購読解除
+const unsubscribeRealtime = () => {
+  if (realtimeSubscription.value) {
+    supabase.removeChannel(realtimeSubscription.value)
+    realtimeSubscription.value = null
+  }
+}
+
+// 通知権限をリクエスト
+const requestNotificationPermission = () => {
+  if ('Notification' in window && Notification.permission === 'default') {
+    Notification.requestPermission()
+  }
+}
+
+// モーダル表示時にメッセージ読み込みとリアルタイム開始
 watch(() => props.show, (show) => {
   if (show) {
     loadMessages()
+    setupRealtimeSubscription()
+    requestNotificationPermission()
+  } else {
+    unsubscribeRealtime()
   }
 })
 
 onMounted(() => {
   if (props.show) {
     loadMessages()
+    setupRealtimeSubscription()
+    requestNotificationPermission()
   }
+})
+
+onUnmounted(() => {
+  unsubscribeRealtime()
 })
 </script>

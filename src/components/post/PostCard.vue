@@ -1,15 +1,22 @@
 <template>
-  <div
-    class="bg-white rounded-lg shadow-sm border border-gray-200 hover:shadow-md transition-shadow duration-200 overflow-hidden"
+  <article
+    class="bg-white rounded-lg shadow-sm border border-gray-200 hover:shadow-md transition-shadow duration-200 overflow-hidden focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
+    :aria-label="`${post.title}の募集投稿`"
+    data-post-card
+    tabindex="0"
+    role="article"
+    @keydown="handleKeyDown"
   >
     <!-- Header -->
     <div class="p-4 pb-3">
       <div class="flex items-start justify-between mb-3">
         <div class="flex items-center space-x-3">
-          <img
+          <LazyImage
             :src="post.authorAvatar || '/default-avatar.png'"
             :alt="post.authorName"
-            class="w-10 h-10 rounded-full"
+            container-class="w-10 h-10 rounded-full"
+            image-class="w-10 h-10 rounded-full object-cover"
+            :eager="false"
           />
           <div>
             <p class="font-medium text-gray-900">{{ post.authorName }}</p>
@@ -34,6 +41,35 @@
       <p class="text-gray-600 text-sm mb-3 line-clamp-3">
         {{ post.description }}
       </p>
+      
+      <!-- 画像プレビュー -->
+      <div v-if="post.images && post.images.length > 0" class="mb-3">
+        <div class="grid gap-2" :class="imageGridClasses">
+          <div
+            v-for="(image, index) in displayImages"
+            :key="index"
+            class="relative group cursor-pointer overflow-hidden rounded-lg"
+            @click="$emit('view-image', image, index)"
+          >
+            <LazyImage
+              :src="image"
+              :alt="`投稿画像 ${index + 1}`"
+              container-class="w-full h-32"
+              image-class="w-full h-32 object-cover transition-transform duration-200 group-hover:scale-105"
+              :eager="index === 0"
+              :threshold="0.2"
+            />
+            
+            <!-- 残り画像数表示 -->
+            <div
+              v-if="index === 2 && post.images!.length > 3"
+              class="absolute inset-0 bg-black bg-opacity-50 flex items-center justify-center text-white font-semibold"
+            >
+              +{{ post.images!.length - 3 }}
+            </div>
+          </div>
+        </div>
+      </div>
     </div>
     
     <!-- Details -->
@@ -122,12 +158,13 @@
           size="sm"
           variant="outline"
           @click="$emit('view-details', post.id)"
+          :aria-label="`${post.title}の詳細を見る`"
         >
           詳細を見る
         </BaseButton>
       </div>
     </div>
-  </div>
+  </article>
 </template>
 
 <script setup lang="ts">
@@ -135,6 +172,7 @@ import { computed } from 'vue'
 import type { Post } from '@/types/post'
 import { categoryLabels, typeLabels, statusLabels } from '@/utils/mockData'
 import { BaseButton } from '@/components/ui'
+import LazyImage from '@/components/ui/LazyImage.vue'
 
 interface Props {
   post: Post
@@ -142,10 +180,32 @@ interface Props {
 
 interface Emits {
   (e: 'view-details', postId: string): void
+  (e: 'view-image', imageUrl: string, index: number): void
 }
 
 const props = defineProps<Props>()
-defineEmits<Emits>()
+const emit = defineEmits<Emits>()
+
+// キーボードイベント処理
+const handleKeyDown = (event: KeyboardEvent) => {
+  if (event.key === 'Enter' || event.key === ' ') {
+    event.preventDefault()
+    emit('view-details', props.post.id)
+  }
+}
+
+// 画像グリッドのレイアウト
+const imageGridClasses = computed(() => {
+  const imageCount = props.post.images?.length || 0
+  if (imageCount === 1) return 'grid-cols-1'
+  if (imageCount === 2) return 'grid-cols-2'
+  return 'grid-cols-3'
+})
+
+// 表示する画像（最大3枚）
+const displayImages = computed(() => {
+  return props.post.images?.slice(0, 3) || []
+})
 
 const statusBadgeClasses = computed(() => {
   const baseClasses = 'inline-flex items-center px-2 py-1 rounded-full text-xs font-medium'

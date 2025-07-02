@@ -1,5 +1,5 @@
 <template>
-  <footer class="bg-gray-50 border-t border-gray-200">
+  <footer class="bg-gray-50 dark:bg-gray-900 border-t border-gray-200 dark:border-gray-700 transition-colors duration-200">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
       <div class="grid grid-cols-1 md:grid-cols-4 gap-8">
         <!-- About -->
@@ -8,9 +8,9 @@
             <div class="w-8 h-8 bg-indigo-600 rounded-lg flex items-center justify-center">
               <span class="text-white font-bold text-sm">VR</span>
             </div>
-            <span class="text-xl font-bold text-gray-900">キャスト募集</span>
+            <span class="text-xl font-bold text-gray-900 dark:text-white transition-colors duration-200">キャスト募集</span>
           </div>
-          <p class="text-gray-600 text-sm mb-4">
+          <p class="text-gray-600 dark:text-gray-400 text-sm mb-4 transition-colors duration-200">
             VRChatでのキャスト募集・応募を簡単に。クリエイターとキャストをつなぐプラットフォームです。
           </p>
           <div class="flex space-x-4">

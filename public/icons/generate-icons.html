@@ -1,0 +1,332 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>CastChat PWA Icons Generator</title>
+  <style>
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      margin: 0;
+      padding: 20px;
+      background: #f5f5f5;
+    }
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+      background: white;
+      border-radius: 10px;
+      padding: 20px;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+    }
+    .icon-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 20px;
+      margin-top: 20px;
+    }
+    .icon-item {
+      text-align: center;
+      padding: 20px;
+      border: 1px solid #ddd;
+      border-radius: 8px;
+      background: #fafafa;
+    }
+    .icon-canvas {
+      border: 1px solid #ccc;
+      margin: 10px 0;
+      background: white;
+    }
+    .download-btn {
+      background: #3B82F6;
+      color: white;
+      border: none;
+      padding: 8px 16px;
+      border-radius: 4px;
+      cursor: pointer;
+      margin-top: 10px;
+    }
+    .download-btn:hover {
+      background: #1D4ED8;
+    }
+    .master-canvas {
+      border: 2px solid #3B82F6;
+      margin: 20px auto;
+      display: block;
+    }
+    h1 {
+      color: #3B82F6;
+      text-align: center;
+    }
+    .generate-all {
+      text-align: center;
+      margin: 20px 0;
+    }
+    .generate-all button {
+      background: #10B981;
+      color: white;
+      border: none;
+      padding: 15px 30px;
+      border-radius: 8px;
+      font-size: 16px;
+      cursor: pointer;
+    }
+    .generate-all button:hover {
+      background: #059669;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>🎨 CastChat PWA Icons Generator</h1>
+    
+    <!-- マスターアイコン -->
+    <div style="text-align: center;">
+      <h2>Master Icon (512x512)</h2>
+      <canvas id="masterCanvas" class="master-canvas" width="512" height="512"></canvas>
+      <div class="generate-all">
+        <button onclick="generateAllIcons()">🚀 全アイコンを生成</button>
+      </div>
+    </div>
+
+    <!-- アイコン一覧 -->
+    <div class="icon-grid">
+      <!-- PWA Required Icons -->
+      <div class="icon-item">
+        <h3>icon-72x72.png</h3>
+        <canvas id="icon72" class="icon-canvas" width="72" height="72"></canvas>
+        <button class="download-btn" onclick="downloadIcon('icon72', 'icon-72x72.png')">Download</button>
+      </div>
+      
+      <div class="icon-item">
+        <h3>icon-96x96.png</h3>
+        <canvas id="icon96" class="icon-canvas" width="96" height="96"></canvas>
+        <button class="download-btn" onclick="downloadIcon('icon96', 'icon-96x96.png')">Download</button>
+      </div>
+      
+      <div class="icon-item">
+        <h3>icon-128x128.png</h3>
+        <canvas id="icon128" class="icon-canvas" width="128" height="128"></canvas>
+        <button class="download-btn" onclick="downloadIcon('icon128', 'icon-128x128.png')">Download</button>
+      </div>
+      
+      <div class="icon-item">
+        <h3>icon-144x144.png</h3>
+        <canvas id="icon144" class="icon-canvas" width="144" height="144"></canvas>
+        <button class="download-btn" onclick="downloadIcon('icon144', 'icon-144x144.png')">Download</button>
+      </div>
+      
+      <div class="icon-item">
+        <h3>icon-152x152.png</h3>
+        <canvas id="icon152" class="icon-canvas" width="152" height="152"></canvas>
+        <button class="download-btn" onclick="downloadIcon('icon152', 'icon-152x152.png')">Download</button>
+      </div>
+      
+      <div class="icon-item">
+        <h3>icon-192x192.png</h3>
+        <canvas id="icon192" class="icon-canvas" width="192" height="192"></canvas>
+        <button class="download-btn" onclick="downloadIcon('icon192', 'icon-192x192.png')">Download</button>
+      </div>
+      
+      <div class="icon-item">
+        <h3>icon-384x384.png</h3>
+        <canvas id="icon384" class="icon-canvas" width="384" height="384"></canvas>
+        <button class="download-btn" onclick="downloadIcon('icon384', 'icon-384x384.png')">Download</button>
+      </div>
+      
+      <div class="icon-item">
+        <h3>icon-512x512.png</h3>
+        <canvas id="icon512" class="icon-canvas" width="512" height="512"></canvas>
+        <button class="download-btn" onclick="downloadIcon('icon512', 'icon-512x512.png')">Download</button>
+      </div>
+      
+      <!-- Apple Touch Icon -->
+      <div class="icon-item">
+        <h3>apple-touch-icon.png (180x180)</h3>
+        <canvas id="appleIcon" class="icon-canvas" width="180" height="180"></canvas>
+        <button class="download-btn" onclick="downloadIcon('appleIcon', 'apple-touch-icon.png')">Download</button>
+      </div>
+      
+      <!-- Favicon Icons -->
+      <div class="icon-item">
+        <h3>favicon-16x16.png</h3>
+        <canvas id="favicon16" class="icon-canvas" width="16" height="16"></canvas>
+        <button class="download-btn" onclick="downloadIcon('favicon16', 'favicon-16x16.png')">Download</button>
+      </div>
+      
+      <div class="icon-item">
+        <h3>favicon-32x32.png</h3>
+        <canvas id="favicon32" class="icon-canvas" width="32" height="32"></canvas>
+        <button class="download-btn" onclick="downloadIcon('favicon32', 'favicon-32x32.png')">Download</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // CastChat Logo Drawing Function
+    function drawCastChatLogo(ctx, size) {
+      const scale = size / 512;
+      ctx.save();
+      ctx.scale(scale, scale);
+      
+      // Background gradient
+      const gradient = ctx.createLinearGradient(0, 0, 512, 512);
+      gradient.addColorStop(0, '#3B82F6');
+      gradient.addColorStop(1, '#1D4ED8');
+      
+      ctx.fillStyle = gradient;
+      ctx.fillRect(0, 0, 512, 512);
+      
+      // VR Headset Body
+      ctx.fillStyle = 'white';
+      ctx.beginPath();
+      ctx.roundRect(128, 180, 256, 120, 40);
+      ctx.fill();
+      
+      // Left Lens
+      ctx.fillStyle = '#1E40AF';
+      ctx.beginPath();
+      ctx.arc(190, 240, 35, 0, 2 * Math.PI);
+      ctx.fill();
+      
+      ctx.fillStyle = '#60A5FA';
+      ctx.beginPath();
+      ctx.arc(190, 240, 20, 0, 2 * Math.PI);
+      ctx.fill();
+      
+      // Right Lens
+      ctx.fillStyle = '#1E40AF';
+      ctx.beginPath();
+      ctx.arc(322, 240, 35, 0, 2 * Math.PI);
+      ctx.fill();
+      
+      ctx.fillStyle = '#60A5FA';
+      ctx.beginPath();
+      ctx.arc(322, 240, 20, 0, 2 * Math.PI);
+      ctx.fill();
+      
+      // Head Strap (left)
+      ctx.strokeStyle = 'white';
+      ctx.lineWidth = 12;
+      ctx.beginPath();
+      ctx.arc(256, 240, 128, Math.PI * 0.7, Math.PI * 1.3);
+      ctx.stroke();
+      
+      // Head Strap (right)
+      ctx.beginPath();
+      ctx.arc(256, 240, 128, Math.PI * 1.7, Math.PI * 0.3);
+      ctx.stroke();
+      
+      // Chat Bubble
+      ctx.fillStyle = '#A855F7';
+      ctx.beginPath();
+      ctx.arc(380, 160, 40, 0, 2 * Math.PI);
+      ctx.fill();
+      
+      // Chat Bubble Tail
+      ctx.beginPath();
+      ctx.moveTo(350, 180);
+      ctx.lineTo(360, 190);
+      ctx.lineTo(340, 200);
+      ctx.closePath();
+      ctx.fill();
+      
+      // Heart in Chat Bubble
+      ctx.fillStyle = 'white';
+      ctx.font = `${24 * scale}px Arial`;
+      ctx.textAlign = 'center';
+      ctx.fillText('💬', 380, 170);
+      
+      // Sound Waves
+      ctx.strokeStyle = '#60A5FA';
+      ctx.lineWidth = 3;
+      ctx.globalAlpha = 0.6;
+      
+      ctx.beginPath();
+      ctx.arc(256, 240, 100, -0.3, 0.3);
+      ctx.stroke();
+      
+      ctx.lineWidth = 2;
+      ctx.globalAlpha = 0.4;
+      ctx.beginPath();
+      ctx.arc(256, 240, 120, -0.2, 0.2);
+      ctx.stroke();
+      
+      ctx.restore();
+    }
+    
+    // Initialize master canvas
+    function initMasterCanvas() {
+      const canvas = document.getElementById('masterCanvas');
+      const ctx = canvas.getContext('2d');
+      drawCastChatLogo(ctx, 512);
+    }
+    
+    // Generate specific size icon
+    function generateIcon(canvasId, size) {
+      const canvas = document.getElementById(canvasId);
+      const ctx = canvas.getContext('2d');
+      
+      // Clear canvas
+      ctx.clearRect(0, 0, size, size);
+      
+      // Draw logo at specific size
+      drawCastChatLogo(ctx, size);
+    }
+    
+    // Generate all icons
+    function generateAllIcons() {
+      const sizes = [
+        { id: 'icon72', size: 72 },
+        { id: 'icon96', size: 96 },
+        { id: 'icon128', size: 128 },
+        { id: 'icon144', size: 144 },
+        { id: 'icon152', size: 152 },
+        { id: 'icon192', size: 192 },
+        { id: 'icon384', size: 384 },
+        { id: 'icon512', size: 512 },
+        { id: 'appleIcon', size: 180 },
+        { id: 'favicon16', size: 16 },
+        { id: 'favicon32', size: 32 }
+      ];
+      
+      sizes.forEach(({ id, size }) => {
+        generateIcon(id, size);
+      });
+      
+      alert('🎉 全てのアイコンが生成されました！各アイコンのDownloadボタンから保存してください。');
+    }
+    
+    // Download specific icon
+    function downloadIcon(canvasId, filename) {
+      const canvas = document.getElementById(canvasId);
+      const link = document.createElement('a');
+      link.download = filename;
+      link.href = canvas.toDataURL('image/png');
+      link.click();
+    }
+    
+    // Add roundRect polyfill for older browsers
+    if (!CanvasRenderingContext2D.prototype.roundRect) {
+      CanvasRenderingContext2D.prototype.roundRect = function(x, y, width, height, radius) {
+        this.beginPath();
+        this.moveTo(x + radius, y);
+        this.lineTo(x + width - radius, y);
+        this.quadraticCurveTo(x + width, y, x + width, y + radius);
+        this.lineTo(x + width, y + height - radius);
+        this.quadraticCurveTo(x + width, y + height, x + width - radius, y + height);
+        this.lineTo(x + radius, y + height);
+        this.quadraticCurveTo(x, y + height, x, y + height - radius);
+        this.lineTo(x, y + radius);
+        this.quadraticCurveTo(x, y, x + radius, y);
+        this.closePath();
+      };
+    }
+    
+    // Initialize on load
+    window.onload = function() {
+      initMasterCanvas();
+    };
+  </script>
+</body>
+</html>

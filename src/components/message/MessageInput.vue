@@ -5,9 +5,10 @@
       type="button"
       @click="fileInput?.click()"
       class="flex-shrink-0 p-2 text-gray-400 hover:text-gray-600 focus:outline-none focus:ring-2 focus:ring-indigo-500 rounded-md"
-      :disabled="loading"
+      :disabled="loading || uploadingFile"
     >
-      <ImageIcon class="w-5 h-5" />
+      <LoadingSpinner v-if="uploadingFile" size="sm" />
+      <ImageIcon v-else class="w-5 h-5" />
     </button>
     
     <input
@@ -59,6 +60,8 @@
 <script setup lang="ts">
 import { ref, computed, watch, nextTick } from 'vue'
 import { ImageIcon } from 'lucide-vue-next'
+import { uploadMessageImage } from '@/lib/imageUpload'
+import { useAuthStore } from '@/stores/auth'
 import LoadingSpinner from '@/components/ui/LoadingSpinner.vue'
 
 interface Props {
@@ -80,8 +83,10 @@ const props = withDefaults(defineProps<Props>(), {
 
 const emit = defineEmits<Emits>()
 
+const authStore = useAuthStore()
 const fileInput = ref<HTMLInputElement>()
 const textareaHeight = ref('auto')
+const uploadingFile = ref(false)
 
 const message = computed({
   get: () => props.modelValue,
@@ -127,25 +132,49 @@ const handleSend = () => {
 }
 
 // ファイル選択処理
-const handleFileChange = (event: Event) => {
+const handleFileChange = async (event: Event) => {
   const target = event.target as HTMLInputElement
   const file = target.files?.[0]
   
-  if (file) {
-    // ファイルサイズチェック (5MB)
-    if (file.size > 5 * 1024 * 1024) {
-      alert('ファイルサイズが5MBを超えています')
+  if (!file) return
+  
+  if (!authStore.user?.id) {
+    alert('ログインが必要です')
+    return
+  }
+  
+  // ファイルサイズチェック (5MB)
+  if (file.size > 5 * 1024 * 1024) {
+    alert('ファイルサイズが5MBを超えています')
+    return
+  }
+  
+  // 画像ファイルかチェック
+  if (!file.type.startsWith('image/')) {
+    alert('画像ファイルのみアップロード可能です')
+    return
+  }
+  
+  uploadingFile.value = true
+  
+  try {
+    const result = await uploadMessageImage(file, authStore.user.id)
+    
+    if (result.error) {
+      alert(result.error)
       return
     }
     
-    // 画像ファイルかチェック
-    if (!file.type.startsWith('image/')) {
-      alert('画像ファイルのみアップロード可能です')
-      return
+    if (result.data) {
+      emit('fileSelect', file)
+      // 画像URLをメッセージに挿入（オプション）
+      // message.value += `\n![画像](${result.data.url})`
     }
-    
-    emit('fileSelect', file)
-    
+  } catch (err) {
+    console.error('Image upload error:', err)
+    alert('画像のアップロードに失敗しました')
+  } finally {
+    uploadingFile.value = false
     // inputをリセット
     target.value = ''
   }

@@ -3,7 +3,7 @@ import { messagesService } from './messages'
 import { useAuthStore } from '@/stores/auth'
 import type { Tables } from './database.types'
 
-export type Message = Tables<'messages'>
+export type Message = Tables<'messages'>['Row']
 
 export interface MessageData {
   recipientId: string
@@ -217,6 +217,48 @@ class MessageApi {
         data: [],
         error: '会話一覧の取得に失敗しました',
         total: 0
+      }
+    }
+  }
+
+  /**
+   * メッセージを送信
+   */
+  async sendMessage(messageData: MessageData): Promise<MessageResponse> {
+    try {
+      const { id: userId, profile } = this.getCurrentUser()
+      
+      if (!userId) {
+        return {
+          data: null,
+          error: 'ログインが必要です'
+        }
+      }
+
+      const result = await messagesService.createMessage(userId, {
+        recipient_id: messageData.recipientId,
+        content: messageData.content,
+        message_type: messageData.messageType,
+        related_application_id: messageData.relatedApplicationId || null
+      }, profile || undefined)
+
+      if (result.error) {
+        return {
+          data: null,
+          error: result.error.message
+        }
+      }
+
+      return {
+        data: result.data,
+        error: null
+      }
+
+    } catch (error) {
+      console.error('Send message error:', error)
+      return {
+        data: null,
+        error: 'メッセージの送信に失敗しました'
       }
     }
   }

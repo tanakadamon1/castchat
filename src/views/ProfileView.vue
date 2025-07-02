@@ -37,10 +37,20 @@
               v-if="isEditing"
               size="sm"
               variant="outline"
-              @click="handleAvatarUpload"
+              @click="triggerFileUpload"
+              :disabled="uploadingAvatar"
             >
-              画像を変更
+              {{ uploadingAvatar ? 'アップロード中...' : '画像を変更' }}
             </BaseButton>
+            
+            <!-- ファイル入力（非表示） -->
+            <input
+              ref="fileInput"
+              type="file"
+              accept="image/*"
+              @change="handleAvatarUpload"
+              class="hidden"
+            />
           </div>
 
           <!-- 基本情報 -->
@@ -244,6 +254,7 @@ import { useRouter } from 'vue-router'
 import { useAuthStore } from '@/stores/auth'
 import { useToast } from '@/composables/useToast'
 import { useValidation, commonRules } from '@/utils/validation'
+import { uploadProfileImage } from '@/lib/imageUpload'
 import { User } from 'lucide-vue-next'
 import BaseInput from '@/components/ui/BaseInput.vue'
 import BaseTextarea from '@/components/ui/BaseTextarea.vue'
@@ -258,6 +269,10 @@ const { validate: validateField, getFieldError, hasErrors } = useValidation()
 // 編集モード
 const isEditing = ref(false)
 const saving = ref(false)
+const uploadingAvatar = ref(false)
+
+// ファイル入力参照
+const fileInput = ref<HTMLInputElement>()
 
 // プロフィールデータ（モック）
 const profileData = ref({
@@ -352,9 +367,46 @@ const formatDate = (dateString: string) => {
 }
 
 // イベントハンドラー
-const handleAvatarUpload = () => {
-  // TODO: 画像アップロード機能実装
-  info('画像アップロード機能は準備中です')
+const triggerFileUpload = () => {
+  fileInput.value?.click()
+}
+
+const handleAvatarUpload = async (event: Event) => {
+  const target = event.target as HTMLInputElement
+  const file = target.files?.[0]
+  
+  if (!file) return
+  
+  if (!authStore.user?.id) {
+    error('ユーザー情報が見つかりません')
+    return
+  }
+  
+  uploadingAvatar.value = true
+  
+  try {
+    const result = await uploadProfileImage(file, authStore.user.id)
+    
+    if (result.error) {
+      error(result.error)
+      return
+    }
+    
+    if (result.data) {
+      // プロフィール画像URLを更新
+      profileData.value.avatarUrl = result.data.url
+      success('プロフィール画像をアップロードしました')
+    }
+  } catch (err) {
+    console.error('Avatar upload error:', err)
+    error('画像のアップロードに失敗しました')
+  } finally {
+    uploadingAvatar.value = false
+    // ファイル入力をリセット
+    if (target) {
+      target.value = ''
+    }
+  }
 }
 
 const handleSave = async () => {

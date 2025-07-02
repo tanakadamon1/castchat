@@ -4,9 +4,9 @@ import { errorHandler, ErrorCode, type AppError } from './errors'
 import { permissionManager } from './permissions'
 import type { Tables, TablesInsert, TablesUpdate } from './database.types'
 
-export type Message = Tables<'messages'>
-export type MessageInsert = TablesInsert<'messages'>
-export type MessageUpdate = TablesUpdate<'messages'>
+export type Message = Tables<'messages'>['Row']
+export type MessageInsert = Tables<'messages'>['Insert']
+export type MessageUpdate = Tables<'messages'>['Update']
 
 export interface MessageWithDetails extends Message {
   sender?: {
@@ -103,7 +103,7 @@ export class MessagesService {
         return {
           data: null,
           error: errorHandler.createError(
-            ErrorCode.VALIDATION_INVALID_INPUT,
+            ErrorCode.VALIDATION_INVALID_FORMAT,
             'Cannot send message to yourself',
             'Sender and recipient cannot be the same'
           )

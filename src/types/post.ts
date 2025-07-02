@@ -20,6 +20,7 @@ export interface Post {
   applicationsCount: number
   viewsCount: number
   tags: string[]
+  images?: string[]
   // Legacy fields for compatibility
   startDate?: string
   endDate?: string

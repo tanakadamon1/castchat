@@ -74,9 +74,62 @@ export default defineConfig(({ mode }) => {
       sourcemap: mode === 'development',
       rollupOptions: {
         output: {
-          manualChunks: {
-            'vue-vendor': ['vue', 'vue-router', 'pinia'],
+          manualChunks: (id) => {
+            // Vue関連のvendorチャンク
+            if (id.includes('node_modules/vue') || 
+                id.includes('node_modules/vue-router') || 
+                id.includes('node_modules/pinia')) {
+              return 'vue-vendor'
+            }
+            
+            // UI関連のチャンク
+            if (id.includes('node_modules/lucide-vue-next') ||
+                id.includes('node_modules/@heroicons')) {
+              return 'ui-vendor'
+            }
+            
+            // Supabase関連のチャンク
+            if (id.includes('node_modules/@supabase')) {
+              return 'supabase-vendor'
+            }
+            
+            // その他のvendor
+            if (id.includes('node_modules')) {
+              return 'vendor'
+            }
+            
+            // コンポーネント別チャンク
+            if (id.includes('/src/components/ui/')) {
+              return 'ui-components'
+            }
+            
+            if (id.includes('/src/components/message/')) {
+              return 'message-components'
+            }
+            
+            if (id.includes('/src/components/post/')) {
+              return 'post-components'
+            }
+          },
+          chunkFileNames: (chunkInfo) => {
+            const facadeModuleId = chunkInfo.facadeModuleId
+            if (facadeModuleId && facadeModuleId.includes('src/views/')) {
+              // ビューファイルに基づいた命名
+              const name = facadeModuleId.split('/').pop()?.replace('.vue', '') || 'view'
+              return `js/${name}-[hash].js`
+            }
+            return 'js/[name]-[hash].js'
           }
+        },
+        external: id => id.includes('workbox-')
+      },
+      // 圧縮オプション
+      minify: 'terser',
+      terserOptions: {
+        compress: {
+          drop_console: mode === 'production',
+          drop_debugger: mode === 'production',
+          pure_funcs: mode === 'production' ? ['console.log', 'console.info'] : []
         }
       }
     },

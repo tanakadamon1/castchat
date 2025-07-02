@@ -78,12 +78,19 @@
         </div>
         
         <!-- Posts List -->
-        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <div 
+          ref="postsContainerRef"
+          class="grid grid-cols-1 lg:grid-cols-2 gap-6"
+          role="region"
+          aria-label="募集投稿一覧"
+          aria-live="polite"
+        >
           <PostCard
             v-for="post in posts"
             :key="post.id"
             :post="post"
             @view-details="goToPostDetail"
+            @view-image="handleViewImage"
           />
         </div>
         
@@ -102,11 +109,19 @@
         </div>
       </div>
     </div>
+    
+    <!-- 画像ビューア -->
+    <ImageViewer
+      :show="showImageViewer"
+      :images="selectedImages"
+      :initial-index="selectedImageIndex"
+      @close="closeImageViewer"
+    />
   </div>
 </template>
 
 <script setup lang="ts">
-import { ref, reactive, onMounted, computed } from 'vue'
+import { ref, reactive, onMounted, computed, shallowRef } from 'vue'
 import { useRouter } from 'vue-router'
 import type { Post, PostFilter } from '@/types/post'
 import PostCard from '@/components/post/PostCard.vue'
@@ -119,12 +134,27 @@ import {
   EmptyState,
   toast
 } from '@/components/ui'
+import ImageViewer from '@/components/ui/ImageViewer.vue'
 import { postsApi } from '@/lib/postsApi'
+import { useMemoizedComputed, useListMemoization } from '@/composables/useMemoizedComputed'
+import { usePerformanceMonitor } from '@/utils/performanceMonitor'
+import { useKeyboardNavigation } from '@/composables/useKeyboardNavigation'
+import { useScreenReader } from '@/composables/useScreenReader'
 
 const router = useRouter()
+const { measureAsync } = usePerformanceMonitor()
 
-// State
-const posts = ref<Post[]>([])
+// アクセシビリティ
+const postsContainerRef = ref<HTMLElement>()
+const { announcePageLoad, announceListInfo, announceLoading, announceLoadComplete } = useScreenReader()
+useKeyboardNavigation(postsContainerRef, {
+  loop: true,
+  autoFocus: false,
+  focusableSelector: '[data-post-card], button, [href]'
+})
+
+// State - パフォーマンス最適化のためshallowRefを使用
+const posts = shallowRef<Post[]>([])
 const loading = ref(false)
 const error = ref<string | null>(null)
 const total = ref(0)
@@ -135,25 +165,41 @@ const filters = ref<PostFilter>({
   sortBy: 'newest'
 })
 
-// Computed
-const totalPages = computed(() => Math.ceil(total.value / perPage.value))
+// 画像ビューア関連
+const showImageViewer = ref(false)
+const selectedImages = ref<string[]>([])
+const selectedImageIndex = ref(0)
+
+// Computed - メモ化を使用してパフォーマンス向上
+const totalPages = useMemoizedComputed(
+  () => Math.ceil(total.value / perPage.value),
+  () => [total.value, perPage.value]
+)
+
+// リストメモ化によるレンダリング最適化
+const { itemsMap: postsMap, hasChanged: hasPostChanged } = useListMemoization(
+  computed(() => posts.value)
+)
 
 // Methods
 const loadPosts = async (showLoading = true) => {
   if (showLoading) {
     loading.value = true
+    announceLoading('募集情報')
   }
   error.value = null
   
   try {
-    // 実際のAPIコール
-    const result = await postsApi.getPosts({
-      category: filters.value.category,
-      search: filters.value.search,
-      type: filters.value.type,
-      status: filters.value.status || 'active',
-      limit: perPage.value,
-      offset: (currentPage.value - 1) * perPage.value
+    // パフォーマンス測定付きAPIコール
+    const result = await measureAsync('load-posts', async () => {
+      return await postsApi.getPosts({
+        category: filters.value.category,
+        search: filters.value.search,
+        type: filters.value.type,
+        status: filters.value.status || 'active',
+        limit: perPage.value,
+        offset: (currentPage.value - 1) * perPage.value
+      })
     })
     
     if (result.error) {
@@ -165,6 +211,10 @@ const loadPosts = async (showLoading = true) => {
     
     posts.value = result.data || []
     total.value = result.total
+    
+    // スクリーンリーダーに結果を通知
+    announceLoadComplete('募集情報の読み込み', result.total)
+    announceListInfo(result.total, '募集投稿')
     
   } catch (err) {
     error.value = 'データの読み込みに失敗しました'
@@ -200,8 +250,25 @@ const goToCreatePost = () => {
   router.push('/posts/create')
 }
 
+// 画像ビューア関連のハンドラー
+const handleViewImage = (imageUrl: string, index: number) => {
+  const post = posts.value.find(p => p.images?.includes(imageUrl))
+  if (post?.images) {
+    selectedImages.value = post.images
+    selectedImageIndex.value = index
+    showImageViewer.value = true
+  }
+}
+
+const closeImageViewer = () => {
+  showImageViewer.value = false
+  selectedImages.value = []
+  selectedImageIndex.value = 0
+}
+
 // Lifecycle
 onMounted(() => {
   loadPosts()
+  announcePageLoad('募集一覧', 'VRChatでのキャスト募集・応募情報を閲覧できます')
 })
 </script>

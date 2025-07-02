@@ -223,15 +223,16 @@
                 </svg>
                 
                 <p class="text-gray-600 mb-2">画像をドラッグ&ドロップまたはクリックしてアップロード</p>
-                <p class="text-sm text-gray-500">PNG, JPG, GIF形式をサポート（最大5MB）</p>
+                <p class="text-sm text-gray-500">PNG, JPG, GIF形式をサポート（最大3枚、各5MB）</p>
                 
                 <BaseButton
                   type="button"
                   variant="outline"
                   @click="fileInput?.click()"
+                  :disabled="uploadingImages"
                   class="mt-4"
                 >
-                  ファイルを選択
+                  {{ uploadingImages ? 'アップロード中...' : 'ファイルを選択' }}
                 </BaseButton>
               </div>
               
@@ -317,6 +318,7 @@ import { useAuthStore } from '@/stores/auth'
 import { useToast } from '@/composables/useToast'
 import { useValidation, commonRules } from '@/utils/validation'
 import { postsApi } from '@/lib/postsApi'
+import { uploadPostImage } from '@/lib/imageUpload'
 import BaseInput from '@/components/ui/BaseInput.vue'
 import BaseTextarea from '@/components/ui/BaseTextarea.vue'
 import BaseSelect from '@/components/ui/BaseSelect.vue'
@@ -352,9 +354,10 @@ const formData = ref({
 })
 
 // 画像アップロード関連
-const selectedImages = ref<Array<{ file: File; preview: string }>>([])
+const selectedImages = ref<Array<{ file: File; preview: string; uploaded?: { url: string; path: string } }>>([])
 const dragOver = ref(false)
 const fileInput = ref<HTMLInputElement>()
+const uploadingImages = ref(false)
 
 // ローディング状態
 const submitting = ref(false)
@@ -551,7 +554,16 @@ const handleDrop = (event: DragEvent) => {
 }
 
 const addFiles = (files: File[]) => {
-  files.forEach(file => {
+  // 3枚までの制限
+  const remainingSlots = 3 - selectedImages.value.length
+  if (remainingSlots <= 0) {
+    showToast.error('画像は最大3枚まで追加できます')
+    return
+  }
+  
+  const filesToAdd = files.slice(0, remainingSlots)
+  
+  filesToAdd.forEach(file => {
     // ファイルサイズチェック (5MB)
     if (file.size > 5 * 1024 * 1024) {
       showToast.error(`${file.name} のファイルサイズが5MBを超えています`)
@@ -576,6 +588,10 @@ const addFiles = (files: File[]) => {
     }
     reader.readAsDataURL(file)
   })
+  
+  if (files.length > remainingSlots) {
+    showToast.info(`${remainingSlots}枚のみ追加されました（最大3枚まで）`)
+  }
 }
 
 const removeImage = (index: number) => {
@@ -652,8 +668,51 @@ const handleCancel = () => {
   }
 }
 
+// 画像アップロード処理
+const uploadImages = async (postId?: string) => {
+  if (selectedImages.value.length === 0) {
+    return []
+  }
+  
+  if (!authStore.user?.id) {
+    throw new Error('ユーザー情報が見つかりません')
+  }
+  
+  uploadingImages.value = true
+  const uploadedUrls = []
+  
+  try {
+    for (const imageData of selectedImages.value) {
+      if (imageData.uploaded) {
+        // 既にアップロード済み
+        uploadedUrls.push(imageData.uploaded.url)
+        continue
+      }
+      
+      const result = await uploadPostImage(imageData.file, authStore.user.id, postId)
+      
+      if (result.error) {
+        throw new Error(result.error)
+      }
+      
+      if (result.data) {
+        uploadedUrls.push(result.data.url)
+        // アップロード情報をキャッシュ
+        imageData.uploaded = result.data
+      }
+    }
+    
+    return uploadedUrls
+  } finally {
+    uploadingImages.value = false
+  }
+}
+
 // API呼び出し関数
 const submitPost = async () => {
+  // まず画像をアップロード
+  const imageUrls = await uploadImages()
+  
   const postData: Partial<Post> = {
     title: formData.value.title,
     category: formData.value.category as PostCategory,
@@ -668,7 +727,7 @@ const submitPost = async () => {
     contactMethod: formData.value.contactMethod as ContactMethod,
     contactValue: formData.value.contactInfo,
     tags: [],
-    // images: selectedImages.value.map(img => img.preview) // 画像は後で実装
+    images: imageUrls
   }
 
   if (isEditing.value) {
