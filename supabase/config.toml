@@ -38,8 +38,8 @@ additional_redirect_urls = ["https://castchat.jp", "https://staging.castchat.jp"
 
 [auth.external.google]
 enabled = true
-client_id = "env(GOOGLE_CLIENT_ID)"
-secret = "env(GOOGLE_CLIENT_SECRET)"
+client_id = "244502393612-t7fvuqf9rg2kssse5b1i5qvaqha605fs.apps.googleusercontent.com"
+secret = "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"
 redirect_uri = "http://localhost:54321/auth/v1/callback"
 
 [auth.email]
