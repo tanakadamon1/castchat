@@ -1,0 +1,81 @@
+<template>
+  <div class="min-h-screen flex items-center justify-center bg-gray-50">
+    <div class="max-w-md w-full space-y-8">
+      <div class="text-center">
+        <div v-if="loading" class="space-y-4">
+          <div class="inline-block animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
+          <h2 class="text-2xl font-bold text-gray-900">認証中...</h2>
+          <p class="text-gray-600">Googleアカウントで認証しています</p>
+        </div>
+        
+        <div v-else-if="error" class="space-y-4">
+          <div class="text-red-500">
+            <svg class="mx-auto h-12 w-12" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.732-.833-2.5 0L4.268 19.5c-.77.833.192 2.5 1.732 2.5z"></path>
+            </svg>
+          </div>
+          <h2 class="text-2xl font-bold text-gray-900">認証エラー</h2>
+          <p class="text-gray-600">{{ error }}</p>
+          <button
+            @click="retryAuth"
+            class="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+          >
+            再試行
+          </button>
+        </div>
+
+        <div v-else class="space-y-4">
+          <div class="text-green-500">
+            <svg class="mx-auto h-12 w-12" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+            </svg>
+          </div>
+          <h2 class="text-2xl font-bold text-gray-900">認証完了</h2>
+          <p class="text-gray-600">ホーム画面にリダイレクトしています...</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</template>
+
+<script setup lang="ts">
+import { ref, onMounted } from 'vue'
+import { useRouter } from 'vue-router'
+import { useAuthStore } from '@/stores/auth'
+
+const router = useRouter()
+const authStore = useAuthStore()
+
+const loading = ref(true)
+const error = ref<string | null>(null)
+
+const handleAuthCallback = async () => {
+  try {
+    loading.value = true
+    error.value = null
+
+    await authStore.initialize()
+    
+    if (authStore.isAuthenticated) {
+      setTimeout(() => {
+        router.push('/')
+      }, 1500)
+    } else {
+      throw new Error('認証に失敗しました')
+    }
+  } catch (err) {
+    console.error('Auth callback error:', err)
+    error.value = err instanceof Error ? err.message : '認証処理でエラーが発生しました'
+  } finally {
+    loading.value = false
+  }
+}
+
+const retryAuth = () => {
+  router.push('/login')
+}
+
+onMounted(() => {
+  handleAuthCallback()
+})
+</script>
