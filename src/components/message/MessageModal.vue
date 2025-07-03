@@ -59,7 +59,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted, watch, onUnmounted, nextTick } from 'vue'
+import { ref, computed, onMounted, watch, onUnmounted, nextTick } from 'vue'
 import { User, MessageCircle } from 'lucide-vue-next'
 import { useAuthStore } from '@/stores/auth'
 import { useToast } from '@/composables/useToast'
@@ -115,11 +115,11 @@ const sending = ref(false)
 const realtimeSubscription = ref<any>(null)
 const messagesContainer = ref<HTMLElement>()
 
-const currentUserId = authStore.user?.id
+const currentUserId = computed(() => authStore.user?.id || '')
 
 // メッセージ読み込み
 const loadMessages = async () => {
-  if (!props.recipient || !currentUserId) return
+  if (!props.recipient || !currentUserId.value) return
 
   loading.value = true
   try {
@@ -145,7 +145,7 @@ const loadMessages = async () => {
 
 // 未読メッセージを既読にする
 const markMessagesAsRead = async () => {
-  if (!props.recipient || !currentUserId) return
+  if (!props.recipient || !currentUserId.value) return
   
   try {
     await messageApi.markConversationAsRead(props.recipient.id)
@@ -203,7 +203,7 @@ const handleSendMessage = async () => {
 
 // ファイル選択
 const handleFileSelect = async (file: File) => {
-  if (!props.recipient || !currentUserId) return
+  if (!props.recipient || !currentUserId.value) return
 
   sending.value = true
   try {
@@ -250,7 +250,7 @@ const handleFileSelect = async (file: File) => {
 
 // リアルタイムメッセージ購読設定
 const setupRealtimeSubscription = () => {
-  if (!props.recipient || !currentUserId) return
+  if (!props.recipient || !currentUserId.value) return
 
   const channelName = `messages:${[currentUserId, props.recipient.id].sort().join('-')}`
   

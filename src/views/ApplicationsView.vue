@@ -176,6 +176,7 @@
 
     <!-- メッセージモーダル -->
     <MessageModal
+      v-if="selectedRecipient"
       :show="showMessageModal"
       :recipient="selectedRecipient"
       @close="showMessageModal = false"
