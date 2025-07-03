@@ -27,9 +27,9 @@
           </div>
           
           <div class="user-details">
-            <h3 class="user-name">{{ recipient.name }}</h3>
+            <h3 class="user-name">{{ recipient?.name || 'ユーザー' }}</h3>
             <span class="user-status">
-              {{ recipient.isOnline ? 'オンライン' : `最終ログイン: ${formatLastSeen(recipient.lastSeen)}` }}
+              {{ recipient?.isOnline ? 'オンライン' : `最終ログイン: ${formatLastSeen(recipient?.lastSeen)}` }}
             </span>
           </div>
         </div>
@@ -304,16 +304,22 @@ const formatTime = (timestamp: string): string => {
 const formatLastSeen = (lastSeen?: string): string => {
   if (!lastSeen) return '不明'
   
-  const date = new Date(lastSeen)
-  const now = new Date()
-  const diffMs = now.getTime() - date.getTime()
-  const diffMinutes = Math.floor(diffMs / 60000)
-  
-  if (diffMinutes < 1) return 'たった今'
-  if (diffMinutes < 60) return `${diffMinutes}分前`
-  if (diffMinutes < 1440) return `${Math.floor(diffMinutes / 60)}時間前`
-  
-  return date.toLocaleDateString('ja-JP')
+  try {
+    const date = new Date(lastSeen)
+    if (isNaN(date.getTime())) return '不明'
+    
+    const now = new Date()
+    const diffMs = now.getTime() - date.getTime()
+    const diffMinutes = Math.floor(diffMs / 60000)
+    
+    if (diffMinutes < 1) return 'たった今'
+    if (diffMinutes < 60) return `${diffMinutes}分前`
+    if (diffMinutes < 1440) return `${Math.floor(diffMinutes / 60)}時間前`
+    
+    return date.toLocaleDateString('ja-JP')
+  } catch (error) {
+    return '不明'
+  }
 }
 
 const getStatusLabel = (status: string): string => {
