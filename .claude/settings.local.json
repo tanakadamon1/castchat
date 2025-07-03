@@ -113,7 +113,8 @@
       "Bash(npm uninstall:*)",
       "Bash(curl:*)",
       "Bash(/dev/null)",
-      "Bash(touch:*)"
+      "Bash(touch:*)",
+      "Bash(vercel:*)"
     ],
     "deny": []
   }

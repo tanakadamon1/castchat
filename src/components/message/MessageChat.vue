@@ -12,7 +12,7 @@
           <ArrowLeft class="w-5 h-5" />
         </button>
         
-        <div class="user-info">
+        <div v-if="recipient" class="user-info">
           <div class="user-avatar-container">
             <img
               :src="recipient.avatar || '/default-avatar.png'"
@@ -165,7 +165,7 @@
       <MessageInput
         v-model="messageText"
         :disabled="sending"
-        :placeholder="`${recipient.name}さんにメッセージを送信`"
+        :placeholder="recipient ? `${recipient.name}さんにメッセージを送信` : 'メッセージを送信'"
         @send="handleSendMessage"
         @typing="handleTyping"
         @file-select="handleFileSelect"
