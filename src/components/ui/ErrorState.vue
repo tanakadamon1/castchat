@@ -70,7 +70,7 @@
             variant="ghost"
             size="sm"
           >
-            <ExclamationTriangleIcon class="w-4 h-4 mr-2" />
+            <AlertTriangle class="w-4 h-4 mr-2" />
             問題を報告
           </BaseButton>
         </slot>
