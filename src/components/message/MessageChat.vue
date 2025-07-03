@@ -80,7 +80,7 @@
           >
             <img
               :src="message.sender?.avatar || '/default-avatar.png'"
-              :alt="`${message.sender?.name}のアバター`"
+              :alt="`${message.sender?.name || 'ユーザー'}のアバター`"
               class="avatar-img"
             />
           </div>
@@ -140,12 +140,12 @@
       </div>
       
       <!-- タイピングインジケーター -->
-      <div v-if="isRecipientTyping" class="typing-container">
+      <div v-if="isRecipientTyping && recipient" class="typing-container">
         <div class="typing-message">
           <div class="typing-avatar">
             <img
-              :src="recipient.avatar || '/default-avatar.png'"
-              :alt="`${recipient.name}のアバター`"
+              :src="recipient?.avatar || '/default-avatar.png'"
+              :alt="`${recipient?.name || 'ユーザー'}のアバター`"
               class="avatar-img"
             />
           </div>
@@ -209,12 +209,22 @@ const typingTimeout = ref<number>()
 const groupedMessages = computed(() => {
   const groups: Record<string, Message[]> = {}
   
+  if (!props.messages || !Array.isArray(props.messages)) {
+    return groups
+  }
+  
   props.messages.forEach(message => {
-    const date = new Date(message.timestamp).toDateString()
-    if (!groups[date]) {
-      groups[date] = []
+    if (!message || !message.timestamp) return
+    
+    try {
+      const date = new Date(message.timestamp).toDateString()
+      if (!groups[date]) {
+        groups[date] = []
+      }
+      groups[date].push(message)
+    } catch (error) {
+      console.error('Error grouping message:', error)
     }
-    groups[date].push(message)
   })
   
   return groups
