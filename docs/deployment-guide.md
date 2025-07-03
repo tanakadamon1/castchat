@@ -47,8 +47,8 @@ VITE_APP_URL=https://castchat.jp
 VITE_APP_NAME=VRChat Cast Recruitment Board
 VITE_SUPABASE_URL=https://ewjfnquypoeyoicmgbnp.supabase.co
 VITE_SUPABASE_ANON_KEY=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
-GOOGLE_CLIENT_ID=244502393612-t7fvuqf9rg2kssse5b1i5qvaqha605fs.apps.googleusercontent.com
-GOOGLE_CLIENT_SECRET=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
+GOOGLE_CLIENT_ID=YOUR_GOOGLE_CLIENT_ID
+GOOGLE_CLIENT_SECRET=YOUR_GOOGLE_CLIENT_SECRET
 ```
 
 #### GitHub Secrets

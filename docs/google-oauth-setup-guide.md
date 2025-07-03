@@ -15,7 +15,7 @@ CastChatアプリケーションのGoogle OAuth認証設定の完了ガイドで
    - Anon Key: 設定済み
 
 3. **Google OAuth Client ID**
-   - Client ID: `244502393612-t7fvuqf9rg2kssse5b1i5qvaqha605fs.apps.googleusercontent.com`
+   - Client ID: `YOUR_GOOGLE_CLIENT_ID`
 
 ## 🔧 あなたが設定する必要がある項目
 
@@ -28,8 +28,8 @@ CastChatアプリケーションのGoogle OAuth認証設定の完了ガイドで
 4. **Google** プロバイダーを有効化
 5. 以下の情報を入力：
    ```
-   Client ID: 244502393612-t7fvuqf9rg2kssse5b1i5qvaqha605fs.apps.googleusercontent.com
-   Client Secret: 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
+   Client ID: YOUR_GOOGLE_CLIENT_ID
+   Client Secret: YOUR_GOOGLE_CLIENT_SECRET
    ```
 
 #### B. URL Configuration設定
@@ -51,7 +51,7 @@ http://localhost:5175/auth/callback
 #### A. OAuth 2.0 設定
 1. [Google Cloud Console](https://console.cloud.google.com) にアクセス
 2. **APIs & Services > Credentials** へ移動
-3. 既存のOAuth 2.0 Client ID `244502393612-t7fvuqf9rg2kssse5b1i5qvaqha605fs.apps.googleusercontent.com` を編集
+3. 既存のOAuth 2.0 Client ID `YOUR_GOOGLE_CLIENT_ID` を編集
 
 #### B. 承認済みJavaScript生成元
 ```
