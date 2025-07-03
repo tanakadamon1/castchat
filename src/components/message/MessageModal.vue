@@ -41,7 +41,7 @@
           v-for="message in messages"
           :key="message.id"
           :message="message"
-          :is-own="message.sender_id === currentUserId"
+          :is-own="message.sender_id === currentUserId.value"
         />
       </div>
 
@@ -163,7 +163,7 @@ const scrollToBottom = () => {
 
 // メッセージ送信
 const handleSendMessage = async () => {
-  if (!newMessage.value.trim() || !props.recipient || !currentUserId) return
+  if (!newMessage.value.trim() || !props.recipient || !currentUserId.value) return
 
   sending.value = true
   try {
@@ -208,7 +208,7 @@ const handleFileSelect = async (file: File) => {
   sending.value = true
   try {
     // 画像をアップロード
-    const uploadResult = await uploadMessageImage(file, currentUserId)
+    const uploadResult = await uploadMessageImage(file, currentUserId.value)
     if (uploadResult.error) {
       throw new Error(uploadResult.error)
     }
@@ -252,7 +252,7 @@ const handleFileSelect = async (file: File) => {
 const setupRealtimeSubscription = () => {
   if (!props.recipient || !currentUserId.value) return
 
-  const channelName = `messages:${[currentUserId, props.recipient.id].sort().join('-')}`
+  const channelName = `messages:${[currentUserId.value, props.recipient.id].sort().join('-')}`
   
   realtimeSubscription.value = supabase
     .channel(channelName)
@@ -262,7 +262,7 @@ const setupRealtimeSubscription = () => {
         event: 'INSERT',
         schema: 'public',
         table: 'messages',
-        filter: `or(and(sender_id.eq.${currentUserId},recipient_id.eq.${props.recipient.id}),and(sender_id.eq.${props.recipient.id},recipient_id.eq.${currentUserId}))`
+        filter: `or(and(sender_id.eq.${currentUserId.value},recipient_id.eq.${props.recipient.id}),and(sender_id.eq.${props.recipient.id},recipient_id.eq.${currentUserId.value}))`
       },
       (payload: RealtimePostgresChangesPayload<any>) => {
         if (payload.new) {
@@ -279,7 +279,7 @@ const setupRealtimeSubscription = () => {
             })
             
             // 受信したメッセージを既読にする（自分が送信者でない場合）
-            if (newMessage.sender_id !== currentUserId) {
+            if (newMessage.sender_id !== currentUserId.value) {
               markMessagesAsRead()
               
               // 通知表示
@@ -300,7 +300,7 @@ const setupRealtimeSubscription = () => {
         event: 'UPDATE',
         schema: 'public',
         table: 'messages',
-        filter: `or(and(sender_id.eq.${currentUserId},recipient_id.eq.${props.recipient.id}),and(sender_id.eq.${props.recipient.id},recipient_id.eq.${currentUserId}))`
+        filter: `or(and(sender_id.eq.${currentUserId.value},recipient_id.eq.${props.recipient.id}),and(sender_id.eq.${props.recipient.id},recipient_id.eq.${currentUserId.value}))`
       },
       (payload: RealtimePostgresChangesPayload<any>) => {
         if (payload.new) {
