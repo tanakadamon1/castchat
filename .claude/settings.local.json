@@ -114,7 +114,8 @@
       "Bash(curl:*)",
       "Bash(/dev/null)",
       "Bash(touch:*)",
-      "Bash(vercel:*)"
+      "Bash(vercel:*)",
+      "Bash(git push:*)"
     ],
     "deny": []
   }

@@ -168,8 +168,8 @@
             <h3 class="text-lg font-semibold text-gray-900 mb-3">応募条件</h3>
             <ul class="space-y-2">
               <li
-                v-for="requirement in post.requirements"
-                :key="requirement"
+                v-for="(requirement, index) in post.requirements"
+                :key="`requirement-${index}`"
                 class="flex items-start"
               >
                 <svg class="w-5 h-5 text-green-500 mr-2 mt-0.5 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -188,8 +188,8 @@
             <h3 class="text-lg font-semibold text-gray-900 mb-3">タグ</h3>
             <div class="flex flex-wrap gap-2">
               <span
-                v-for="tag in post.tags"
-                :key="tag"
+                v-for="(tag, index) in post.tags"
+                :key="`tag-${index}`"
                 class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-gray-100 text-gray-800"
               >
                 #{{ tag }}
