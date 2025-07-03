@@ -175,12 +175,14 @@
     />
 
     <!-- メッセージモーダル -->
+    <!-- 一時的に無効化
     <MessageModal
       v-if="selectedRecipient"
       :show="showMessageModal"
       :recipient="selectedRecipient"
       @close="showMessageModal = false"
     />
+    -->
   </div>
 </template>
 
@@ -197,7 +199,7 @@ import LoadingSpinner from '@/components/ui/LoadingSpinner.vue'
 import EmptyState from '@/components/ui/EmptyState.vue'
 import ApplicationCard from '@/components/application/ApplicationCard.vue'
 import ApplicationDetailModal from '@/components/application/ApplicationDetailModal.vue'
-import MessageModal from '@/components/message/MessageModal.vue'
+// import MessageModal from '@/components/message/MessageModal.vue'
 
 const router = useRouter()
 const authStore = useAuthStore()
