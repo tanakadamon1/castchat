@@ -6,7 +6,7 @@
           <img
             v-if="recipient?.avatar_url"
             :src="recipient.avatar_url"
-            :alt="recipient.display_name"
+            :alt="recipient?.display_name || '匿名ユーザー'"
             class="w-full h-full object-cover"
           />
           <div v-else class="w-full h-full flex items-center justify-center text-gray-400">
@@ -18,7 +18,7 @@
             {{ recipient?.display_name || '匿名ユーザー' }}
           </h3>
           <p class="text-sm text-gray-500">
-            {{ relatedApplication ? `応募について: ${relatedApplication.postTitle}` : 'メッセージ' }}
+            {{ relatedApplication?.postTitle ? `応募について: ${relatedApplication.postTitle}` : 'メッセージ' }}
           </p>
         </div>
       </div>

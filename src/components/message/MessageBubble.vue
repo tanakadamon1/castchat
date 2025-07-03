@@ -7,7 +7,7 @@
           <img
             v-if="message.sender?.avatar_url"
             :src="message.sender.avatar_url"
-            :alt="message.sender.display_name"
+            :alt="message.sender?.display_name || 'ユーザー'"
             class="w-full h-full object-cover"
           />
           <div v-else class="w-full h-full flex items-center justify-center text-gray-400">
