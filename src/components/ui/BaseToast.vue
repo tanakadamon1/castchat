@@ -66,6 +66,12 @@
 
 <script setup lang="ts">
 import { computed, onMounted, onUnmounted } from 'vue'
+import {
+  CheckCircle,
+  XCircle,
+  AlertTriangle,
+  Info
+} from 'lucide-vue-next'
 
 interface Props {
   show: boolean
@@ -111,14 +117,13 @@ const toastClasses = computed(() => {
 
 const iconComponent = computed(() => {
   const icons = {
-    success: 'CheckCircleIcon',
-    error: 'XCircleIcon',
-    warning: 'ExclamationTriangleIcon',
-    info: 'InformationCircleIcon'
+    success: CheckCircle,
+    error: XCircle,
+    warning: AlertTriangle,
+    info: Info
   }
   
-  // For now, return a generic SVG component name
-  return 'div'
+  return icons[props.type]
 })
 
 const iconClasses = computed(() => {
