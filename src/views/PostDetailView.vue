@@ -261,7 +261,7 @@ import { categoryLabels, typeLabels, statusLabels, contactMethodLabels } from '@
 const route = useRoute()
 const router = useRouter()
 const authStore = useAuthStore()
-const { success, error, info } = useToast()
+const toast = useToast()
 
 // State
 const post = ref<Post | null>(null)
@@ -335,7 +335,7 @@ const goBack = () => {
 
 const handleApply = () => {
   if (!authStore.isAuthenticated) {
-    error('ログインが必要です')
+    toast.error('ログインが必要です')
     router.push('/login')
     return
   }
@@ -359,11 +359,11 @@ const sharePost = async () => {
     } else {
       // Fallback: Copy to clipboard
       await navigator.clipboard.writeText(window.location.href)
-      success('URLをクリップボードにコピーしました')
+      toast.success('URLをクリップボードにコピーしました')
     }
   } catch (err) {
     console.error('Share failed:', err)
-    error('シェアに失敗しました')
+    toast.error('シェアに失敗しました')
   }
 }
 
@@ -385,15 +385,15 @@ const handleApplicationSubmit = async (applicationData: any) => {
     const result = await applicationApi.submitApplication(applicationData)
     
     if (result.error) {
-      error(result.error)
+      toast.error(result.error)
       return
     }
     
-    success('応募を送信しました')
+    toast.success('応募を送信しました')
     showApplicationModal.value = false
   } catch (err) {
     console.error('応募エラー:', err)
-    error('応募に失敗しました')
+    toast.error('応募に失敗しました')
   }
 }
 

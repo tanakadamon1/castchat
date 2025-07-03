@@ -9,7 +9,7 @@
           @click="$emit('close')"
           aria-label="チャットを閉じる"
         >
-          <ArrowLeftIcon class="w-5 h-5" />
+          <ArrowLeft class="w-5 h-5" />
         </button>
         
         <div class="user-info">
@@ -176,7 +176,7 @@
 
 <script setup lang="ts">
 import { ref, computed, onMounted, onUnmounted, nextTick, watch } from 'vue'
-import { ArrowLeftIcon, XMarkIcon } from '@heroicons/vue/24/outline'
+import { ArrowLeft, X } from 'lucide-vue-next'
 import MessageInput from './MessageInput.vue'
 import type { User, Message } from '@/types'
 

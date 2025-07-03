@@ -263,7 +263,7 @@ import UserStatusBadge from '@/components/user/UserStatusBadge.vue'
 
 const router = useRouter()
 const authStore = useAuthStore()
-const { success, error, info } = useToast()
+const toast = useToast()
 const { validate: validateField, getFieldError, hasErrors } = useValidation()
 
 // 編集モード
@@ -378,7 +378,7 @@ const handleAvatarUpload = async (event: Event) => {
   if (!file) return
   
   if (!authStore.user?.id) {
-    error('ユーザー情報が見つかりません')
+    toast.error('ユーザー情報が見つかりません')
     return
   }
   
@@ -388,18 +388,18 @@ const handleAvatarUpload = async (event: Event) => {
     const result = await uploadProfileImage(file, authStore.user.id)
     
     if (result.error) {
-      error(result.error)
+      toast.error(result.error)
       return
     }
     
     if (result.data) {
       // プロフィール画像URLを更新
       profileData.value.avatarUrl = result.data.url
-      success('プロフィール画像をアップロードしました')
+      toast.success('プロフィール画像をアップロードしました')
     }
   } catch (err) {
     console.error('Avatar upload error:', err)
-    error('画像のアップロードに失敗しました')
+    toast.error('画像のアップロードに失敗しました')
   } finally {
     uploadingAvatar.value = false
     // ファイル入力をリセット
@@ -411,7 +411,7 @@ const handleAvatarUpload = async (event: Event) => {
 
 const handleSave = async () => {
   if (!isFormValid.value) {
-    error('入力内容に誤りがあります')
+    toast.error('入力内容に誤りがあります')
     return
   }
 
@@ -424,11 +424,11 @@ const handleSave = async () => {
     // プロフィールデータを更新
     Object.assign(profileData.value, editData.value)
     
-    success('プロフィールを更新しました')
+    toast.success('プロフィールを更新しました')
     isEditing.value = false
   } catch (err) {
     console.error('プロフィール更新エラー:', err)
-    error('プロフィール更新に失敗しました')
+    toast.error('プロフィール更新に失敗しました')
   } finally {
     saving.value = false
   }
@@ -470,7 +470,7 @@ onMounted(async () => {
     }
   } catch (err) {
     console.error('プロフィール取得エラー:', err)
-    error('プロフィールの取得に失敗しました')
+    toast.error('プロフィールの取得に失敗しました')
   }
 })
 </script>

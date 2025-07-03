@@ -329,7 +329,7 @@ import type { PostCategory, PostType, ContactMethod, Post } from '@/types/post'
 const router = useRouter()
 const route = useRoute()
 const authStore = useAuthStore()
-const showToast = useToast()
+const toast = useToast()
 const { validate: validateField, validateAll, getFieldError, hasErrors } = useValidation()
 
 // 編集モードの判定
@@ -557,7 +557,7 @@ const addFiles = (files: File[]) => {
   // 3枚までの制限
   const remainingSlots = 3 - selectedImages.value.length
   if (remainingSlots <= 0) {
-    showToast.error('画像は最大3枚まで追加できます')
+    toast.error('画像は最大3枚まで追加できます')
     return
   }
   
@@ -566,13 +566,13 @@ const addFiles = (files: File[]) => {
   filesToAdd.forEach(file => {
     // ファイルサイズチェック (5MB)
     if (file.size > 5 * 1024 * 1024) {
-      showToast.error(`${file.name} のファイルサイズが5MBを超えています`)
+      toast.error(`${file.name} のファイルサイズが5MBを超えています`)
       return
     }
     
     // ファイル形式チェック
     if (!file.type.startsWith('image/')) {
-      showToast.error(`${file.name} は画像ファイルではありません`)
+      toast.error(`${file.name} は画像ファイルではありません`)
       return
     }
     
@@ -590,7 +590,7 @@ const addFiles = (files: File[]) => {
   })
   
   if (files.length > remainingSlots) {
-    showToast.info(`${remainingSlots}枚のみ追加されました（最大3枚まで）`)
+    toast.info(`${remainingSlots}枚のみ追加されました（最大3枚まで）`)
   }
 }
 
@@ -601,7 +601,7 @@ const removeImage = (index: number) => {
 // フォーム送信
 const handleSubmit = async () => {
   if (!authStore.isAuthenticated) {
-    showToast.error('ログインが必要です')
+    toast.error('ログインが必要です')
     router.push('/login')
     return
   }
@@ -619,7 +619,7 @@ const handleSubmit = async () => {
   }
 
   if (!validateAll(formData.value, validationRules)) {
-    showToast.error('入力内容に誤りがあります')
+    toast.error('入力内容に誤りがあります')
     return
   }
 
@@ -628,14 +628,14 @@ const handleSubmit = async () => {
   try {
     await submitPost()
     
-    showToast.success(
+    toast.success(
       isEditing.value ? '募集を更新しました' : '募集を投稿しました'
     )
     
     router.push('/posts')
   } catch (error) {
     console.error('投稿エラー:', error)
-    showToast.error('投稿に失敗しました')
+    toast.error('投稿に失敗しました')
   } finally {
     submitting.value = false
   }
@@ -644,7 +644,7 @@ const handleSubmit = async () => {
 // 下書き保存
 const handleSaveDraft = async () => {
   if (!authStore.isAuthenticated) {
-    showToast.error('ログインが必要です')
+    toast.error('ログインが必要です')
     return
   }
 
@@ -652,10 +652,10 @@ const handleSaveDraft = async () => {
   
   try {
     await saveDraft()
-    showToast.success('下書きを保存しました')
+    toast.success('下書きを保存しました')
   } catch (error) {
     console.error('下書き保存エラー:', error)
-    showToast.error('下書き保存に失敗しました')
+    toast.error('下書き保存に失敗しました')
   } finally {
     saving.value = false
   }
@@ -783,7 +783,7 @@ onMounted(async () => {
       }
     } catch (error) {
       console.error('投稿データ取得エラー:', error)
-      showToast.error('投稿データの取得に失敗しました')
+      toast.error('投稿データの取得に失敗しました')
       router.push('/posts')
     }
   }

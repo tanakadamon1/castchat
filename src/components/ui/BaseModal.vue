@@ -93,10 +93,6 @@ interface Props {
   padding?: boolean
 }
 
-interface Emits {
-  (e: 'close'): void
-}
-
 const props = withDefaults(defineProps<Props>(), {
   size: 'md',
   closable: true,
@@ -105,7 +101,9 @@ const props = withDefaults(defineProps<Props>(), {
   padding: true
 })
 
-const emit = defineEmits<Emits>()
+const emit = defineEmits<{
+  close: []
+}>()
 
 const modalClasses = computed(() => {
   const baseClasses = [

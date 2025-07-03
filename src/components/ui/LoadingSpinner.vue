@@ -72,7 +72,7 @@
         }"
       >
         <div class="step-indicator">
-          <CheckIcon v-if="index < currentStep" class="w-4 h-4" />
+          <Check v-if="index < currentStep" class="w-4 h-4" />
           <div v-else-if="index === currentStep" class="step-spinner">
             <div class="mini-spinner" />
           </div>
@@ -86,7 +86,7 @@
 
 <script setup lang="ts">
 import { computed } from 'vue'
-import { CheckIcon } from '@heroicons/vue/24/outline'
+import { Check } from 'lucide-vue-next'
 
 interface Props {
   size?: 'sm' | 'md' | 'lg'
@@ -136,8 +136,8 @@ const spinnerClasses = computed(() => {
   }
   
   const variantClasses = {
-    default: 'text-blue-600',
-    success: 'text-green-600',
+    default: 'text-indigo-500',
+    success: 'text-emerald-500',
     warning: 'text-yellow-600',
     error: 'text-red-600'
   }
@@ -154,7 +154,7 @@ const messageClasses = computed(() => {
   
   const variantClasses = {
     default: 'text-gray-700',
-    success: 'text-green-700',
+    success: 'text-emerald-700',
     warning: 'text-yellow-700',
     error: 'text-red-700'
   }
@@ -187,7 +187,7 @@ const messageClasses = computed(() => {
 
 .progress-fill {
   height: 100%;
-  background: linear-gradient(90deg, #3B82F6, #1D4ED8);
+  background: linear-gradient(90deg, #6366f1, #4f46e5);
   border-radius: 4px;
   transition: width 0.3s ease;
 }
@@ -225,12 +225,12 @@ const messageClasses = computed(() => {
 }
 
 .step-completed {
-  border-left-color: #10B981;
+  border-left-color: #10b981;
 }
 
 .step-current {
-  border-left-color: #3B82F6;
-  background: linear-gradient(90deg, rgba(59, 130, 246, 0.05), transparent);
+  border-left-color: #6366f1;
+  background: linear-gradient(90deg, rgba(99, 102, 241, 0.05), transparent);
   border-radius: 0 8px 8px 0;
 }
 
@@ -248,13 +248,13 @@ const messageClasses = computed(() => {
 }
 
 .step-completed .step-indicator {
-  background: #10B981;
+  background: #10b981;
   color: white;
   border-radius: 50%;
 }
 
 .step-current .step-indicator {
-  background: #3B82F6;
+  background: #6366f1;
   border-radius: 50%;
 }
 
@@ -267,7 +267,7 @@ const messageClasses = computed(() => {
   width: 16px;
   height: 16px;
   border: 2px solid #E5E7EB;
-  border-top: 2px solid #3B82F6;
+  border-top: 2px solid #6366f1;
   border-radius: 50%;
   animation: spin 1s linear infinite;
 }
@@ -295,7 +295,7 @@ const messageClasses = computed(() => {
 }
 
 .step-current .step-text {
-  color: #1D4ED8;
+  color: #4f46e5;
   font-weight: 600;
 }
 

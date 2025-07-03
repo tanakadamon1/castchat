@@ -8,7 +8,7 @@
       :class="{ 'button-dark': darkMode.isDarkMode.value }"
       :aria-label="`現在のテーマ: ${darkMode.currentLabel.value}。クリックして切り替え`"
     >
-      <span class="toggle-icon">{{ darkMode.currentIcon.value }}</span>
+      <component :is="currentIconComponent" class="toggle-icon" />
       <span class="toggle-text">{{ darkMode.currentLabel.value }}</span>
     </button>
 
@@ -20,7 +20,7 @@
       :class="{ 'button-compact-dark': darkMode.isDarkMode.value }"
       :aria-label="`現在のテーマ: ${darkMode.currentLabel.value}。クリックして切り替え`"
     >
-      <span class="toggle-icon-compact">{{ darkMode.currentIcon.value }}</span>
+      <component :is="currentIconComponent" class="toggle-icon-compact" />
     </button>
 
     <!-- Theme Dropdown (optional) -->
@@ -35,7 +35,7 @@
           'item-dark': darkMode.isDarkMode.value 
         }"
       >
-        <span class="item-icon">{{ theme.icon }}</span>
+        <component :is="theme.icon" class="item-icon" />
         <span class="item-label">{{ theme.label }}</span>
         <span v-if="darkMode.preference.value === theme.value" class="item-check">✓</span>
       </button>
@@ -45,6 +45,7 @@
 
 <script setup lang="ts">
 import { computed } from 'vue'
+import { Sun, Moon, Monitor } from 'lucide-vue-next'
 import useDarkModeWithInit, { type DarkModePreference } from '@/composables/useDarkMode'
 
 interface Props {
@@ -60,10 +61,19 @@ const props = withDefaults(defineProps<Props>(), {
 const darkMode = useDarkModeWithInit()
 
 const themes = computed(() => [
-  { value: 'light' as DarkModePreference, icon: '☀️', label: 'ライトモード' },
-  { value: 'system' as DarkModePreference, icon: '💻', label: 'システム設定' },
-  { value: 'dark' as DarkModePreference, icon: '🌙', label: 'ダークモード' }
+  { value: 'light' as DarkModePreference, icon: Sun, label: 'ライトモード' },
+  { value: 'system' as DarkModePreference, icon: Monitor, label: 'システム設定' },
+  { value: 'dark' as DarkModePreference, icon: Moon, label: 'ダークモード' }
 ])
+
+const currentIconComponent = computed(() => {
+  const iconMap = {
+    light: Sun,
+    dark: Moon,
+    system: Monitor
+  }
+  return iconMap[darkMode.preference.value]
+})
 
 const selectTheme = (theme: DarkModePreference) => {
   darkMode.setPreference(theme)
@@ -103,12 +113,11 @@ const selectTheme = (theme: DarkModePreference) => {
 }
 
 .toggle-icon {
-  font-size: 16px;
+  width: 18px;
+  height: 18px;
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 20px;
-  height: 20px;
 }
 
 .toggle-text {
@@ -147,7 +156,8 @@ const selectTheme = (theme: DarkModePreference) => {
 }
 
 .toggle-icon-compact {
-  font-size: 18px;
+  width: 20px;
+  height: 20px;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -198,18 +208,17 @@ const selectTheme = (theme: DarkModePreference) => {
 }
 
 .item-active {
-  background: #3b82f6;
+  background: #6366f1;
   color: white;
 }
 
 .item-active:hover {
-  background: #1d4ed8;
+  background: #4f46e5;
 }
 
 .item-icon {
-  font-size: 16px;
-  width: 20px;
-  height: 20px;
+  width: 16px;
+  height: 16px;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -256,7 +265,7 @@ const selectTheme = (theme: DarkModePreference) => {
 /* Focus styles */
 .toggle-button:focus,
 .toggle-button-compact:focus {
-  outline: 2px solid #3b82f6;
+  outline: 2px solid #6366f1;
   outline-offset: 2px;
 }
 

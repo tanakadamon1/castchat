@@ -51,7 +51,7 @@ const applyDarkMode = (dark: boolean): void => {
   // メタテーマカラーの更新
   const themeColorMeta = document.querySelector('meta[name="theme-color"]')
   if (themeColorMeta) {
-    themeColorMeta.setAttribute('content', dark ? '#1F2937' : '#3B82F6')
+    themeColorMeta.setAttribute('content', dark ? '#1F2937' : '#6366f1')
   }
 }
 
@@ -167,10 +167,10 @@ export function useDarkMode() {
   // テーマカラーパレット
   const colors = computed(() => {
     const base = {
-      primary: '#3B82F6',
-      primaryHover: '#1D4ED8',
-      secondary: '#A855F7',
-      secondaryHover: '#7C3AED',
+      primary: '#6366f1',
+      primaryHover: '#4f46e5',
+      secondary: '#10b981',
+      secondaryHover: '#059669',
       success: '#10B981',
       warning: '#F59E0B',
       error: '#EF4444',

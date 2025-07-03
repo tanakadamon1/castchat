@@ -5,7 +5,7 @@
   "start_url": "/",
   "display": "standalone",
   "background_color": "#FFFFFF",
-  "theme_color": "#3B82F6",
+  "theme_color": "#6366f1",
   "orientation": "portrait-primary",
   "categories": ["social", "entertainment", "lifestyle"],
   "lang": "ja",
@@ -23,31 +23,6 @@
       "type": "image/png"
     },
     {
-      "src": "/icons/icon-72x72.png",
-      "sizes": "72x72",
-      "type": "image/png"
-    },
-    {
-      "src": "/icons/icon-96x96.png",
-      "sizes": "96x96",
-      "type": "image/png"
-    },
-    {
-      "src": "/icons/icon-128x128.png",
-      "sizes": "128x128",
-      "type": "image/png"
-    },
-    {
-      "src": "/icons/icon-144x144.png",
-      "sizes": "144x144",
-      "type": "image/png"
-    },
-    {
-      "src": "/icons/icon-152x152.png",
-      "sizes": "152x152",
-      "type": "image/png"
-    },
-    {
       "src": "/icons/apple-touch-icon.png",
       "sizes": "180x180",
       "type": "image/png"
@@ -59,48 +34,10 @@
       "purpose": "any"
     },
     {
-      "src": "/icons/icon-384x384.png",
-      "sizes": "384x384",
-      "type": "image/png",
-      "purpose": "any"
-    },
-    {
       "src": "/icons/icon-512x512.png",
       "sizes": "512x512",
       "type": "image/png",
       "purpose": "any"
-    },
-    {
-      "src": "/icons/maskable-icon-512x512.png",
-      "sizes": "512x512",
-      "type": "image/png",
-      "purpose": "maskable"
-    }
-  ],
-  "shortcuts": [
-    {
-      "name": "新規投稿",
-      "short_name": "投稿",
-      "description": "新しい募集を投稿する",
-      "url": "/posts/create",
-      "icons": [
-        {
-          "src": "/icons/shortcut-create.png",
-          "sizes": "96x96"
-        }
-      ]
-    },
-    {
-      "name": "応募履歴",
-      "short_name": "履歴",
-      "description": "応募履歴を確認する",
-      "url": "/applications",
-      "icons": [
-        {
-          "src": "/icons/shortcut-applications.png",
-          "sizes": "96x96"
-        }
-      ]
     }
   ]
 }

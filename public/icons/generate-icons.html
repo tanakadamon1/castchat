@@ -171,8 +171,8 @@
       
       // Background gradient
       const gradient = ctx.createLinearGradient(0, 0, 512, 512);
-      gradient.addColorStop(0, '#3B82F6');
-      gradient.addColorStop(1, '#1D4ED8');
+      gradient.addColorStop(0, '#6366f1');
+      gradient.addColorStop(1, '#4f46e5');
       
       ctx.fillStyle = gradient;
       ctx.fillRect(0, 0, 512, 512);
@@ -218,7 +218,7 @@
       ctx.stroke();
       
       // Chat Bubble
-      ctx.fillStyle = '#A855F7';
+      ctx.fillStyle = '#10b981';
       ctx.beginPath();
       ctx.arc(380, 160, 40, 0, 2 * Math.PI);
       ctx.fill();
@@ -238,7 +238,7 @@
       ctx.fillText('💬', 380, 170);
       
       // Sound Waves
-      ctx.strokeStyle = '#60A5FA';
+      ctx.strokeStyle = '#a7f3d0';
       ctx.lineWidth = 3;
       ctx.globalAlpha = 0.6;
       
@@ -294,7 +294,29 @@
         generateIcon(id, size);
       });
       
-      alert('🎉 全てのアイコンが生成されました！各アイコンのDownloadボタンから保存してください。');
+      // 自動ダウンロード機能を追加
+      setTimeout(() => {
+        downloadAllIcons();
+      }, 1000);
+      
+      alert('🎉 全てのアイコンが生成されました！重要なアイコンファイルを自動ダウンロードします。');
+    }
+    
+    // 重要なアイコンファイルを自動ダウンロード
+    function downloadAllIcons() {
+      const importantIcons = [
+        { id: 'icon192', filename: 'icon-192x192.png' },
+        { id: 'icon512', filename: 'icon-512x512.png' },
+        { id: 'appleIcon', filename: 'apple-touch-icon.png' },
+        { id: 'favicon16', filename: 'favicon-16x16.png' },
+        { id: 'favicon32', filename: 'favicon-32x32.png' }
+      ];
+      
+      importantIcons.forEach(({ id, filename }, index) => {
+        setTimeout(() => {
+          downloadIcon(id, filename);
+        }, index * 500); // 500ms間隔で順次ダウンロード
+      });
     }
     
     // Download specific icon

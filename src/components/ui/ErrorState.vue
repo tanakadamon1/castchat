@@ -51,7 +51,7 @@
             :disabled="retrying"
             variant="primary"
           >
-            <ArrowPathIcon v-if="retrying" class="w-4 h-4 mr-2 animate-spin" />
+            <RotateCcw v-if="retrying" class="w-4 h-4 mr-2 animate-spin" />
             {{ retrying ? '再試行中...' : '再試行' }}
           </BaseButton>
           
@@ -60,7 +60,7 @@
             @click="goHome"
             variant="outline"
           >
-            <HomeIcon class="w-4 h-4 mr-2" />
+            <Home class="w-4 h-4 mr-2" />
             ホームに戻る
           </BaseButton>
           
@@ -80,7 +80,7 @@
       <div v-if="showHelp" class="mt-4">
         <router-link
           to="/help"
-          class="text-sm text-blue-600 hover:text-blue-800 underline"
+          class="text-sm text-indigo-500 hover:text-indigo-600 underline"
         >
           ヘルプ・FAQ
         </router-link>
@@ -94,15 +94,15 @@ import { computed, ref } from 'vue'
 import { useRouter } from 'vue-router'
 import { BaseButton } from '@/components/ui'
 import {
-  ExclamationTriangleIcon,
-  WifiIcon,
-  MagnifyingGlassIcon,
-  ShieldExclamationIcon,
-  ExclamationCircleIcon,
-  CloudIcon,
-  ArrowPathIcon,
-  HomeIcon
-} from '@heroicons/vue/24/outline'
+  AlertTriangle,
+  Wifi,
+  Search,
+  ShieldAlert,
+  AlertCircle,
+  Cloud,
+  RotateCcw,
+  Home
+} from 'lucide-vue-next'
 
 interface Props {
   type?: 'general' | 'network' | 'not-found' | 'forbidden' | 'server' | 'timeout' | 'validation'
@@ -119,9 +119,20 @@ interface Props {
   severity?: 'low' | 'medium' | 'high' | 'critical'
 }
 
+interface ErrorData {
+  type: string
+  title: string
+  message: string
+  errorCode?: string
+  timestamp: string
+  userAgent: string
+  url: string
+  severity: string
+}
+
 interface Emits {
   (e: 'retry'): void
-  (e: 'report', errorData: any): void
+  (e: 'report', errorData: ErrorData): void
 }
 
 const props = withDefaults(defineProps<Props>(), {
@@ -141,13 +152,13 @@ const retrying = ref(false)
 
 // アイコンマッピング
 const iconComponents = {
-  general: ExclamationCircleIcon,
-  network: WifiIcon,
-  'not-found': MagnifyingGlassIcon,
-  forbidden: ShieldExclamationIcon,
-  server: CloudIcon,
-  timeout: ExclamationTriangleIcon,
-  validation: ExclamationTriangleIcon
+  general: AlertCircle,
+  network: Wifi,
+  'not-found': Search,
+  forbidden: ShieldAlert,
+  server: Cloud,
+  timeout: AlertTriangle,
+  validation: AlertTriangle
 }
 
 // Computed
@@ -165,7 +176,7 @@ const iconComponent = computed(() => iconComponents[props.type])
 
 const iconContainerClasses = computed(() => {
   const severityClasses = {
-    low: 'bg-blue-100',
+    low: 'bg-indigo-100',
     medium: 'bg-yellow-100', 
     high: 'bg-orange-100',
     critical: 'bg-red-100'
@@ -176,7 +187,7 @@ const iconContainerClasses = computed(() => {
 
 const iconClasses = computed(() => {
   const severityClasses = {
-    low: 'text-blue-600',
+    low: 'text-indigo-500',
     medium: 'text-yellow-600',
     high: 'text-orange-600', 
     critical: 'text-red-600'

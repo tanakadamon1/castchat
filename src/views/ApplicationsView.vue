@@ -200,7 +200,7 @@ import MessageModal from '@/components/message/MessageModal.vue'
 
 const router = useRouter()
 const authStore = useAuthStore()
-const { success, error, info } = useToast()
+const toast = useToast()
 
 // タブ状態
 const activeTab = ref<'received' | 'sent'>('received')
@@ -322,7 +322,7 @@ const handleUpdateStatus = async (applicationId: string, status: string) => {
     success(`応募を${statusText}しました`)
   } catch (err) {
     console.error('ステータス更新エラー:', err)
-    error('ステータス更新に失敗しました')
+    toast.error('ステータス更新に失敗しました')
   }
 }
 
@@ -343,7 +343,7 @@ const handleSendMessage = (userId: string) => {
     }
     showMessageModal.value = true
   } else {
-    error('ユーザー情報が見つかりません')
+    toast.error('ユーザー情報が見つかりません')
   }
 }
 
@@ -370,10 +370,10 @@ const handleWithdraw = async (applicationId: string) => {
       sentApplications.value.splice(index, 1)
     }
     
-    success('応募を取り下げました')
+    toast.success('応募を取り下げました')
   } catch (err) {
     console.error('応募取り下げエラー:', err)
-    error('応募取り下げに失敗しました')
+    toast.error('応募取り下げに失敗しました')
   }
 }
 
@@ -412,7 +412,7 @@ onMounted(async () => {
     await loadApplications()
   } catch (err) {
     console.error('データ取得エラー:', err)
-    error('データの取得に失敗しました')
+    toast.error('データの取得に失敗しました')
   } finally {
     loading.value = false
   }

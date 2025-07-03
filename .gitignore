@@ -67,3 +67,5 @@ out/
 .output/
 .vite/
 *.local
+
+.vercel

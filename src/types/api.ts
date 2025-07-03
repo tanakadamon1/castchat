@@ -74,6 +74,13 @@ export interface ApiResponse<T = any> {
   error?: ApiError
 }
 
+// Supabase統一レスポンス型（指示書対応）
+export interface SupabaseResponse<T = any> {
+  data: T | null
+  error: string | null
+  count?: number
+}
+
 // ユーザー関連
 export interface UserResponse {
   id: string

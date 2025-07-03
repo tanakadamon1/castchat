@@ -5,7 +5,7 @@
         <!-- About -->
         <div class="col-span-1 md:col-span-2">
           <div class="flex items-center space-x-2 mb-4">
-            <div class="w-8 h-8 bg-indigo-600 rounded-lg flex items-center justify-center">
+            <div class="w-8 h-8 bg-indigo-500 rounded-lg flex items-center justify-center">
               <span class="text-white font-bold text-sm">VR</span>
             </div>
             <span class="text-xl font-bold text-gray-900 dark:text-white transition-colors duration-200">キャスト募集</span>

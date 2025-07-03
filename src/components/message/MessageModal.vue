@@ -99,12 +99,10 @@ interface Props {
   relatedApplication?: RelatedApplication
 }
 
-interface Emits {
-  (e: 'close'): void
-}
-
 const props = defineProps<Props>()
-const emit = defineEmits<Emits>()
+const emit = defineEmits<{
+  close: []
+}>()
 
 const authStore = useAuthStore()
 const toast = useToast()
