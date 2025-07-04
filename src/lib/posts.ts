@@ -488,10 +488,7 @@ export class PostsService {
         .select(`
           *,
           users!posts_user_id_fkey(id, username, display_name, avatar_url, is_verified),
-          post_categories!posts_category_id_fkey(id, name, slug),
-          post_tags(tags(id, name, slug)),
-          post_images(id, url, alt_text, display_order),
-          applications(id)
+          post_categories!posts_category_id_fkey(id, name, slug)
         `, { count: 'exact' })
 
       // フィルター適用
