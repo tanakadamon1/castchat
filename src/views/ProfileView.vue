@@ -17,7 +17,7 @@
 
     <div class="container mx-auto px-4 py-8 max-w-4xl">
       <!-- プロフィール情報 -->
-      <div class="bg-white rounded-lg shadow-sm border p-6 mb-8">
+      <div v-if="profileData" class="bg-white rounded-lg shadow-sm border p-6 mb-8">
         <div class="flex flex-col md:flex-row gap-6">
           <!-- アバター -->
           <div class="flex flex-col items-center">
@@ -135,7 +135,7 @@
               @blur="validateDiscord"
             />
             <p v-else class="text-gray-900">
-              {{ profileData.discordUsername || 'なし' }}
+              {{ profileData?.discordUsername || 'なし' }}
             </p>
           </div>
 
@@ -152,7 +152,7 @@
               @blur="validateTwitter"
             />
             <p v-else class="text-gray-900">
-              {{ profileData.twitterUsername || 'なし' }}
+              {{ profileData?.twitterUsername || 'なし' }}
             </p>
           </div>
 
@@ -168,7 +168,7 @@
               :error="getFieldError('vrchatUsername')"
             />
             <p v-else class="text-gray-900">
-              {{ profileData.vrchatUsername || 'なし' }}
+              {{ profileData?.vrchatUsername || 'なし' }}
             </p>
           </div>
 
@@ -185,13 +185,13 @@
               @blur="validateWebsite"
             />
             <a
-              v-else-if="profileData.websiteUrl"
+              v-else-if="profileData?.websiteUrl"
               :href="profileData.websiteUrl"
               target="_blank"
               rel="noopener noreferrer"
               class="text-indigo-600 hover:text-indigo-700"
             >
-              {{ profileData.websiteUrl }}
+              {{ profileData?.websiteUrl }}
             </a>
             <p v-else class="text-gray-900">なし</p>
           </div>
@@ -245,6 +245,14 @@
         </BaseButton>
       </div>
     </div>
+    
+    <!-- ローディング表示 -->
+    <div v-else class="flex items-center justify-center py-12">
+      <div class="text-center">
+        <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-indigo-600 mx-auto"></div>
+        <p class="mt-2 text-gray-500">プロフィールを読み込み中...</p>
+      </div>
+    </div>
   </div>
 </template>
 
@@ -274,20 +282,25 @@ const uploadingAvatar = ref(false)
 // ファイル入力参照
 const fileInput = ref<HTMLInputElement>()
 
-// プロフィールデータ（モック）
-const profileData = ref({
-  id: 'user123',
-  username: 'sakura_vr',
-  displayName: 'さくら',
-  bio: 'VRChatでの配信や写真撮影を楽しんでいます！\n気軽に声をかけてください♪',
-  avatarUrl: 'https://via.placeholder.com/128',
-  discordUsername: 'sakura#1234',
-  twitterUsername: '@sakura_vr',
-  vrchatUsername: 'sakura_vrchat',
-  websiteUrl: 'https://example.com',
-  status: 'active' as const,
-  lastActiveAt: '2024-01-30T12:00:00Z',
-  createdAt: '2023-06-15T00:00:00Z'
+// プロフィールデータ（実データを使用）
+const profileData = computed(() => {
+  if (!authStore.profile) return null
+  
+  const profile = authStore.profile
+  return {
+    id: profile.id,
+    username: profile.username || '',
+    displayName: profile.display_name || '',
+    bio: profile.bio || '',
+    avatarUrl: profile.avatar_url || '',
+    discordUsername: profile.discord_username || '',
+    twitterUsername: profile.twitter_username || '',
+    vrchatUsername: profile.vrchat_username || '',
+    websiteUrl: profile.website_url || '',
+    status: 'active' as const,
+    lastActiveAt: profile.updated_at || profile.created_at,
+    createdAt: profile.created_at
+  }
 })
 
 // 編集用データ
@@ -394,7 +407,7 @@ const handleAvatarUpload = async (event: Event) => {
     
     if (result.data) {
       // プロフィール画像URLを更新
-      profileData.value.avatarUrl = result.data.url
+      await authStore.updateProfile({ avatar_url: result.data.url })
       toast.success('プロフィール画像をアップロードしました')
     }
   } catch (err) {
@@ -418,11 +431,16 @@ const handleSave = async () => {
   saving.value = true
   
   try {
-    // TODO: API実装時に置き換え
-    await new Promise(resolve => setTimeout(resolve, 1000))
-    
-    // プロフィールデータを更新
-    Object.assign(profileData.value, editData.value)
+    // 実際のAPIを使用してプロフィールを更新
+    await authStore.updateProfile({
+      display_name: editData.value.displayName,
+      username: editData.value.username,
+      bio: editData.value.bio,
+      discord_username: editData.value.discordUsername,
+      twitter_username: editData.value.twitterUsername,
+      vrchat_username: editData.value.vrchatUsername,
+      website_url: editData.value.websiteUrl
+    })
     
     toast.success('プロフィールを更新しました')
     isEditing.value = false
@@ -435,6 +453,8 @@ const handleSave = async () => {
 }
 
 const handleCancel = () => {
+  if (!profileData.value) return
+  
   // 編集データをリセット
   editData.value = {
     displayName: profileData.value.displayName,
@@ -457,16 +477,18 @@ onMounted(async () => {
   }
   
   try {
-    // TODO: API実装時にデータ取得
-    // 編集データを初期化
-    editData.value = {
-      displayName: profileData.value.displayName,
-      username: profileData.value.username,
-      bio: profileData.value.bio,
-      discordUsername: profileData.value.discordUsername,
-      twitterUsername: profileData.value.twitterUsername,
-      vrchatUsername: profileData.value.vrchatUsername,
-      websiteUrl: profileData.value.websiteUrl
+    // プロフィールデータが利用可能になるまで待機
+    if (profileData.value) {
+      // 編集データを初期化
+      editData.value = {
+        displayName: profileData.value.displayName,
+        username: profileData.value.username,
+        bio: profileData.value.bio,
+        discordUsername: profileData.value.discordUsername,
+        twitterUsername: profileData.value.twitterUsername,
+        vrchatUsername: profileData.value.vrchatUsername,
+        websiteUrl: profileData.value.websiteUrl
+      }
     }
   } catch (err) {
     console.error('プロフィール取得エラー:', err)
