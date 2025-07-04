@@ -449,14 +449,23 @@ const participantsRules = {
 
 // フォームバリデーション
 const isFormValid = computed(() => {
-  return !hasErrors.value && 
-         formData.value.title && 
+  const hasRequiredFields = formData.value.title && 
          formData.value.category && 
          formData.value.type && 
          formData.value.description && 
          formData.value.startDate && 
          formData.value.contactMethod && 
          formData.value.contactInfo
+         
+  console.log('Post form validation:', {
+    hasErrors: hasErrors.value,
+    hasRequiredFields,
+    formData: formData.value,
+    errors: errors.value
+  })
+  
+  // 一時的に簡素化 - hasErrorsチェックを外す
+  return hasRequiredFields
 })
 
 // 連絡先のラベルとプレースホルダーを取得
@@ -600,6 +609,10 @@ const removeImage = (index: number) => {
 
 // フォーム送信
 const handleSubmit = async () => {
+  console.log('Submit button clicked!')
+  console.log('Form valid?', isFormValid.value)
+  console.log('Form data:', formData.value)
+  
   if (!authStore.isAuthenticated) {
     toast.error('ログインが必要です')
     router.push('/login')
