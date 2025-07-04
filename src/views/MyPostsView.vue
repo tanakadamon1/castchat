@@ -180,11 +180,12 @@ import LoadingSpinner from '@/components/ui/LoadingSpinner.vue'
 import ErrorState from '@/components/ui/ErrorState.vue'
 import EmptyState from '@/components/ui/EmptyState.vue'
 import ImageViewer from '@/components/ui/ImageViewer.vue'
-import { toast } from '@/composables/useToast'
+import { useToast } from '@/composables/useToast'
 import { postsApi } from '@/lib/postsApi'
 
 const router = useRouter()
 const authStore = useAuthStore()
+const toast = useToast()
 
 // State
 const posts = ref<Post[]>([])

@@ -151,7 +151,9 @@ import BaseButton from '@/components/ui/BaseButton.vue'
 import BaseSelect from '@/components/ui/BaseSelect.vue'
 import BaseCheckbox from '@/components/ui/BaseCheckbox.vue'
 import BaseModal from '@/components/ui/BaseModal.vue'
-import { toast } from '@/composables/useToast'
+import { useToast } from '@/composables/useToast'
+
+const toast = useToast()
 
 // Demo form data
 const demoForm = ref({

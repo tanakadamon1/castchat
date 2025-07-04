@@ -137,13 +137,14 @@ import LoadingSpinner from '@/components/ui/LoadingSpinner.vue'
 import ErrorState from '@/components/ui/ErrorState.vue'
 import EmptyState from '@/components/ui/EmptyState.vue'
 import ImageViewer from '@/components/ui/ImageViewer.vue'
-import { toast } from '@/composables/useToast'
+import { useToast } from '@/composables/useToast'
 import { postsApi } from '@/lib/postsApi'
-import { useMemoizedComputed, useListMemoization } from '@/composables/useMemoizedComputed'
+// import { useMemoizedComputed, useListMemoization } from '@/composables/useMemoizedComputed'
 import { useKeyboardNavigation } from '@/composables/useKeyboardNavigation'
 import { useScreenReader } from '@/composables/useScreenReader'
 
 const router = useRouter()
+const toast = useToast()
 
 // アクセシビリティ
 const postsContainerRef = ref<HTMLElement | null>(null)
@@ -171,16 +172,13 @@ const showImageViewer = ref(false)
 const selectedImages = ref<string[]>([])
 const selectedImageIndex = ref(0)
 
-// Computed - メモ化を使用してパフォーマンス向上
-const totalPages = useMemoizedComputed(
-  () => Math.ceil(total.value / perPage.value),
-  () => [total.value, perPage.value]
-)
+// Computed - シンプルなcomputed
+const totalPages = computed(() => Math.ceil(total.value / perPage.value))
 
-// リストメモ化によるレンダリング最適化
-const { itemsMap: postsMap, hasChanged: hasPostChanged } = useListMemoization(
-  computed(() => posts.value)
-)
+// リストメモ化を一時的に無効化
+// const { itemsMap: postsMap, hasChanged: hasPostChanged } = useListMemoization(
+//   computed(() => posts.value)
+// )
 
 // Methods
 const loadPosts = async (showLoading = true) => {
