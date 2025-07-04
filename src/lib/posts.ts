@@ -489,7 +489,7 @@ export class PostsService {
           *,
           users!posts_user_id_fkey(id, username, display_name, avatar_url, is_verified),
           post_categories!posts_category_id_fkey(id, name, slug),
-          post_tags!inner(tags(id, name, slug)),
+          post_tags(tags(id, name, slug)),
           post_images(id, url, alt_text, display_order),
           applications(id)
         `, { count: 'exact' })
