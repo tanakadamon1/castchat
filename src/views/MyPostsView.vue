@@ -173,15 +173,13 @@ import { useRouter } from 'vue-router'
 import { useAuthStore } from '@/stores/auth'
 import type { Post } from '@/types/post'
 import PostCard from '@/components/post/PostCard.vue'
-import {
-  BaseButton,
-  BaseSelect,
-  BasePagination,
-  LoadingSpinner,
-  ErrorState,
-  EmptyState,
-  toast
-} from '@/components/ui'
+import BaseButton from '@/components/ui/BaseButton.vue'
+import BaseSelect from '@/components/ui/BaseSelect.vue'
+import BasePagination from '@/components/ui/BasePagination.vue'
+import LoadingSpinner from '@/components/ui/LoadingSpinner.vue'
+import ErrorState from '@/components/ui/ErrorState.vue'
+import EmptyState from '@/components/ui/EmptyState.vue'
+import { toast } from '@/components/ui'
 import ImageViewer from '@/components/ui/ImageViewer.vue'
 import { postsApi } from '@/lib/postsApi'
 

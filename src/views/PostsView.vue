@@ -128,23 +128,19 @@ import { useRouter } from 'vue-router'
 import type { Post, PostFilter } from '@/types/post'
 import PostCard from '@/components/post/PostCard.vue'
 import PostSearch from '@/components/post/PostSearch.vue'
-import {
-  BaseButton,
-  BasePagination,
-  LoadingSpinner,
-  ErrorState,
-  EmptyState,
-  toast
-} from '@/components/ui'
+import BaseButton from '@/components/ui/BaseButton.vue'
+import BasePagination from '@/components/ui/BasePagination.vue'
+import LoadingSpinner from '@/components/ui/LoadingSpinner.vue'
+import ErrorState from '@/components/ui/ErrorState.vue'
+import EmptyState from '@/components/ui/EmptyState.vue'
+import { toast } from '@/components/ui'
 import ImageViewer from '@/components/ui/ImageViewer.vue'
 import { postsApi } from '@/lib/postsApi'
 import { useMemoizedComputed, useListMemoization } from '@/composables/useMemoizedComputed'
-import { usePerformanceMonitor } from '@/utils/performanceMonitor'
 import { useKeyboardNavigation } from '@/composables/useKeyboardNavigation'
 import { useScreenReader } from '@/composables/useScreenReader'
 
 const router = useRouter()
-const { measureAsync } = usePerformanceMonitor()
 
 // アクセシビリティ
 const postsContainerRef = ref<HTMLElement | null>(null)
@@ -192,17 +188,15 @@ const loadPosts = async (showLoading = true) => {
   error.value = null
   
   try {
-    // パフォーマンス測定付きAPIコール
-    const result = await measureAsync('load-posts', async () => {
-      return await postsApi.getPosts({
-        category: filters.value.category,
-        search: filters.value.search,
-        type: filters.value.type,
-        status: filters.value.status || 'active',
-        sortBy: filters.value.sortBy || 'newest',
-        limit: perPage.value,
-        offset: (currentPage.value - 1) * perPage.value
-      })
+    // APIコール
+    const result = await postsApi.getPosts({
+      category: filters.value.category,
+      search: filters.value.search,
+      type: filters.value.type,
+      status: filters.value.status || 'active',
+      sortBy: filters.value.sortBy || 'newest',
+      limit: perPage.value,
+      offset: (currentPage.value - 1) * perPage.value
     })
     
     if (result.error) {

@@ -127,7 +127,7 @@
 <script setup lang="ts">
 import { ref, computed, watch } from 'vue'
 import type { PostFilter } from '@/types/post'
-import { BaseSelect } from '@/components/ui'
+import BaseSelect from '@/components/ui/BaseSelect.vue'
 
 interface Props {
   modelValue: PostFilter

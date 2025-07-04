@@ -179,7 +179,7 @@
 import { computed } from 'vue'
 import type { Post } from '@/types/post'
 import { categoryLabels, statusLabels, eventFrequencyLabels, weekdayLabels, weekOfMonthLabels } from '@/utils/mockData'
-import { BaseButton } from '@/components/ui'
+import BaseButton from '@/components/ui/BaseButton.vue'
 import LazyImage from '@/components/ui/LazyImage.vue'
 import { useAuthStore } from '@/stores/auth'
 
