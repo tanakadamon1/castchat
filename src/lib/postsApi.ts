@@ -47,23 +47,21 @@ export const postsApi = {
         title: post.title,
         description: post.description,
         category: (post.category?.slug as any) || 'other',
-        type: (post.post_type as any) || 'volunteer',
         status: (post.status === 'published' ? 'active' : 'closed') as any,
         deadline: post.deadline || undefined,
         maxParticipants: post.recruitment_count || 1,
-        minParticipants: post.min_participants || 1,
         contactMethod: (post.contact_method as any) || 'form',
         contactValue: post.contact_value || '',
         requirements: post.requirements ? [post.requirements] : [],
         tags: post.tags?.map(tag => tag.name) || [],
-        payment: post.payment_info || '相談',
         authorId: post.user_id,
         authorName: post.user?.display_name || post.user?.username || '匿名',
-        authorAvatar: post.user?.avatar_url || undefined,
         createdAt: post.created_at,
         updatedAt: post.updated_at || post.created_at,
-        viewsCount: post.view_count || 0,
-        applicationsCount: post.application_count || 0
+        applicationsCount: post.application_count || 0,
+        eventStartDate: post.event_start_date || undefined,
+        eventFrequency: post.event_frequency || undefined,
+        images: post.images || []
       }))
 
       return { data: posts, total: result.count || 0 }
@@ -94,23 +92,21 @@ export const postsApi = {
         title: post.title,
         description: post.description,
         category: (post.category?.slug as any) || 'other',
-        type: (post.post_type as any) || 'volunteer',
         status: (post.status === 'published' ? 'active' : 'closed') as any,
         deadline: post.deadline || undefined,
         maxParticipants: post.recruitment_count || 1,
-        minParticipants: post.min_participants || 1,
         contactMethod: (post.contact_method as any) || 'form',
         contactValue: post.contact_value || '',
         requirements: post.requirements ? [post.requirements] : [],
         tags: post.tags?.map(tag => tag.name) || [],
-        payment: post.payment_info || '相談',
         authorId: post.user_id,
         authorName: post.user?.display_name || post.user?.username || '匿名',
-        authorAvatar: post.user?.avatar_url || undefined,
         createdAt: post.created_at,
         updatedAt: post.updated_at || post.created_at,
-        viewsCount: post.view_count || 0,
-        applicationsCount: post.application_count || 0
+        applicationsCount: post.application_count || 0,
+        eventStartDate: post.event_start_date || undefined,
+        eventFrequency: post.event_frequency || undefined,
+        images: post.images || []
       }
 
       return { data: transformedPost }
@@ -139,15 +135,16 @@ export const postsApi = {
       console.log('postsApi.createPost: User ID:', authStore.user.id)
       console.log('postsApi.createPost: User object:', JSON.stringify(authStore.user, null, 2))
 
-      // カテゴリslugをIDに変換（実際のデータベースのカテゴリに合わせる）
+      // カテゴリslugをIDに変換（新しいカテゴリに合わせる）
       const categoryMap: Record<string, string> = {
-        'streaming': '7c104ccc-ae25-44c8-b8b6-d8392d8b44e0', // 配信・動画
-        'event': '7de2f5db-0a00-4b55-adf0-10f9ecf755a1',     // イベント
-        'photo': 'b6928c39-9e2b-48f6-b4a1-8291543f4374',     // アバター制作（写真に近い）
-        'roleplay': '86701fea-6a75-4abe-bdf6-d04534043093',  // ワールド制作（ロールプレイに近い）
-        'game': '86701fea-6a75-4abe-bdf6-d04534043093',      // ワールド制作（ゲームに近い）
-        'music': '7c104ccc-ae25-44c8-b8b6-d8392d8b44e0',     // 配信・動画（音楽も配信に含む）
-        'other': '8878469d-a3b7-40f5-ad32-7be0846f2498'      // その他
+        'customer-service': '86701fea-6a75-4abe-bdf6-d04534043093', // 接客
+        'meetings': 'b6928c39-9e2b-48f6-b4a1-8291543f4374',        // 集会
+        'music-dance': '7de2f5db-0a00-4b55-adf0-10f9ecf755a1',     // 音楽・ダンス
+        'social': '7c104ccc-ae25-44c8-b8b6-d8392d8b44e0',           // 出会い
+        'beginners': 'd93d482c-402a-469f-ba9a-92da08ff05e8',       // 初心者
+        'roleplay': '50a97664-cd88-45a3-baf7-8e2c2776df03',        // ロールプレイ
+        'games': '23e2cbf3-3a80-4249-afaa-491b696bf94b',           // ゲーム
+        'other': '8878469d-a3b7-40f5-ad32-7be0846f2498'             // その他
       }
 
       const categoryId = categoryMap[postData.category] || categoryMap['other']
@@ -161,14 +158,11 @@ export const postsApi = {
         description: postData.description,
         requirements: postData.requirements?.join ? postData.requirements.join(', ') : (typeof postData.requirements === 'string' ? postData.requirements : ''),
         recruitment_count: postData.maxParticipants || 1,
-        deadline: postData.endDate ? new Date(postData.endDate).toISOString().split('T')[0] : (postData.startDate ? new Date(postData.startDate).toISOString().split('T')[0] : null),
-        post_type: postData.type || 'volunteer',
+        deadline: postData.deadline ? new Date(postData.deadline).toISOString().split('T')[0] : null,
         contact_method: postData.contactMethod || null,
         contact_value: postData.contactValue || null,
-        payment_info: postData.payment || null,
-        start_date: postData.startDate ? new Date(postData.startDate).toISOString() : null,
-        end_date: postData.endDate ? new Date(postData.endDate).toISOString() : null,
-        min_participants: postData.minParticipants || 1
+        event_start_date: postData.eventStartDate ? new Date(postData.eventStartDate).toISOString() : null,
+        event_frequency: postData.eventFrequency || null
       }
       
       console.log('postsApi.createPost: Prepared data for database:', createData)

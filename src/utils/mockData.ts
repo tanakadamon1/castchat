@@ -158,19 +158,21 @@ export const mockPosts: Post[] = [
 ]
 
 export const categoryLabels = {
-  video: '動画制作',
-  streaming: '配信',
-  event: 'イベント',
-  photo: '写真撮影',
-  modeling: 'モデリング',
-  voice: 'ボイス',
-  other: 'その他'
+  'customer-service': '接客',
+  'meetings': '集会',
+  'music-dance': '音楽・ダンス',
+  'social': '出会い',
+  'beginners': '初心者',
+  'roleplay': 'ロールプレイ',
+  'games': 'ゲーム',
+  'other': 'その他'
 }
 
-export const typeLabels = {
-  paid: '有償',
-  volunteer: '無償',
-  collaboration: 'コラボ'
+export const eventFrequencyLabels = {
+  'once': '単発',
+  'weekly': '週1',
+  'biweekly': '隔週',
+  'monthly': '月1'
 }
 
 export const contactMethodLabels = {

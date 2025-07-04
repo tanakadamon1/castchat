@@ -3,45 +3,39 @@ export interface Post {
   title: string
   description: string
   category: PostCategory
-  type: PostType
   requirements: string[]
-  compensation?: string
   deadline?: string
   worldName?: string
-  worldUrl?: string
   contactMethod: ContactMethod
   contactValue: string
   authorId: string
   authorName: string
-  authorAvatar?: string
   status: PostStatus
   createdAt: string
   updatedAt: string
   applicationsCount: number
-  viewsCount: number
   tags: string[]
   images?: string[]
-  // Legacy fields for compatibility
-  startDate?: string
-  endDate?: string
   maxParticipants?: number
-  minParticipants?: number
-  payment?: string
+  eventStartDate?: string
+  eventFrequency?: EventFrequency
 }
 
 export type PostCategory = 
-  | 'video' // 動画制作
-  | 'streaming' // 配信
-  | 'event' // イベント
-  | 'photo' // 写真撮影
-  | 'modeling' // モデル
-  | 'voice' // ボイス
+  | 'customer-service' // 接客
+  | 'meetings' // 集会
+  | 'music-dance' // 音楽・ダンス
+  | 'social' // 出会い
+  | 'beginners' // 初心者
+  | 'roleplay' // ロールプレイ
+  | 'games' // ゲーム
   | 'other' // その他
 
-export type PostType = 
-  | 'paid' // 有償
-  | 'volunteer' // 無償
-  | 'collaboration' // コラボ
+export type EventFrequency = 
+  | 'once' // 単発
+  | 'weekly' // 週1
+  | 'biweekly' // 隔週
+  | 'monthly' // 月1
 
 export type ContactMethod = 
   | 'discord' // Discord
@@ -56,7 +50,6 @@ export type PostStatus =
 
 export interface PostFilter {
   category?: PostCategory
-  type?: PostType
   search?: string
   tags?: string[]
   status?: PostStatus

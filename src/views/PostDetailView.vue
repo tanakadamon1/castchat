@@ -55,9 +55,6 @@
               <span :class="statusBadgeClasses">
                 {{ statusLabels[post.status] }}
               </span>
-              <span :class="typeBadgeClasses">
-                {{ typeLabels[post.type] }}
-              </span>
             </div>
           </div>
           
@@ -103,18 +100,21 @@
             <h3 class="text-lg font-semibold text-gray-900 mb-4">詳細情報</h3>
             
             <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <!-- Compensation -->
+              <!-- Event Start Date -->
               <div
-                v-if="post.payment"
-                class="bg-green-50 rounded-lg p-4"
+                v-if="post.eventStartDate"
+                class="bg-blue-50 rounded-lg p-4"
               >
                 <div class="flex items-center mb-2">
-                  <svg class="w-5 h-5 text-green-600 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1" />
+                  <svg class="w-5 h-5 text-blue-600 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
                   </svg>
-                  <span class="font-medium text-green-900">報酬</span>
+                  <span class="font-medium text-blue-900">開始日時</span>
                 </div>
-                <p class="text-green-800">{{ post.payment }}</p>
+                <p class="text-blue-800">
+                  {{ formatDate(post.eventStartDate) }}
+                  <span v-if="post.eventFrequency" class="ml-2">({{ eventFrequencyLabels[post.eventFrequency] }})</span>
+                </p>
               </div>
               
               <!-- Deadline -->
@@ -157,7 +157,15 @@
                   <span class="font-medium text-gray-900">連絡方法</span>
                 </div>
                 <p class="text-gray-700">
-                  {{ contactMethodLabels[post.contactMethod] || post.contactMethod }}: {{ post.contactValue }}
+                  {{ contactMethodLabels[post.contactMethod] || post.contactMethod }}:
+                  <a 
+                    :href="getContactLink(post.contactMethod, post.contactValue)"
+                    :target="post.contactMethod === 'discord' ? '_self' : '_blank'"
+                    :rel="post.contactMethod === 'discord' ? '' : 'noopener noreferrer'"
+                    class="text-blue-600 hover:text-blue-800 underline ml-1"
+                  >
+                    {{ post.contactValue }}
+                  </a>
                 </p>
               </div>
             </div>
@@ -259,7 +267,7 @@ import LoadingSpinner from '@/components/ui/LoadingSpinner.vue'
 import ErrorState from '@/components/ui/ErrorState.vue'
 import ApplicationModal from '@/components/application/ApplicationModal.vue'
 import { postsApi } from '@/lib/postsApi'
-import { categoryLabels, typeLabels, statusLabels, contactMethodLabels } from '@/utils/mockData'
+import { categoryLabels, statusLabels, contactMethodLabels, eventFrequencyLabels } from '@/utils/mockData'
 
 const route = useRoute()
 const router = useRouter()
@@ -287,19 +295,20 @@ const statusBadgeClasses = computed(() => {
   return `${baseClasses} ${variants[post.value.status]}`
 })
 
-const typeBadgeClasses = computed(() => {
-  if (!post.value) return ''
-  
-  const baseClasses = 'inline-flex items-center px-3 py-1 rounded-full text-sm font-medium'
-  
-  const variants = {
-    paid: 'bg-blue-100 text-blue-800',
-    volunteer: 'bg-purple-100 text-purple-800',
-    collaboration: 'bg-orange-100 text-orange-800'
+const getContactLink = (method: string, value: string) => {
+  switch (method) {
+    case 'discord':
+      return `https://discord.com/users/${value.replace('#', '')}`
+    case 'twitter':
+      return `https://twitter.com/${value.replace('@', '')}`
+    case 'email':
+      return `mailto:${value}`
+    case 'vrchat':
+      return `https://vrchat.com/home/user/${value}`
+    default:
+      return '#'
   }
-  
-  return `${baseClasses} ${variants[post.value.type]}`
-})
+}
 
 // Methods
 const loadPost = async () => {

@@ -30,38 +30,15 @@
               />
             </div>
 
-            <!-- カテゴリとタイプ -->
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div>
-                <BaseSelect
-                  v-model="formData.category"
-                  label="カテゴリ"
-                  :options="categoryOptions"
-                  required
-                  :error="getFieldError('category')"
-                  @change="validateField('category', formData.category, requiredRules)"
-                />
-              </div>
-              <div>
-                <BaseSelect
-                  v-model="formData.type"
-                  label="募集タイプ"
-                  :options="typeOptions"
-                  required
-                  :error="getFieldError('type')"
-                  @change="validateField('type', formData.type, requiredRules)"
-                />
-              </div>
-            </div>
-
-            <!-- 報酬 -->
+            <!-- カテゴリ -->
             <div>
-              <BaseInput
-                v-model="formData.payment"
-                label="報酬・条件"
-                placeholder="例：時給1,000円、ボランティア、相談"
-                :error="getFieldError('payment')"
-                @blur="validateField('payment', formData.payment, {})"
+              <BaseSelect
+                v-model="formData.category"
+                label="カテゴリ"
+                :options="categoryOptions"
+                required
+                :error="getFieldError('category')"
+                @change="validateField('category', formData.category, requiredRules)"
               />
             </div>
           </div>
@@ -120,32 +97,42 @@
               </div>
             </div>
 
-            <!-- 募集人数 -->
+            <!-- イベント開始日時と頻度 -->
             <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
                 <BaseInput
-                  v-model="formData.maxParticipants"
-                  type="number"
-                  label="最大募集人数"
-                  placeholder="例：5"
-                  min="1"
-                  max="100"
-                  :error="getFieldError('maxParticipants')"
-                  @blur="validateField('maxParticipants', formData.maxParticipants, participantsRules)"
+                  v-model="formData.eventStartDate"
+                  type="datetime-local"
+                  label="イベント開始日時"
+                  required
+                  :error="getFieldError('eventStartDate')"
+                  @blur="validateField('eventStartDate', formData.eventStartDate, requiredRules)"
                 />
               </div>
               <div>
-                <BaseInput
-                  v-model="formData.minParticipants"
-                  type="number"
-                  label="最小催行人数（任意）"
-                  placeholder="例：2"
-                  min="1"
-                  :max="formData.maxParticipants || 100"
-                  :error="getFieldError('minParticipants')"
-                  @blur="validateMinParticipants"
+                <BaseSelect
+                  v-model="formData.eventFrequency"
+                  label="開催頻度"
+                  :options="frequencyOptions"
+                  required
+                  :error="getFieldError('eventFrequency')"
+                  @change="validateField('eventFrequency', formData.eventFrequency, requiredRules)"
                 />
               </div>
+            </div>
+
+            <!-- 募集人数 -->
+            <div>
+              <BaseInput
+                v-model="formData.maxParticipants"
+                type="number"
+                label="最大募集人数"
+                placeholder="例：5"
+                min="1"
+                max="100"
+                :error="getFieldError('maxParticipants')"
+                @blur="validateField('maxParticipants', formData.maxParticipants, participantsRules)"
+              />
             </div>
           </div>
         </div>
@@ -334,7 +321,7 @@ import BaseTextarea from '@/components/ui/BaseTextarea.vue'
 import BaseSelect from '@/components/ui/BaseSelect.vue'
 import BaseButton from '@/components/ui/BaseButton.vue'
 import PostCard from '@/components/post/PostCard.vue'
-import type { PostCategory, PostType, ContactMethod, Post } from '@/types/post'
+import type { PostCategory, ContactMethod, Post, EventFrequency } from '@/types/post'
 
 const router = useRouter()
 const route = useRoute()
@@ -350,16 +337,14 @@ const postId = computed(() => route.params.id as string)
 const formData = ref({
   title: '',
   category: '' as PostCategory | '',
-  type: '' as PostType | '',
   description: '',
   requirements: '',
-  payment: '',
-  startDate: '',
-  endDate: '',
+  eventStartDate: '',
+  eventFrequency: '' as EventFrequency | '',
   maxParticipants: undefined as number | undefined,
-  minParticipants: undefined as number | undefined,
   contactMethod: '' as ContactMethod | '',
   contactInfo: '',
+  deadline: '',
   additionalNotes: ''
 })
 
@@ -409,19 +394,21 @@ const previewPost = computed(() => {
 
 // セレクトボックスのオプション
 const categoryOptions = [
-  { value: 'streaming', label: '配信・動画撮影' },
-  { value: 'event', label: 'イベント・パーティー' },
-  { value: 'photo', label: '写真撮影・モデル' },
-  { value: 'roleplay', label: 'ロールプレイ・演技' },
-  { value: 'game', label: 'ゲーム・競技' },
-  { value: 'music', label: '音楽・ダンス' },
+  { value: 'customer-service', label: '接客' },
+  { value: 'meetings', label: '集会' },
+  { value: 'music-dance', label: '音楽・ダンス' },
+  { value: 'social', label: '出会い' },
+  { value: 'beginners', label: '初心者' },
+  { value: 'roleplay', label: 'ロールプレイ' },
+  { value: 'games', label: 'ゲーム' },
   { value: 'other', label: 'その他' }
 ]
 
-const typeOptions = [
-  { value: 'paid', label: '有償' },
-  { value: 'volunteer', label: 'ボランティア' },
-  { value: 'collaboration', label: 'コラボ' }
+const frequencyOptions = [
+  { value: 'once', label: '単発' },
+  { value: 'weekly', label: '週1' },
+  { value: 'biweekly', label: '隔週' },
+  { value: 'monthly', label: '月1' }
 ]
 
 const contactMethodOptions = [
@@ -461,9 +448,9 @@ const participantsRules = {
 const isFormValid = computed(() => {
   const hasRequiredFields = formData.value.title && 
          formData.value.category && 
-         formData.value.type && 
          formData.value.description && 
-         formData.value.startDate && 
+         formData.value.eventStartDate && 
+         formData.value.eventFrequency && 
          formData.value.contactMethod && 
          formData.value.contactInfo
          
@@ -474,7 +461,6 @@ const isFormValid = computed(() => {
     errors: errors.value
   })
   
-  // 一時的に簡素化 - hasErrorsチェックを外す
   return hasRequiredFields
 })
 
@@ -784,16 +770,14 @@ const submitPost = async () => {
   const postData: Partial<Post> = {
     title: formData.value.title,
     category: formData.value.category as PostCategory,
-    type: formData.value.type as PostType,
     description: formData.value.description,
     requirements: formData.value.requirements ? [formData.value.requirements] : [],
-    payment: formData.value.payment,
-    startDate: formData.value.startDate,
-    endDate: formData.value.endDate || undefined,
+    deadline: formData.value.deadline || undefined,
     maxParticipants: formData.value.maxParticipants || 1,
-    minParticipants: formData.value.minParticipants || 1,
     contactMethod: formData.value.contactMethod as ContactMethod,
     contactValue: formData.value.contactInfo,
+    eventStartDate: formData.value.eventStartDate,
+    eventFrequency: formData.value.eventFrequency as EventFrequency,
     tags: [],
     images: imageUrls
   }
