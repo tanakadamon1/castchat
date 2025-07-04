@@ -128,51 +128,78 @@ export const postsApi = {
         return { data: null, error: 'ログインが必要です' }
       }
 
+      console.log('postsApi.createPost: Input data:', postData)
+      console.log('postsApi.createPost: User ID:', authStore.user.id)
+
+      // カテゴリslugをIDに変換
+      const categoryMap: Record<string, string> = {
+        'world-creation': '86701fea-6a75-4abe-bdf6-d04534043093',
+        'avatar-creation': 'b6928c39-9e2b-48f6-b4a1-8291543f4374',
+        'events': '7de2f5db-0a00-4b55-adf0-10f9ecf755a1',
+        'streaming': '7c104ccc-ae25-44c8-b8b6-d8392d8b44e0',
+        'other': '8878469d-a3b7-40f5-ad32-7be0846f2498'
+      }
+
+      const categoryId = categoryMap[postData.category] || categoryMap['other']
+      console.log('postsApi.createPost: Category mapping:', postData.category, '->', categoryId)
+
       // フロントエンドのデータをバックエンド形式に変換
-      const createData: PostCreateData = {
+      const createData = {
+        user_id: authStore.user.id,
+        category_id: categoryId,
         title: postData.title,
         description: postData.description,
-        category_id: postData.category, // カテゴリはIDに変換が必要かもしれません
-        requirements: postData.requirements?.join ? postData.requirements.join(', ') : postData.requirements,
-        recruitment_count: postData.maxParticipants,
-        deadline: postData.endDate || postData.startDate
+        requirements: postData.requirements?.join ? postData.requirements.join(', ') : (typeof postData.requirements === 'string' ? postData.requirements : ''),
+        recruitment_count: postData.maxParticipants || 1,
+        deadline: postData.endDate || postData.startDate || null
       }
-
-      const result = await postsService.createPost(authStore.user.id, createData)
       
-      if (result.error) {
-        return { data: null, error: result.error.message }
+      console.log('postsApi.createPost: Prepared data for database:', createData)
+
+      // Supabaseに直接挿入
+      const { data: insertedPost, error: insertError } = await import('@/lib/supabase').then(m => m.supabase)
+        .from('posts')
+        .insert([createData])
+        .select()
+        .single()
+
+      console.log('postsApi.createPost: Supabase insert result:', { insertedPost, insertError })
+      
+      if (insertError) {
+        console.error('postsApi.createPost: Insert error:', insertError)
+        return { data: null, error: insertError.message }
       }
 
-      if (!result.data) {
+      if (!insertedPost) {
         return { data: null, error: '投稿の作成に失敗しました' }
       }
 
       // レスポンスデータをフロントエンド形式に変換
-      const post = result.data
       const transformedPost: Post = {
-        id: post.id,
-        title: post.title,
-        description: post.description,
+        id: insertedPost.id,
+        title: insertedPost.title,
+        description: insertedPost.description,
         category: postData.category, // 元のカテゴリ値を使用
         type: postData.type,
         status: 'active' as any,
-        deadline: post.deadline || undefined,
-        maxParticipants: post.recruitment_count || 1,
+        deadline: insertedPost.deadline || undefined,
+        maxParticipants: insertedPost.recruitment_count || 1,
         minParticipants: postData.minParticipants || 1,
         contactMethod: postData.contactMethod,
         contactValue: postData.contactValue,
         requirements: postData.requirements || [],
         tags: [],
         payment: postData.payment,
-        authorId: post.user_id,
+        authorId: insertedPost.user_id,
         authorName: authStore.user.user_metadata?.display_name || '匿名',
         authorAvatar: authStore.user.user_metadata?.avatar_url,
-        createdAt: post.created_at,
-        updatedAt: post.updated_at || post.created_at,
+        createdAt: insertedPost.created_at,
+        updatedAt: insertedPost.updated_at || insertedPost.created_at,
         viewsCount: 0,
         applicationsCount: 0
       }
+      
+      console.log('postsApi.createPost: Transformed post:', transformedPost)
 
       return { data: transformedPost }
     } catch (error) {

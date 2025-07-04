@@ -117,7 +117,8 @@
       "Bash(vercel:*)",
       "Bash(git push:*)",
       "WebFetch(domain:www.castchat.jp)",
-      "mcp__supabase__list_projects"
+      "mcp__supabase__list_projects",
+      "mcp__supabase__list_tables"
     ],
     "deny": []
   }
