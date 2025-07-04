@@ -2,6 +2,7 @@ import { postsService } from './posts'
 import type { PostCreateData } from './posts'
 import type { Post } from '@/types/post'
 import { useAuthStore } from '@/stores/auth'
+import { supabase } from '@/lib/supabase'
 
 export interface PostsResponse {
   data: Post[]
@@ -166,7 +167,7 @@ export const postsApi = {
       console.log('postsApi.createPost: Prepared data for database:', createData)
 
       // Supabaseに直接挿入
-      const { data: insertedPost, error: insertError } = await import('@/lib/supabase').then(m => m.supabase)
+      const { data: insertedPost, error: insertError } = await supabase
         .from('posts')
         .insert([createData])
         .select()
@@ -253,7 +254,7 @@ export const postsApi = {
       
       console.log('Test data:', testData)
 
-      const { data, error } = await import('@/lib/supabase').then(m => m.supabase)
+      const { data, error } = await supabase
         .from('posts')
         .insert([testData])
         .select()
