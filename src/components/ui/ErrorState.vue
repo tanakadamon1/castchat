@@ -3,12 +3,27 @@
     <div class="text-center max-w-md mx-auto">
       <!-- エラーアイコン -->
       <div :class="iconContainerClasses">
-        <component
-          :is="iconComponent"
+        <svg 
           :class="iconClasses"
           :aria-label="title"
           role="img"
-        />
+          fill="none" 
+          viewBox="0 0 24 24" 
+          stroke="currentColor"
+        >
+          <!-- General/Alert Circle -->
+          <path v-if="props.type === 'general'" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+          <!-- Network/Wifi -->
+          <path v-else-if="props.type === 'network'" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.111 16.404a5.5 5.5 0 017.778 0M12 20h.01m-7.08-7.071c3.904-3.905 10.236-3.905 14.141 0M1.394 9.393c5.857-5.857 15.355-5.857 21.213 0" />
+          <!-- Not Found/Search -->
+          <path v-else-if="props.type === 'not-found'" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+          <!-- Forbidden/Shield Alert -->
+          <path v-else-if="props.type === 'forbidden'" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.618 5.984A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016zM12 9v2m0 4h.01" />
+          <!-- Server/Cloud -->
+          <path v-else-if="props.type === 'server'" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" />
+          <!-- Timeout/Validation/Alert Triangle -->
+          <path v-else stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+        </svg>
       </div>
       
       <!-- エラータイトル -->
@@ -51,7 +66,9 @@
             :disabled="retrying"
             variant="primary"
           >
-            <RotateCcw v-if="retrying" class="w-4 h-4 mr-2 animate-spin" />
+            <svg v-if="retrying" class="w-4 h-4 mr-2 animate-spin" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+            </svg>
             {{ retrying ? '再試行中...' : '再試行' }}
           </BaseButton>
           
@@ -60,7 +77,9 @@
             @click="goHome"
             variant="outline"
           >
-            <Home class="w-4 h-4 mr-2" />
+            <svg class="w-4 h-4 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
+            </svg>
             ホームに戻る
           </BaseButton>
           
@@ -70,7 +89,9 @@
             variant="ghost"
             size="sm"
           >
-            <AlertTriangle class="w-4 h-4 mr-2" />
+            <svg class="w-4 h-4 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+            </svg>
             問題を報告
           </BaseButton>
         </slot>
@@ -92,17 +113,8 @@
 <script setup lang="ts">
 import { computed, ref } from 'vue'
 import { useRouter } from 'vue-router'
-import { BaseButton } from '@/components/ui'
-import {
-  AlertTriangle,
-  Wifi,
-  Search,
-  ShieldAlert,
-  AlertCircle,
-  Cloud,
-  RotateCcw,
-  Home
-} from 'lucide-vue-next'
+import BaseButton from './BaseButton.vue'
+// SVGアイコンを直接定義
 
 interface Props {
   type?: 'general' | 'network' | 'not-found' | 'forbidden' | 'server' | 'timeout' | 'validation'
@@ -150,17 +162,6 @@ const emit = defineEmits<Emits>()
 const router = useRouter()
 const retrying = ref(false)
 
-// アイコンマッピング
-const iconComponents = {
-  general: AlertCircle,
-  network: Wifi,
-  'not-found': Search,
-  forbidden: ShieldAlert,
-  server: Cloud,
-  timeout: AlertTriangle,
-  validation: AlertTriangle
-}
-
 // Computed
 const containerClasses = computed(() => {
   const baseClasses = 'flex items-center justify-center px-4'
@@ -171,8 +172,6 @@ const containerClasses = computed(() => {
   
   return `${baseClasses} py-12`
 })
-
-const iconComponent = computed(() => iconComponents[props.type])
 
 const iconContainerClasses = computed(() => {
   const severityClasses = {

@@ -59,7 +59,7 @@
 
 <script setup lang="ts">
 import { computed } from 'vue'
-import { BaseButton } from '@/components/ui'
+import BaseButton from './BaseButton.vue'
 
 interface Props {
   type?: 'general' | 'search' | 'posts' | 'applications'
