@@ -145,15 +145,13 @@
 
 <script setup lang="ts">
 import { ref, computed } from 'vue'
-import {
-  BaseInput,
-  BaseTextarea,
-  BaseButton,
-  BaseSelect,
-  BaseCheckbox,
-  BaseModal,
-  toast
-} from '@/components/ui'
+import BaseInput from '@/components/ui/BaseInput.vue'
+import BaseTextarea from '@/components/ui/BaseTextarea.vue'
+import BaseButton from '@/components/ui/BaseButton.vue'
+import BaseSelect from '@/components/ui/BaseSelect.vue'
+import BaseCheckbox from '@/components/ui/BaseCheckbox.vue'
+import BaseModal from '@/components/ui/BaseModal.vue'
+import { toast } from '@/composables/useToast'
 
 // Demo form data
 const demoForm = ref({

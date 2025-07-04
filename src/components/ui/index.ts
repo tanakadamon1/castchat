@@ -18,6 +18,10 @@ export { default as LoadingSpinner } from './LoadingSpinner.vue'
 export { default as ErrorState } from './ErrorState.vue'
 export { default as EmptyState } from './EmptyState.vue'
 
-// Composables
-export { useToast, toast } from '@/composables/useToast'
-export type { Toast } from '@/stores/toast'
+// Image Components
+export { default as ImageViewer } from './ImageViewer.vue'
+export { default as LazyImage } from './LazyImage.vue'
+
+// Other UI Components
+export { default as DarkModeToggle } from './DarkModeToggle.vue'
+export { default as SkeletonLoader } from './SkeletonLoader.vue'
