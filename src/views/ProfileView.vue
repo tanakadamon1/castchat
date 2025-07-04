@@ -230,7 +230,7 @@
         <BaseButton
           @click="handleSave"
           :loading="saving"
-          :disabled="!isFormValid"
+          :disabled="false"
           class="flex-1"
         >
           保存
@@ -337,9 +337,15 @@ const usernameRules = {
 
 // フォームの有効性
 const isFormValid = computed(() => {
-  return !hasErrors.value && 
-         editData.value.displayName.trim() && 
-         editData.value.username.trim()
+  const hasRequiredFields = editData.value.displayName?.trim() && editData.value.username?.trim()
+  console.log('Form validation:', {
+    hasErrors: hasErrors.value,
+    displayName: editData.value.displayName,
+    username: editData.value.username,
+    hasRequiredFields,
+    isValid: !hasErrors.value && hasRequiredFields
+  })
+  return !hasErrors.value && hasRequiredFields
 })
 
 // バリデーション関数
