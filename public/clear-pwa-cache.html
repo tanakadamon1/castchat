@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PWAキャッシュクリア</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            max-width: 600px;
+            margin: 50px auto;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+        .container {
+            background: white;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        h1 {
+            color: #333;
+            margin-bottom: 20px;
+        }
+        button {
+            background: #6366f1;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 6px;
+            font-size: 16px;
+            cursor: pointer;
+            margin: 10px 0;
+            display: block;
+            width: 100%;
+        }
+        button:hover {
+            background: #5558e3;
+        }
+        .status {
+            margin-top: 20px;
+            padding: 15px;
+            border-radius: 4px;
+            font-weight: 500;
+        }
+        .success {
+            background: #d4edda;
+            color: #155724;
+        }
+        .error {
+            background: #f8d7da;
+            color: #721c24;
+        }
+        .info {
+            background: #d1ecf1;
+            color: #0c5460;
+        }
+        pre {
+            background: #f4f4f4;
+            padding: 10px;
+            border-radius: 4px;
+            overflow-x: auto;
+            font-size: 14px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>PWAキャッシュクリアツール</h1>
+        <p>このツールを使用して、PWAのキャッシュとService Workerをクリアできます。</p>
+        
+        <button onclick="clearAllPWAData()">すべてのPWAデータをクリア</button>
+        <button onclick="unregisterServiceWorkers()">Service Workerの登録解除</button>
+        <button onclick="clearCaches()">キャッシュのクリア</button>
+        <button onclick="checkStatus()">ステータス確認</button>
+        
+        <div id="status"></div>
+    </div>
+
+    <script>
+        function showStatus(message, type = 'info') {
+            const statusEl = document.getElementById('status');
+            statusEl.className = `status ${type}`;
+            statusEl.innerHTML = message;
+        }
+
+        async function clearAllPWAData() {
+            try {
+                showStatus('PWAデータのクリアを開始します...', 'info');
+                
+                // 1. Service Workerの登録解除
+                await unregisterServiceWorkers();
+                
+                // 2. キャッシュのクリア
+                await clearCaches();
+                
+                // 3. IndexedDBのクリア
+                if ('indexedDB' in window) {
+                    const databases = await indexedDB.databases();
+                    for (const db of databases) {
+                        await indexedDB.deleteDatabase(db.name);
+                    }
+                }
+                
+                // 4. LocalStorageとSessionStorageのクリア
+                localStorage.clear();
+                sessionStorage.clear();
+                
+                showStatus('すべてのPWAデータをクリアしました！ページを再読み込みしてください。', 'success');
+            } catch (error) {
+                showStatus(`エラー: ${error.message}`, 'error');
+            }
+        }
+
+        async function unregisterServiceWorkers() {
+            try {
+                if ('serviceWorker' in navigator) {
+                    const registrations = await navigator.serviceWorker.getRegistrations();
+                    for (const registration of registrations) {
+                        await registration.unregister();
+                    }
+                    showStatus(`${registrations.length}個のService Workerを登録解除しました`, 'success');
+                } else {
+                    showStatus('このブラウザはService Workerをサポートしていません', 'error');
+                }
+            } catch (error) {
+                showStatus(`Service Worker登録解除エラー: ${error.message}`, 'error');
+            }
+        }
+
+        async function clearCaches() {
+            try {
+                if ('caches' in window) {
+                    const cacheNames = await caches.keys();
+                    await Promise.all(
+                        cacheNames.map(name => caches.delete(name))
+                    );
+                    showStatus(`${cacheNames.length}個のキャッシュを削除しました`, 'success');
+                } else {
+                    showStatus('このブラウザはCache APIをサポートしていません', 'error');
+                }
+            } catch (error) {
+                showStatus(`キャッシュクリアエラー: ${error.message}`, 'error');
+            }
+        }
+
+        async function checkStatus() {
+            let status = '<h3>現在のステータス</h3>';
+            
+            // Service Worker
+            if ('serviceWorker' in navigator) {
+                const registrations = await navigator.serviceWorker.getRegistrations();
+                status += `<p><strong>Service Worker:</strong> ${registrations.length}個登録済み</p>`;
+                if (registrations.length > 0) {
+                    status += '<pre>' + registrations.map(r => r.scope).join('\n') + '</pre>';
+                }
+            }
+            
+            // キャッシュ
+            if ('caches' in window) {
+                const cacheNames = await caches.keys();
+                status += `<p><strong>キャッシュ:</strong> ${cacheNames.length}個</p>`;
+                if (cacheNames.length > 0) {
+                    status += '<pre>' + cacheNames.join('\n') + '</pre>';
+                }
+            }
+            
+            // マニフェスト
+            const manifestLink = document.querySelector('link[rel="manifest"]');
+            if (manifestLink) {
+                status += `<p><strong>マニフェスト:</strong> ${manifestLink.href}</p>`;
+            }
+            
+            showStatus(status, 'info');
+        }
+
+        // ページ読み込み時にステータスを表示
+        window.addEventListener('load', checkStatus);
+    </script>
+</body>
+</html>
