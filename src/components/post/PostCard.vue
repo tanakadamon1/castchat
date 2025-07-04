@@ -153,6 +153,7 @@ import { computed } from 'vue'
 import type { Post } from '@/types/post'
 import { categoryLabels, statusLabels, eventFrequencyLabels, weekdayLabels, weekOfMonthLabels } from '@/utils/mockData'
 import { BaseButton } from '@/components/ui'
+import LazyImage from '@/components/ui/LazyImage.vue'
 
 interface Props {
   post: Post
