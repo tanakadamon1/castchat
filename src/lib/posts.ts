@@ -30,6 +30,13 @@ export interface PostCreateData {
   world_name?: string
   recruitment_count?: number
   deadline?: string
+  post_type?: string
+  contact_method?: string
+  contact_value?: string
+  payment_info?: string
+  start_date?: string
+  end_date?: string
+  min_participants?: number
   tag_ids?: string[]
   image_urls?: string[]
 }
@@ -42,6 +49,13 @@ export interface PostUpdateData {
   world_name?: string
   recruitment_count?: number
   deadline?: string
+  post_type?: string
+  contact_method?: string
+  contact_value?: string
+  payment_info?: string
+  start_date?: string
+  end_date?: string
+  min_participants?: number
   status?: Post['status']
   tag_ids?: string[]
   image_urls?: string[]
@@ -148,6 +162,13 @@ export class PostsService {
         world_name: postData.world_name || null,
         recruitment_count: postData.recruitment_count || 1,
         deadline: postData.deadline || null,
+        post_type: postData.post_type || 'volunteer',
+        contact_method: postData.contact_method || null,
+        contact_value: postData.contact_value || null,
+        payment_info: postData.payment_info || null,
+        start_date: postData.start_date || null,
+        end_date: postData.end_date || null,
+        min_participants: postData.min_participants || 1,
         status: 'published',
         published_at: new Date().toISOString()
       }
@@ -269,6 +290,13 @@ export class PostsService {
       if (updateData.world_name !== undefined) updatePayload.world_name = updateData.world_name
       if (updateData.recruitment_count !== undefined) updatePayload.recruitment_count = updateData.recruitment_count
       if (updateData.deadline !== undefined) updatePayload.deadline = updateData.deadline
+      if (updateData.post_type !== undefined) updatePayload.post_type = updateData.post_type
+      if (updateData.contact_method !== undefined) updatePayload.contact_method = updateData.contact_method
+      if (updateData.contact_value !== undefined) updatePayload.contact_value = updateData.contact_value
+      if (updateData.payment_info !== undefined) updatePayload.payment_info = updateData.payment_info
+      if (updateData.start_date !== undefined) updatePayload.start_date = updateData.start_date
+      if (updateData.end_date !== undefined) updatePayload.end_date = updateData.end_date
+      if (updateData.min_participants !== undefined) updatePayload.min_participants = updateData.min_participants
       if (updateData.status !== undefined) {
         updatePayload.status = updateData.status
         if (updateData.status === 'closed') {
