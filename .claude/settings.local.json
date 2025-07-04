@@ -115,7 +115,8 @@
       "Bash(/dev/null)",
       "Bash(touch:*)",
       "Bash(vercel:*)",
-      "Bash(git push:*)"
+      "Bash(git push:*)",
+      "WebFetch(domain:www.castchat.jp)"
     ],
     "deny": []
   }
