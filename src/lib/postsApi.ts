@@ -32,7 +32,7 @@ export const postsApi = {
       const result = await postsService.getPosts({
         category_id: filters.category,
         search: filters.search,
-        status: (filters.status as any) || 'published',
+        status: filters.status === 'active' ? 'published' : (filters.status as any),
         limit: filters.limit || 10,
         page
       })
