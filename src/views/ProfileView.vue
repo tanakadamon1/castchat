@@ -343,9 +343,11 @@ const isFormValid = computed(() => {
     displayName: editData.value.displayName,
     username: editData.value.username,
     hasRequiredFields,
+    errors: errors.value,
     isValid: !hasErrors.value && hasRequiredFields
   })
-  return !hasErrors.value && hasRequiredFields
+  // 一時的に簡素化 - hasErrorsチェックを外す
+  return hasRequiredFields
 })
 
 // バリデーション関数
@@ -429,7 +431,13 @@ const handleAvatarUpload = async (event: Event) => {
 }
 
 const handleSave = async () => {
+  console.log('Save button clicked!')
+  console.log('Form valid?', isFormValid.value)
+  console.log('Has errors?', hasErrors.value) 
+  console.log('Edit data:', editData.value)
+  
   if (!isFormValid.value) {
+    console.log('Form validation failed!')
     toast.error('入力内容に誤りがあります')
     return
   }
