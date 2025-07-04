@@ -39,16 +39,9 @@
         <!-- Header -->
         <div class="p-6 border-b border-gray-200">
           <div class="flex items-start justify-between mb-4">
-            <div class="flex items-center space-x-3">
-              <div class="w-12 h-12 rounded-full bg-gray-300 flex items-center justify-center">
-                <span class="text-gray-600 font-medium">
-                  {{ (post.authorName || '匿名').charAt(0) }}
-                </span>
-              </div>
-              <div>
-                <h2 class="font-semibold text-gray-900">{{ post.authorName || '匿名' }}</h2>
-                <p class="text-sm text-gray-500">{{ formatDate(post.createdAt) }}に投稿</p>
-              </div>
+            <div>
+              <h2 class="font-semibold text-gray-900">{{ post.authorName || '匿名' }}</h2>
+              <p class="text-sm text-gray-500">{{ formatDate(post.createdAt) }}に投稿</p>
             </div>
             
             <div class="flex items-center space-x-2">
@@ -68,13 +61,6 @@
               {{ categoryLabels[post.category] }}
             </div>
             
-            <div class="flex items-center">
-              <svg class="w-4 h-4 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
-              </svg>
-              {{ post.viewsCount }} 回閲覧
-            </div>
             
             <div class="flex items-center">
               <svg class="w-4 h-4 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -100,20 +86,19 @@
             <h3 class="text-lg font-semibold text-gray-900 mb-4">詳細情報</h3>
             
             <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <!-- Event Start Date -->
+              <!-- Event Schedule -->
               <div
-                v-if="post.eventStartDate"
+                v-if="post.eventFrequency"
                 class="bg-blue-50 rounded-lg p-4"
               >
                 <div class="flex items-center mb-2">
                   <svg class="w-5 h-5 text-blue-600 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
                   </svg>
-                  <span class="font-medium text-blue-900">開始日時</span>
+                  <span class="font-medium text-blue-900">開催日時</span>
                 </div>
                 <p class="text-blue-800">
-                  {{ formatDate(post.eventStartDate) }}
-                  <span v-if="post.eventFrequency" class="ml-2">({{ eventFrequencyLabels[post.eventFrequency] }})</span>
+                  {{ formatEventTime(post) }}
                 </p>
               </div>
               
@@ -267,7 +252,7 @@ import LoadingSpinner from '@/components/ui/LoadingSpinner.vue'
 import ErrorState from '@/components/ui/ErrorState.vue'
 import ApplicationModal from '@/components/application/ApplicationModal.vue'
 import { postsApi } from '@/lib/postsApi'
-import { categoryLabels, statusLabels, contactMethodLabels, eventFrequencyLabels } from '@/utils/mockData'
+import { categoryLabels, statusLabels, contactMethodLabels, eventFrequencyLabels, weekdayLabels, weekOfMonthLabels } from '@/utils/mockData'
 
 const route = useRoute()
 const router = useRouter()
@@ -388,6 +373,37 @@ const formatDate = (dateString: string) => {
     hour: '2-digit',
     minute: '2-digit'
   })
+}
+
+const formatEventTime = (post: any) => {
+  if (post.eventFrequency === 'once' && post.eventSpecificDate) {
+    const date = new Date(post.eventSpecificDate)
+    return date.toLocaleString('ja-JP', {
+      year: 'numeric',
+      month: 'long',
+      day: 'numeric',
+      hour: '2-digit',
+      minute: '2-digit'
+    })
+  }
+  
+  if (post.eventFrequency && post.eventWeekday !== undefined && post.eventTime) {
+    const frequency = eventFrequencyLabels[post.eventFrequency]
+    const weekday = weekdayLabels[post.eventWeekday]
+    const time = post.eventTime
+    
+    if (post.eventFrequency === 'monthly' && post.eventWeekOfMonth) {
+      const weekOfMonth = weekOfMonthLabels[post.eventWeekOfMonth]
+      return `${frequency} ${weekOfMonth}${weekday} ${time}`
+    } else if (post.eventFrequency === 'biweekly' && post.eventWeekOfMonth) {
+      const pattern = post.eventWeekOfMonth === 1 ? '第1・第3' : '第2・第4'
+      return `${pattern}${weekday} ${time}`
+    } else {
+      return `${frequency} ${weekday} ${time}`
+    }
+  }
+  
+  return eventFrequencyLabels[post.eventFrequency] || ''
 }
 
 // 応募処理

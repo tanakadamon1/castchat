@@ -422,7 +422,9 @@ export class PostsService {
         .select(`
           *,
           users!posts_user_id_fkey(id, username, display_name, is_verified),
-          post_categories!posts_category_id_fkey(id, name, slug)
+          post_categories!posts_category_id_fkey(id, name, slug),
+          post_images(url, display_order),
+          post_tags(tags(name))
         `)
         .eq('id', postId)
         .single()
@@ -516,7 +518,9 @@ export class PostsService {
         .select(`
           *,
           users!posts_user_id_fkey(id, username, display_name, is_verified),
-          post_categories!posts_category_id_fkey(id, name, slug)
+          post_categories!posts_category_id_fkey(id, name, slug),
+          post_images(url, display_order),
+          post_tags(tags(name))
         `, { count: 'exact' })
 
       // フィルター適用

@@ -17,8 +17,11 @@ export interface Post {
   tags: string[]
   images?: string[]
   maxParticipants?: number
-  eventStartDate?: string
   eventFrequency?: EventFrequency
+  eventWeekday?: number // 0=Sunday, 1=Monday, etc.
+  eventTime?: string // HH:MM format
+  eventWeekOfMonth?: number // 1=First, 2=Second, 3=Third, 4=Fourth
+  eventSpecificDate?: string // For one-time events
 }
 
 export type PostCategory = 

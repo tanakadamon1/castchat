@@ -175,6 +175,23 @@ export const eventFrequencyLabels = {
   'monthly': '月1'
 }
 
+export const weekdayLabels = {
+  0: '日曜日',
+  1: '月曜日',
+  2: '火曜日',
+  3: '水曜日',
+  4: '木曜日',
+  5: '金曜日',
+  6: '土曜日'
+}
+
+export const weekOfMonthLabels = {
+  1: '第1週',
+  2: '第2週',
+  3: '第3週',
+  4: '第4週'
+}
+
 export const contactMethodLabels = {
   discord: 'Discord',
   twitter: 'Twitter/X',

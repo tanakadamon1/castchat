@@ -53,15 +53,18 @@ export const postsApi = {
         contactMethod: (post.contact_method as any) || 'form',
         contactValue: post.contact_value || '',
         requirements: post.requirements ? [post.requirements] : [],
-        tags: post.tags?.map(tag => tag.name) || [],
+        tags: post.post_tags?.map(pt => pt.tags?.name).filter(Boolean) || [],
         authorId: post.user_id,
         authorName: post.user?.display_name || post.user?.username || '匿名',
         createdAt: post.created_at,
         updatedAt: post.updated_at || post.created_at,
         applicationsCount: post.application_count || 0,
-        eventStartDate: post.event_start_date || undefined,
         eventFrequency: post.event_frequency || undefined,
-        images: post.images || []
+        eventSpecificDate: post.event_specific_date || undefined,
+        eventWeekday: post.event_weekday || undefined,
+        eventTime: post.event_time || undefined,
+        eventWeekOfMonth: post.event_week_of_month || undefined,
+        images: post.post_images?.map(img => img.url) || []
       }))
 
       return { data: posts, total: result.count || 0 }
@@ -98,15 +101,18 @@ export const postsApi = {
         contactMethod: (post.contact_method as any) || 'form',
         contactValue: post.contact_value || '',
         requirements: post.requirements ? [post.requirements] : [],
-        tags: post.tags?.map(tag => tag.name) || [],
+        tags: post.post_tags?.map(pt => pt.tags?.name).filter(Boolean) || [],
         authorId: post.user_id,
         authorName: post.user?.display_name || post.user?.username || '匿名',
         createdAt: post.created_at,
         updatedAt: post.updated_at || post.created_at,
         applicationsCount: post.application_count || 0,
-        eventStartDate: post.event_start_date || undefined,
         eventFrequency: post.event_frequency || undefined,
-        images: post.images || []
+        eventSpecificDate: post.event_specific_date || undefined,
+        eventWeekday: post.event_weekday || undefined,
+        eventTime: post.event_time || undefined,
+        eventWeekOfMonth: post.event_week_of_month || undefined,
+        images: post.post_images?.map(img => img.url) || []
       }
 
       return { data: transformedPost }
@@ -161,8 +167,11 @@ export const postsApi = {
         deadline: postData.deadline ? new Date(postData.deadline).toISOString().split('T')[0] : null,
         contact_method: postData.contactMethod || null,
         contact_value: postData.contactValue || null,
-        event_start_date: postData.eventStartDate ? new Date(postData.eventStartDate).toISOString() : null,
-        event_frequency: postData.eventFrequency || null
+        event_frequency: postData.eventFrequency || null,
+        event_specific_date: postData.eventSpecificDate ? new Date(postData.eventSpecificDate).toISOString() : null,
+        event_weekday: postData.eventWeekday || null,
+        event_time: postData.eventTime || null,
+        event_week_of_month: postData.eventWeekOfMonth || null
       }
       
       console.log('postsApi.createPost: Prepared data for database:', createData)
@@ -197,23 +206,24 @@ export const postsApi = {
         title: insertedPost.title,
         description: insertedPost.description,
         category: postData.category, // 元のカテゴリ値を使用
-        type: postData.type,
         status: 'active' as any,
         deadline: insertedPost.deadline || undefined,
         maxParticipants: insertedPost.recruitment_count || 1,
-        minParticipants: postData.minParticipants || 1,
         contactMethod: postData.contactMethod,
         contactValue: postData.contactValue,
         requirements: postData.requirements || [],
         tags: [],
-        payment: postData.payment,
         authorId: insertedPost.user_id,
         authorName: authStore.user.user_metadata?.display_name || '匿名',
-        authorAvatar: authStore.user.user_metadata?.avatar_url,
         createdAt: insertedPost.created_at,
         updatedAt: insertedPost.updated_at || insertedPost.created_at,
-        viewsCount: 0,
-        applicationsCount: 0
+        applicationsCount: 0,
+        eventFrequency: postData.eventFrequency,
+        eventSpecificDate: postData.eventSpecificDate,
+        eventWeekday: postData.eventWeekday,
+        eventTime: postData.eventTime,
+        eventWeekOfMonth: postData.eventWeekOfMonth,
+        images: []
       }
       
       console.log('postsApi.createPost: Transformed post:', transformedPost)

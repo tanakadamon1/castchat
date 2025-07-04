@@ -74,50 +74,115 @@
               />
             </div>
 
-            <!-- 日時設定 -->
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div>
-                <BaseInput
-                  v-model="formData.startDate"
-                  type="datetime-local"
-                  label="開始日時"
-                  required
-                  :error="getFieldError('startDate')"
-                  @change="validateField('startDate', formData.startDate, requiredRules)"
-                />
-              </div>
-              <div>
-                <BaseInput
-                  v-model="formData.endDate"
-                  type="datetime-local"
-                  label="終了日時（任意）"
-                  :error="getFieldError('endDate')"
-                  @change="validateEndDate"
-                />
-              </div>
+
+            <!-- 開催頻度 -->
+            <div>
+              <BaseSelect
+                v-model="formData.eventFrequency"
+                label="開催頻度"
+                :options="frequencyOptions"
+                required
+                :error="getFieldError('eventFrequency')"
+                @change="validateField('eventFrequency', formData.eventFrequency, requiredRules)"
+              />
             </div>
 
-            <!-- イベント開始日時と頻度 -->
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div>
-                <BaseInput
-                  v-model="formData.eventStartDate"
-                  type="datetime-local"
-                  label="イベント開始日時"
-                  required
-                  :error="getFieldError('eventStartDate')"
-                  @blur="validateField('eventStartDate', formData.eventStartDate, requiredRules)"
-                />
+            <!-- 単発イベントの場合 -->
+            <div v-if="formData.eventFrequency === 'once'">
+              <BaseInput
+                v-model="formData.eventSpecificDate"
+                type="datetime-local"
+                label="イベント開催日時"
+                required
+                :error="getFieldError('eventSpecificDate')"
+                @blur="validateField('eventSpecificDate', formData.eventSpecificDate, requiredRules)"
+              />
+            </div>
+
+            <!-- 定期イベントの場合 -->
+            <div v-else-if="formData.eventFrequency" class="space-y-4">
+              <!-- 月1回の場合 -->
+              <div v-if="formData.eventFrequency === 'monthly'" class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <div>
+                  <BaseSelect
+                    v-model="formData.eventWeekOfMonth"
+                    label="第何週"
+                    :options="weekOfMonthOptions"
+                    required
+                    :error="getFieldError('eventWeekOfMonth')"
+                  />
+                </div>
+                <div>
+                  <BaseSelect
+                    v-model="formData.eventWeekday"
+                    label="曜日"
+                    :options="weekdayOptions"
+                    required
+                    :error="getFieldError('eventWeekday')"
+                  />
+                </div>
+                <div>
+                  <BaseInput
+                    v-model="formData.eventTime"
+                    type="time"
+                    label="時間"
+                    required
+                    :error="getFieldError('eventTime')"
+                  />
+                </div>
               </div>
-              <div>
-                <BaseSelect
-                  v-model="formData.eventFrequency"
-                  label="開催頻度"
-                  :options="frequencyOptions"
-                  required
-                  :error="getFieldError('eventFrequency')"
-                  @change="validateField('eventFrequency', formData.eventFrequency, requiredRules)"
-                />
+
+              <!-- 隔週の場合 -->
+              <div v-else-if="formData.eventFrequency === 'biweekly'" class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <div>
+                  <BaseSelect
+                    v-model="formData.eventWeekOfMonth"
+                    label="第何週（第1・第3 or 第2・第4）"
+                    :options="biweeklyOptions"
+                    required
+                    :error="getFieldError('eventWeekOfMonth')"
+                  />
+                </div>
+                <div>
+                  <BaseSelect
+                    v-model="formData.eventWeekday"
+                    label="曜日"
+                    :options="weekdayOptions"
+                    required
+                    :error="getFieldError('eventWeekday')"
+                  />
+                </div>
+                <div>
+                  <BaseInput
+                    v-model="formData.eventTime"
+                    type="time"
+                    label="時間"
+                    required
+                    :error="getFieldError('eventTime')"
+                  />
+                </div>
+              </div>
+
+              <!-- 週1回の場合 -->
+              <div v-else-if="formData.eventFrequency === 'weekly'" class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                  <BaseSelect
+                    v-model="formData.eventWeekday"
+                    label="曜日"
+                    :options="weekdayOptions"
+                    required
+                    :error="getFieldError('eventWeekday')"
+                  />
+                </div>
+                <div>
+                  <BaseInput
+                    v-model="formData.eventTime"
+                    type="time"
+                    label="時間"
+                    required
+                    :error="getFieldError('eventTime')"
+                  />
+                </div>
               </div>
             </div>
 
@@ -339,8 +404,11 @@ const formData = ref({
   category: '' as PostCategory | '',
   description: '',
   requirements: '',
-  eventStartDate: '',
   eventFrequency: '' as EventFrequency | '',
+  eventSpecificDate: '', // 単発イベント用
+  eventWeekday: undefined as number | undefined, // 曜日
+  eventTime: '', // 時間
+  eventWeekOfMonth: undefined as number | undefined, // 第何週
   maxParticipants: undefined as number | undefined,
   contactMethod: '' as ContactMethod | '',
   contactInfo: '',
@@ -368,27 +436,23 @@ const previewPost = computed(() => {
     id: 'preview',
     title: formData.value.title,
     category: formData.value.category as PostCategory,
-    type: formData.value.type as PostType,
     description: formData.value.description,
     requirements: formData.value.requirements ? [formData.value.requirements] : [],
-    compensation: formData.value.payment,
     contactMethod: formData.value.contactMethod as ContactMethod,
     contactValue: formData.value.contactInfo,
     authorId: authStore.user?.id || 'preview-user',
     authorName: authStore.user?.user_metadata?.display_name || 'プレビューユーザー',
-    authorAvatar: authStore.user?.user_metadata?.avatar_url,
     status: 'active' as const,
     tags: [],
     applicationsCount: 0,
-    viewsCount: 0,
     createdAt: new Date().toISOString(),
     updatedAt: new Date().toISOString(),
-    // Legacy fields for compatibility
-    startDate: formData.value.startDate,
-    endDate: formData.value.endDate || undefined,
     maxParticipants: formData.value.maxParticipants || 1,
-    minParticipants: formData.value.minParticipants || 1,
-    payment: formData.value.payment
+    eventFrequency: formData.value.eventFrequency as EventFrequency,
+    eventSpecificDate: formData.value.eventSpecificDate,
+    eventWeekday: formData.value.eventWeekday,
+    eventTime: formData.value.eventTime,
+    eventWeekOfMonth: formData.value.eventWeekOfMonth
   } as Post
 })
 
@@ -409,6 +473,28 @@ const frequencyOptions = [
   { value: 'weekly', label: '週1' },
   { value: 'biweekly', label: '隔週' },
   { value: 'monthly', label: '月1' }
+]
+
+const weekdayOptions = [
+  { value: 0, label: '日曜日' },
+  { value: 1, label: '月曜日' },
+  { value: 2, label: '火曜日' },
+  { value: 3, label: '水曜日' },
+  { value: 4, label: '木曜日' },
+  { value: 5, label: '金曜日' },
+  { value: 6, label: '土曜日' }
+]
+
+const weekOfMonthOptions = [
+  { value: 1, label: '第1週' },
+  { value: 2, label: '第2週' },
+  { value: 3, label: '第3週' },
+  { value: 4, label: '第4週' }
+]
+
+const biweeklyOptions = [
+  { value: 1, label: '第1・第3週' },
+  { value: 2, label: '第2・第4週' }
 ]
 
 const contactMethodOptions = [
@@ -446,22 +532,33 @@ const participantsRules = {
 
 // フォームバリデーション
 const isFormValid = computed(() => {
-  const hasRequiredFields = formData.value.title && 
+  const basicRequiredFields = formData.value.title && 
          formData.value.category && 
          formData.value.description && 
-         formData.value.eventStartDate && 
          formData.value.eventFrequency && 
          formData.value.contactMethod && 
          formData.value.contactInfo
+  
+  let eventRequiredFields = false
+  
+  if (formData.value.eventFrequency === 'once') {
+    eventRequiredFields = !!formData.value.eventSpecificDate
+  } else if (formData.value.eventFrequency) {
+    eventRequiredFields = !!(formData.value.eventWeekday !== undefined && formData.value.eventTime)
+    if (formData.value.eventFrequency === 'monthly' || formData.value.eventFrequency === 'biweekly') {
+      eventRequiredFields = eventRequiredFields && (formData.value.eventWeekOfMonth !== undefined)
+    }
+  }
          
   console.log('Post form validation:', {
     hasErrors: hasErrors.value,
-    hasRequiredFields,
+    basicRequiredFields,
+    eventRequiredFields,
     formData: formData.value,
     errors: errors.value
   })
   
-  return hasRequiredFields
+  return basicRequiredFields && eventRequiredFields
 })
 
 // 連絡先のラベルとプレースホルダーを取得
@@ -485,36 +582,7 @@ const getContactPlaceholder = (method: ContactMethod) => {
   return placeholders[method] || ''
 }
 
-// 終了日時のバリデーション
-const validateEndDate = () => {
-  if (formData.value.endDate && formData.value.startDate) {
-    const start = new Date(formData.value.startDate)
-    const end = new Date(formData.value.endDate)
-    
-    if (end <= start) {
-      validateField('endDate', formData.value.endDate, {
-        custom: () => false,
-        message: '終了日時は開始日時より後に設定してください'
-      })
-    } else {
-      validateField('endDate', formData.value.endDate, {})
-    }
-  }
-}
 
-// 最小人数のバリデーション
-const validateMinParticipants = () => {
-  if (formData.value.minParticipants && formData.value.maxParticipants) {
-    if (formData.value.minParticipants > formData.value.maxParticipants) {
-      validateField('minParticipants', formData.value.minParticipants, {
-        custom: () => false,
-        message: '最小人数は最大人数以下に設定してください'
-      })
-    } else {
-      validateField('minParticipants', formData.value.minParticipants, {})
-    }
-  }
-}
 
 // 連絡先情報のバリデーション
 const validateContactInfo = () => {
@@ -619,10 +687,8 @@ const handleSubmit = async () => {
   const validationRules = {
     title: titleRules,
     category: requiredRules,
-    type: requiredRules,
     description: descriptionRules,
-    startDate: requiredRules,
-    maxParticipants: participantsRules,
+    eventFrequency: requiredRules,
     contactMethod: requiredRules,
     contactInfo: requiredRules
   }
@@ -776,8 +842,11 @@ const submitPost = async () => {
     maxParticipants: formData.value.maxParticipants || 1,
     contactMethod: formData.value.contactMethod as ContactMethod,
     contactValue: formData.value.contactInfo,
-    eventStartDate: formData.value.eventStartDate,
     eventFrequency: formData.value.eventFrequency as EventFrequency,
+    eventSpecificDate: formData.value.eventSpecificDate || undefined,
+    eventWeekday: formData.value.eventWeekday,
+    eventTime: formData.value.eventTime || undefined,
+    eventWeekOfMonth: formData.value.eventWeekOfMonth,
     tags: [],
     images: imageUrls
   }
@@ -826,16 +895,17 @@ onMounted(async () => {
         formData.value = {
           title: postData.title,
           category: postData.category,
-          type: postData.type,
           description: postData.description,
           requirements: postData.requirements?.join(', ') || '',
-          payment: postData.payment || '',
-          startDate: postData.startDate || '',
-          endDate: postData.endDate || '',
+          eventFrequency: postData.eventFrequency || '',
+          eventSpecificDate: postData.eventSpecificDate || '',
+          eventWeekday: postData.eventWeekday,
+          eventTime: postData.eventTime || '',
+          eventWeekOfMonth: postData.eventWeekOfMonth,
           maxParticipants: postData.maxParticipants || undefined,
-          minParticipants: postData.minParticipants || undefined,
           contactMethod: postData.contactMethod,
           contactInfo: postData.contactValue || '',
+          deadline: postData.deadline || '',
           additionalNotes: ''
         }
       }
