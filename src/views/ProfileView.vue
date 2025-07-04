@@ -18,7 +18,7 @@
     <div class="container mx-auto px-4 py-8 max-w-4xl">
       <!-- プロフィール情報 -->
       <div v-if="profileData" class="bg-white rounded-lg shadow-sm border p-6 mb-8">
-        <div class="flex flex-col md:flex-row gap-6">
+          <div class="flex flex-col md:flex-row gap-6">
           <!-- アバター -->
           <div class="flex flex-col items-center">
             <div class="w-32 h-32 rounded-full bg-gray-200 overflow-hidden mb-4">
@@ -225,35 +225,35 @@
         </div>
       </div>
 
-      <!-- アクションボタン -->
-      <div v-if="isEditing" class="flex flex-col sm:flex-row gap-4">
-        <BaseButton
-          @click="handleSave"
-          :loading="saving"
-          :disabled="false"
-          class="flex-1"
-        >
-          保存
-        </BaseButton>
-        
-        <BaseButton
-          variant="outline"
-          @click="handleCancel"
-          class="flex-1"
-        >
-          キャンセル
-        </BaseButton>
+        <!-- アクションボタン -->
+        <div v-if="isEditing" class="flex flex-col sm:flex-row gap-4">
+          <BaseButton
+            @click="handleSave"
+            :loading="saving"
+            :disabled="false"
+            class="flex-1"
+          >
+            保存
+          </BaseButton>
+          
+          <BaseButton
+            variant="outline"
+            @click="handleCancel"
+            class="flex-1"
+          >
+            キャンセル
+          </BaseButton>
+        </div>
       </div>
-    </div>
     
-    <!-- ローディング表示 -->
-    <div v-else class="flex items-center justify-center py-12">
+      <!-- ローディング表示 -->
+      <div v-if="!profileData" class="flex items-center justify-center py-12">
       <div class="text-center">
         <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-indigo-600 mx-auto"></div>
         <p class="mt-2 text-gray-500">プロフィールを読み込み中...</p>
+        </div>
       </div>
     </div>
-  </div>
 </template>
 
 <script setup lang="ts">
