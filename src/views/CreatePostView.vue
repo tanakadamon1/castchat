@@ -287,12 +287,22 @@
             キャンセル
           </BaseButton>
           
+          <!-- デバッグ用テストボタン -->
+          <BaseButton
+            type="button"
+            variant="outline"
+            @click="handleTestPost"
+            class="order-2 sm:order-2 bg-yellow-500 text-white"
+          >
+            テスト投稿
+          </BaseButton>
+
           <BaseButton
             type="button"
             variant="outline"
             @click="handleSaveDraft"
             :loading="saving"
-            class="order-3 sm:order-2"
+            class="order-3 sm:order-3"
           >
             下書き保存
           </BaseButton>
@@ -301,7 +311,7 @@
             type="submit"
             :loading="submitting"
             :disabled="!isFormValid"
-            class="order-1 sm:order-3"
+            class="order-1 sm:order-4"
           >
             {{ isEditing ? '更新する' : '投稿する' }}
           </BaseButton>
@@ -689,6 +699,23 @@ const handleSaveDraft = async () => {
 const handleCancel = () => {
   if (confirm('編集内容が失われますが、よろしいですか？')) {
     router.back()
+  }
+}
+
+// デバッグ用テスト投稿
+const handleTestPost = async () => {
+  console.log('=== TEST POST BUTTON CLICKED ===')
+  try {
+    const result = await postsApi.testCreatePost()
+    console.log('Test post result:', result)
+    if (result.error) {
+      toast.error(`テスト投稿失敗: ${result.error}`)
+    } else {
+      toast.success('テスト投稿成功！')
+    }
+  } catch (error) {
+    console.error('Test post error:', error)
+    toast.error('テスト投稿でエラーが発生しました')
   }
 }
 

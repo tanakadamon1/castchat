@@ -124,12 +124,19 @@ export const postsApi = {
     try {
       const authStore = useAuthStore()
       
+      console.log('=== POST CREATION DEBUG START ===')
+      console.log('Auth store:', authStore)
+      console.log('Auth store user:', authStore.user)
+      console.log('Auth store isAuthenticated:', authStore.isAuthenticated)
+      
       if (!authStore.user?.id) {
+        console.error('No user ID found in auth store')
         return { data: null, error: 'ログインが必要です' }
       }
 
-      console.log('postsApi.createPost: Input data:', postData)
+      console.log('postsApi.createPost: Input data:', JSON.stringify(postData, null, 2))
       console.log('postsApi.createPost: User ID:', authStore.user.id)
+      console.log('postsApi.createPost: User object:', JSON.stringify(authStore.user, null, 2))
 
       // カテゴリslugをIDに変換（実際のデータベースのカテゴリに合わせる）
       const categoryMap: Record<string, string> = {
@@ -166,10 +173,16 @@ export const postsApi = {
         .single()
 
       console.log('postsApi.createPost: Supabase insert result:', { insertedPost, insertError })
+      console.log('=== DETAILED ERROR ANALYSIS ===')
       
       if (insertError) {
         console.error('postsApi.createPost: Insert error:', insertError)
-        return { data: null, error: insertError.message }
+        console.error('Error code:', insertError.code)
+        console.error('Error message:', insertError.message)
+        console.error('Error details:', insertError.details)
+        console.error('Error hint:', insertError.hint)
+        console.error('=== ERROR END ===')
+        return { data: null, error: `データベースエラー: ${insertError.message}` }
       }
 
       if (!insertedPost) {
@@ -202,11 +215,60 @@ export const postsApi = {
       }
       
       console.log('postsApi.createPost: Transformed post:', transformedPost)
+      console.log('=== POST CREATION DEBUG END ===')
 
       return { data: transformedPost }
     } catch (error) {
+      console.error('=== UNEXPECTED ERROR ===')
       console.error('Unexpected post creation error:', error)
-      return { data: null, error: '投稿の作成に失敗しました' }
+      console.error('Error type:', typeof error)
+      console.error('Error constructor:', error?.constructor?.name)
+      console.error('Error stack:', error?.stack)
+      console.error('=== ERROR END ===')
+      return { data: null, error: `予期しないエラー: ${error?.message || 'Unknown error'}` }
+    }
+  },
+
+  // デバッグ用: 最小限のテスト投稿
+  async testCreatePost(): Promise<PostResponse> {
+    try {
+      const authStore = useAuthStore()
+      
+      console.log('=== TEST POST CREATION ===')
+      console.log('Auth user ID:', authStore.user?.id)
+      
+      if (!authStore.user?.id) {
+        return { data: null, error: 'ログインが必要です' }
+      }
+
+      const testData = {
+        user_id: authStore.user.id,
+        category_id: '7c104ccc-ae25-44c8-b8b6-d8392d8b44e0',
+        title: 'テスト投稿フロントエンド',
+        description: 'フロントエンドからのテスト投稿です。',
+        requirements: null,
+        recruitment_count: 1,
+        deadline: null
+      }
+      
+      console.log('Test data:', testData)
+
+      const { data, error } = await import('@/lib/supabase').then(m => m.supabase)
+        .from('posts')
+        .insert([testData])
+        .select()
+        .single()
+
+      console.log('Test result:', { data, error })
+      
+      if (error) {
+        return { data: null, error: error.message }
+      }
+
+      return { data: data as any }
+    } catch (error) {
+      console.error('Test creation error:', error)
+      return { data: null, error: error?.message || 'Test failed' }
     }
   }
 }
