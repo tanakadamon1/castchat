@@ -29,17 +29,20 @@ A modern web platform for VRChat content creators to find and recruit cast membe
 ## 🚀 Quick Start
 
 1. **Clone the repository**
+
    ```bash
    git clone https://github.com/your-org/castchat.git
    cd castchat
    ```
 
 2. **Install dependencies**
+
    ```bash
    npm install
    ```
 
 3. **Set up environment**
+
    ```bash
    ./scripts/setup-env.sh
    ```
@@ -49,7 +52,7 @@ A modern web platform for VRChat content creators to find and recruit cast membe
 
 5. **Start development server**
    ```bash
-   npm run dev
+   ./scripts/wsl-build.sh dev
    ```
 
 Visit http://localhost:5173 to see the application.

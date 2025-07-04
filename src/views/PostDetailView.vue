@@ -81,6 +81,32 @@
             </div>
           </section>
           
+          <!-- Images -->
+          <section v-if="post.images && post.images.length > 0" class="mb-8">
+            <h3 class="text-lg font-semibold text-gray-900 mb-4">関連画像</h3>
+            <div class="grid gap-4" :class="imageGridClasses">
+              <div
+                v-for="(image, index) in post.images"
+                :key="index"
+                class="relative group cursor-pointer overflow-hidden rounded-lg border border-gray-200 hover:border-gray-300 transition-colors"
+                @click="openImageViewer(image, index)"
+              >
+                <LazyImage
+                  :src="image"
+                  :alt="`投稿画像 ${index + 1}`"
+                  container-class="w-full h-64"
+                  image-class="w-full h-64 object-cover transition-transform duration-200 group-hover:scale-105"
+                  :eager="index === 0"
+                />
+                <div class="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-20 transition-all duration-200 flex items-center justify-center">
+                  <svg class="w-8 h-8 text-white opacity-0 group-hover:opacity-100 transition-opacity duration-200" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0zM10 7v3m0 0v3m0-3h3m-3 0H7" />
+                  </svg>
+                </div>
+              </div>
+            </div>
+          </section>
+          
           <!-- Details Grid -->
           <section class="mb-8">
             <h3 class="text-lg font-semibold text-gray-900 mb-4">詳細情報</h3>
@@ -238,6 +264,14 @@
       @close="showApplicationModal = false"
       @submit="handleApplicationSubmit"
     />
+    
+    <!-- 画像ビューア -->
+    <ImageViewer
+      :show="showImageViewer"
+      :images="selectedImages"
+      :initial-index="selectedImageIndex"
+      @close="closeImageViewer"
+    />
   </div>
 </template>
 
@@ -250,6 +284,8 @@ import type { Post } from '@/types/post'
 import BaseButton from '@/components/ui/BaseButton.vue'
 import LoadingSpinner from '@/components/ui/LoadingSpinner.vue'
 import ErrorState from '@/components/ui/ErrorState.vue'
+import LazyImage from '@/components/ui/LazyImage.vue'
+import ImageViewer from '@/components/ui/ImageViewer.vue'
 import ApplicationModal from '@/components/application/ApplicationModal.vue'
 import { postsApi } from '@/lib/postsApi'
 import { categoryLabels, statusLabels, contactMethodLabels, eventFrequencyLabels, weekdayLabels, weekOfMonthLabels } from '@/utils/mockData'
@@ -264,6 +300,9 @@ const post = ref<Post | null>(null)
 const loading = ref(false)
 const errorMessage = ref<string | null>(null)
 const showApplicationModal = ref(false)
+const showImageViewer = ref(false)
+const selectedImages = ref<string[]>([])
+const selectedImageIndex = ref(0)
 
 // Computed
 const statusBadgeClasses = computed(() => {
@@ -278,6 +317,14 @@ const statusBadgeClasses = computed(() => {
   }
   
   return `${baseClasses} ${variants[post.value.status]}`
+})
+
+const imageGridClasses = computed(() => {
+  if (!post.value?.images) return ''
+  const count = post.value.images.length
+  if (count === 1) return 'grid-cols-1'
+  if (count === 2) return 'grid-cols-1 md:grid-cols-2'
+  return 'grid-cols-1 md:grid-cols-2 lg:grid-cols-3'
 })
 
 const getContactLink = (method: string, value: string) => {
@@ -404,6 +451,21 @@ const formatEventTime = (post: any) => {
   }
   
   return eventFrequencyLabels[post.eventFrequency] || ''
+}
+
+// 画像ビューア関数
+const openImageViewer = (imageUrl: string, index: number) => {
+  if (post.value?.images) {
+    selectedImages.value = post.value.images
+    selectedImageIndex.value = index
+    showImageViewer.value = true
+  }
+}
+
+const closeImageViewer = () => {
+  showImageViewer.value = false
+  selectedImages.value = []
+  selectedImageIndex.value = 0
 }
 
 // 応募処理

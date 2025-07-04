@@ -119,7 +119,8 @@
       "WebFetch(domain:www.castchat.jp)",
       "mcp__supabase__list_projects",
       "mcp__supabase__list_tables",
-      "Bash(git restore:*)"
+      "Bash(git restore:*)",
+      "Bash(npx serve:*)"
     ],
     "deny": []
   }

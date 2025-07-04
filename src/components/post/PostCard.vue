@@ -42,8 +42,8 @@
             <LazyImage
               :src="image"
               :alt="`投稿画像 ${index + 1}`"
-              container-class="w-full h-32"
-              image-class="w-full h-32 object-cover transition-transform duration-200 group-hover:scale-105"
+              container-class="w-full aspect-video"
+              image-class="w-full h-full object-cover transition-transform duration-200 group-hover:scale-105"
               :eager="index === 0"
               :threshold="0.2"
             />

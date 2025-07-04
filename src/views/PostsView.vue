@@ -85,6 +85,9 @@
           aria-label="募集投稿一覧"
           aria-live="polite"
         >
+          <div v-if="posts.length === 0" class="col-span-full text-center py-8">
+            <p class="text-gray-500">投稿がありません</p>
+          </div>
           <PostCard
             v-for="post in posts"
             :key="post.id"
@@ -208,6 +211,15 @@ const loadPosts = async (showLoading = true) => {
     
     posts.value = result.data || []
     total.value = result.total
+    
+    // 画像データをデバッグ
+    if (posts.value.length > 0) {
+      posts.value.forEach(post => {
+        if (post.images && post.images.length > 0) {
+          console.log(`Post "${post.title}" has images:`, post.images)
+        }
+      })
+    }
     
     // スクリーンリーダーに結果を通知
     announceLoadComplete('募集情報の読み込み', result.total)

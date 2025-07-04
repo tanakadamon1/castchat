@@ -81,8 +81,9 @@ export const postsApi = {
         maxParticipants: post.recruitment_count || 1,
         contactMethod: (post.contact_method as any) || 'form',
         contactValue: post.contact_value || '',
-        requirements: post.requirements ? [post.requirements] : [],
+        requirements: post.requirements ? post.requirements.split(',').map(r => r.trim()) : [],
         tags: post.post_tags?.map(pt => pt.tags?.name).filter(Boolean) || [],
+        worldName: post.world_name || undefined,
         authorId: post.user_id,
         authorName: post.users?.display_name || post.users?.username || '匿名',
         createdAt: post.created_at,
@@ -129,8 +130,9 @@ export const postsApi = {
         maxParticipants: post.recruitment_count || 1,
         contactMethod: (post.contact_method as any) || 'form',
         contactValue: post.contact_value || '',
-        requirements: post.requirements ? [post.requirements] : [],
+        requirements: post.requirements ? post.requirements.split(',').map(r => r.trim()) : [],
         tags: post.post_tags?.map(pt => pt.tags?.name).filter(Boolean) || [],
+        worldName: post.world_name || undefined,
         authorId: post.user_id,
         authorName: post.users?.display_name || post.users?.username || '匿名',
         createdAt: post.created_at,
@@ -230,6 +232,7 @@ export const postsApi = {
       }
 
       // 画像がある場合、post_imagesテーブルに保存
+      console.log('postsApi.createPost: Checking images in postData:', postData.images)
       if (postData.images && postData.images.length > 0) {
         console.log('postsApi.createPost: Inserting images:', postData.images)
         const imageData = postData.images.map((url, index) => ({
@@ -237,6 +240,8 @@ export const postsApi = {
           url,
           display_order: index
         }))
+        
+        console.log('postsApi.createPost: Image data to insert:', imageData)
 
         const { error: imageError } = await supabase
           .from('post_images')
@@ -244,10 +249,14 @@ export const postsApi = {
 
         if (imageError) {
           console.error('postsApi.createPost: Image insert error:', imageError)
+          console.error('postsApi.createPost: Error details:', imageError.details)
+          console.error('postsApi.createPost: Error hint:', imageError.hint)
           // 画像の保存に失敗してもポスト自体は成功とする
         } else {
           console.log('postsApi.createPost: Images inserted successfully')
         }
+      } else {
+        console.log('postsApi.createPost: No images to insert')
       }
 
       // レスポンスデータをフロントエンド形式に変換

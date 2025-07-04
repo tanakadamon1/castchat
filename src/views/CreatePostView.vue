@@ -554,8 +554,7 @@ const isFormValid = computed(() => {
     hasErrors: hasErrors.value,
     basicRequiredFields,
     eventRequiredFields,
-    formData: formData.value,
-    errors: errors.value
+    formData: formData.value
   })
   
   return basicRequiredFields && eventRequiredFields
