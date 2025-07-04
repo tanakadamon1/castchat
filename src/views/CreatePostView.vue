@@ -638,19 +638,29 @@ const handleSubmit = async () => {
 
   submitting.value = true
   console.log('Starting post submission process...')
+  console.log('Form data at submission:', formData.value)
+  console.log('Auth store user:', authStore.user)
+  console.log('Selected images:', selectedImages.value)
   
   try {
-    await submitPost()
+    console.log('Calling submitPost()...')
+    const result = await submitPost()
+    console.log('submitPost() completed successfully:', result)
     
     toast.success(
       isEditing.value ? '募集を更新しました' : '募集を投稿しました'
     )
     
+    console.log('Navigating to /posts...')
     router.push('/posts')
   } catch (error) {
-    console.error('投稿エラー:', error)
+    console.error('投稿エラー - handleSubmit catch:', error)
+    console.error('Error type:', typeof error)
+    console.error('Error message:', error?.message)
+    console.error('Error stack:', error?.stack)
     toast.error('投稿に失敗しました')
   } finally {
+    console.log('handleSubmit finally block - resetting submitting')
     submitting.value = false
   }
 }
@@ -684,48 +694,65 @@ const handleCancel = () => {
 
 // 画像アップロード処理
 const uploadImages = async (postId?: string) => {
+  console.log('uploadImages: Starting with', selectedImages.value.length, 'images')
   if (selectedImages.value.length === 0) {
+    console.log('uploadImages: No images to upload')
     return []
   }
   
   if (!authStore.user?.id) {
+    console.error('uploadImages: No user ID found')
     throw new Error('ユーザー情報が見つかりません')
   }
   
+  console.log('uploadImages: User ID:', authStore.user.id)
   uploadingImages.value = true
   const uploadedUrls = []
   
   try {
-    for (const imageData of selectedImages.value) {
+    for (let i = 0; i < selectedImages.value.length; i++) {
+      const imageData = selectedImages.value[i]
+      console.log(`uploadImages: Processing image ${i + 1}/${selectedImages.value.length}`)
+      
       if (imageData.uploaded) {
+        console.log(`uploadImages: Image ${i + 1} already uploaded:`, imageData.uploaded.url)
         // 既にアップロード済み
         uploadedUrls.push(imageData.uploaded.url)
         continue
       }
       
+      console.log(`uploadImages: Uploading image ${i + 1}:`, imageData.file.name)
       const result = await uploadPostImage(imageData.file, authStore.user.id, postId)
+      console.log(`uploadImages: Upload result for image ${i + 1}:`, result)
       
       if (result.error) {
+        console.error(`uploadImages: Error uploading image ${i + 1}:`, result.error)
         throw new Error(result.error)
       }
       
       if (result.data) {
+        console.log(`uploadImages: Image ${i + 1} uploaded successfully:`, result.data.url)
         uploadedUrls.push(result.data.url)
         // アップロード情報をキャッシュ
         imageData.uploaded = result.data
       }
     }
     
+    console.log('uploadImages: All images processed, URLs:', uploadedUrls)
     return uploadedUrls
   } finally {
     uploadingImages.value = false
+    console.log('uploadImages: Finished, reset uploading state')
   }
 }
 
 // API呼び出し関数
 const submitPost = async () => {
+  console.log('submitPost: Starting...')
   // まず画像をアップロード
+  console.log('submitPost: Uploading images...')
   const imageUrls = await uploadImages()
+  console.log('submitPost: Images uploaded:', imageUrls)
   
   const postData: Partial<Post> = {
     title: formData.value.title,
@@ -743,16 +770,22 @@ const submitPost = async () => {
     tags: [],
     images: imageUrls
   }
+  console.log('submitPost: Post data prepared:', postData)
 
   if (isEditing.value) {
+    console.log('submitPost: Editing mode - using mock update')
     // 更新処理（実装予定）
     return new Promise(resolve => setTimeout(resolve, 1000))
   } else {
+    console.log('submitPost: Creating new post via API...')
     // 新規作成処理
     const result = await postsApi.createPost(postData)
+    console.log('submitPost: API result:', result)
     if (result.error) {
+      console.error('submitPost: API error:', result.error)
       throw new Error(result.error)
     }
+    console.log('submitPost: Success, returning data:', result.data)
     return result.data
   }
 }
