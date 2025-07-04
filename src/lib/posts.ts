@@ -394,7 +394,7 @@ export class PostsService {
         .select(`
           *,
           users!posts_user_id_fkey(id, username, display_name, avatar_url, is_verified),
-          post_categories!posts_category_id_fkey(id, name, slug, color)
+          post_categories!posts_category_id_fkey(id, name, slug)
         `)
         .eq('id', postId)
         .single()
@@ -414,7 +414,7 @@ export class PostsService {
       const { data: postTags } = await supabase
         .from('post_tags')
         .select(`
-          tags(id, name, slug, color)
+          tags(id, name, slug)
         `)
         .eq('post_id', postId)
 

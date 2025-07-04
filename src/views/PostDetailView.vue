@@ -42,11 +42,11 @@
             <div class="flex items-center space-x-3">
               <img
                 :src="post.authorAvatar || '/default-avatar.png'"
-                :alt="post.authorName"
+                :alt="post.authorName || '匿名'"
                 class="w-12 h-12 rounded-full"
               />
               <div>
-                <h2 class="font-semibold text-gray-900">{{ post.authorName }}</h2>
+                <h2 class="font-semibold text-gray-900">{{ post.authorName || '匿名' }}</h2>
                 <p class="text-sm text-gray-500">{{ formatDate(post.createdAt) }}に投稿</p>
               </div>
             </div>
@@ -105,7 +105,7 @@
             <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
               <!-- Compensation -->
               <div
-                v-if="post.compensation"
+                v-if="post.payment"
                 class="bg-green-50 rounded-lg p-4"
               >
                 <div class="flex items-center mb-2">
@@ -114,7 +114,7 @@
                   </svg>
                   <span class="font-medium text-green-900">報酬</span>
                 </div>
-                <p class="text-green-800">{{ post.compensation }}</p>
+                <p class="text-green-800">{{ post.payment }}</p>
               </div>
               
               <!-- Deadline -->
