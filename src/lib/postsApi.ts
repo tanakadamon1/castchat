@@ -23,16 +23,45 @@ export const postsApi = {
     search?: string
     type?: string
     status?: string
+    sortBy?: string
     limit?: number
     offset?: number
   }): Promise<PostsResponse> {
     try {
       const page = filters.offset ? Math.floor(filters.offset / (filters.limit || 10)) + 1 : 1
       
+      // ソート設定をマッピング
+      let sortBy: 'created_at' | 'updated_at' | 'deadline' | 'view_count' = 'created_at'
+      let sortOrder: 'asc' | 'desc' = 'desc'
+      
+      switch (filters.sortBy) {
+        case 'newest':
+          sortBy = 'created_at'
+          sortOrder = 'desc'
+          break
+        case 'oldest':
+          sortBy = 'created_at'
+          sortOrder = 'asc'
+          break
+        case 'deadline':
+          sortBy = 'deadline'
+          sortOrder = 'asc'
+          break
+        case 'popular':
+          sortBy = 'view_count'
+          sortOrder = 'desc'
+          break
+        default:
+          sortBy = 'created_at'
+          sortOrder = 'desc'
+      }
+
       const result = await postsService.getPosts({
         category_id: filters.category,
         search: filters.search,
         status: filters.status === 'active' ? 'published' : (filters.status as any),
+        sort_by: sortBy,
+        sort_order: sortOrder,
         limit: filters.limit || 10,
         page
       })
@@ -46,7 +75,7 @@ export const postsApi = {
         id: post.id,
         title: post.title,
         description: post.description,
-        category: (post.category?.slug as any) || 'other',
+        category: (post.post_categories?.slug as any) || 'other',
         status: (post.status === 'published' ? 'active' : 'closed') as any,
         deadline: post.deadline || undefined,
         maxParticipants: post.recruitment_count || 1,
@@ -94,7 +123,7 @@ export const postsApi = {
         id: post.id,
         title: post.title,
         description: post.description,
-        category: (post.category?.slug as any) || 'other',
+        category: (post.post_categories?.slug as any) || 'other',
         status: (post.status === 'published' ? 'active' : 'closed') as any,
         deadline: post.deadline || undefined,
         maxParticipants: post.recruitment_count || 1,
@@ -198,6 +227,27 @@ export const postsApi = {
 
       if (!insertedPost) {
         return { data: null, error: '投稿の作成に失敗しました' }
+      }
+
+      // 画像がある場合、post_imagesテーブルに保存
+      if (postData.images && postData.images.length > 0) {
+        console.log('postsApi.createPost: Inserting images:', postData.images)
+        const imageData = postData.images.map((url, index) => ({
+          post_id: insertedPost.id,
+          url,
+          display_order: index
+        }))
+
+        const { error: imageError } = await supabase
+          .from('post_images')
+          .insert(imageData)
+
+        if (imageError) {
+          console.error('postsApi.createPost: Image insert error:', imageError)
+          // 画像の保存に失敗してもポスト自体は成功とする
+        } else {
+          console.log('postsApi.createPost: Images inserted successfully')
+        }
       }
 
       // レスポンスデータをフロントエンド形式に変換

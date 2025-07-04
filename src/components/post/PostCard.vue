@@ -135,14 +135,41 @@
           </span>
         </div>
         
-        <BaseButton
-          size="sm"
-          variant="outline"
-          @click="$emit('view-details', post.id)"
-          :aria-label="`${post.title}の詳細を見る`"
-        >
-          詳細を見る
-        </BaseButton>
+        <div class="flex items-center space-x-2">
+          <!-- 編集・削除ボタン（投稿者のみ） -->
+          <div v-if="isAuthor" class="flex items-center space-x-1">
+            <BaseButton
+              size="sm"
+              variant="ghost"
+              @click="$emit('edit-post', post.id)"
+              :aria-label="`${post.title}を編集`"
+            >
+              <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+              </svg>
+            </BaseButton>
+            <BaseButton
+              size="sm"
+              variant="ghost"
+              @click="$emit('delete-post', post.id)"
+              :aria-label="`${post.title}を削除`"
+              class="text-red-600 hover:text-red-700"
+            >
+              <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+              </svg>
+            </BaseButton>
+          </div>
+          
+          <BaseButton
+            size="sm"
+            variant="outline"
+            @click="$emit('view-details', post.id)"
+            :aria-label="`${post.title}の詳細を見る`"
+          >
+            詳細を見る
+          </BaseButton>
+        </div>
       </div>
     </div>
   </article>
@@ -154,6 +181,7 @@ import type { Post } from '@/types/post'
 import { categoryLabels, statusLabels, eventFrequencyLabels, weekdayLabels, weekOfMonthLabels } from '@/utils/mockData'
 import { BaseButton } from '@/components/ui'
 import LazyImage from '@/components/ui/LazyImage.vue'
+import { useAuthStore } from '@/stores/auth'
 
 interface Props {
   post: Post
@@ -162,10 +190,18 @@ interface Props {
 interface Emits {
   (e: 'view-details', postId: string): void
   (e: 'view-image', imageUrl: string, index: number): void
+  (e: 'edit-post', postId: string): void
+  (e: 'delete-post', postId: string): void
 }
 
 const props = defineProps<Props>()
 const emit = defineEmits<Emits>()
+const authStore = useAuthStore()
+
+// 投稿者かどうかの判定
+const isAuthor = computed(() => {
+  return authStore.user?.id === props.post.authorId
+})
 
 // キーボードイベント処理
 const handleKeyDown = (event: KeyboardEvent) => {

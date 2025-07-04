@@ -91,6 +91,8 @@
             :post="post"
             @view-details="goToPostDetail"
             @view-image="handleViewImage"
+            @edit-post="handleEditPost"
+            @delete-post="handleDeletePost"
           />
         </div>
         
@@ -197,6 +199,7 @@ const loadPosts = async (showLoading = true) => {
         search: filters.value.search,
         type: filters.value.type,
         status: filters.value.status || 'active',
+        sortBy: filters.value.sortBy || 'newest',
         limit: perPage.value,
         offset: (currentPage.value - 1) * perPage.value
       })
@@ -248,6 +251,25 @@ const goToPostDetail = (postId: string) => {
 
 const goToCreatePost = () => {
   router.push('/posts/create')
+}
+
+const handleEditPost = (postId: string) => {
+  router.push(`/posts/edit/${postId}`)
+}
+
+const handleDeletePost = async (postId: string) => {
+  if (!confirm('この投稿を削除しますか？この操作は取り消せません。')) {
+    return
+  }
+  
+  try {
+    // TODO: API実装後に削除処理を追加
+    toast.success('投稿を削除しました')
+    loadPosts()
+  } catch (error) {
+    console.error('Delete post error:', error)
+    toast.error('投稿の削除に失敗しました')
+  }
 }
 
 // 画像ビューア関連のハンドラー
