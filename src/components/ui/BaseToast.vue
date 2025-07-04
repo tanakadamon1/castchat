@@ -65,7 +65,7 @@
 </template>
 
 <script setup lang="ts">
-import { computed, onMounted, onUnmounted } from 'vue'
+import { computed, onMounted, onUnmounted, markRaw } from 'vue'
 import {
   CheckCircle,
   XCircle,
@@ -117,10 +117,10 @@ const toastClasses = computed(() => {
 
 const iconComponent = computed(() => {
   const icons = {
-    success: CheckCircle,
-    error: XCircle,
-    warning: AlertTriangle,
-    info: Info
+    success: markRaw(CheckCircle),
+    error: markRaw(XCircle),
+    warning: markRaw(AlertTriangle),
+    info: markRaw(Info)
   }
   
   return icons[props.type]

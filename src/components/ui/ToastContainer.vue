@@ -13,7 +13,7 @@
         :closable="toastItem.closable"
         :duration="0"
         class="pointer-events-auto"
-        @close="toast.remove(toastItem.id)"
+        @close="remove(toastItem.id)"
       />
     </div>
   </Teleport>
@@ -21,7 +21,7 @@
 
 <script setup lang="ts">
 import BaseToast from './BaseToast.vue'
-import { toast } from '@/composables/useToast'
+import { useToast } from '@/composables/useToast'
 
-const { toasts } = toast
+const { toasts, remove } = useToast()
 </script>
