@@ -171,12 +171,12 @@ export function useInstallPrompt() {
       } catch (error) {
         console.error('Failed to share:', error)
         // フォールバック: クリップボードにコピー
-        await navigator.clipboard.writeText(window.location.href)
+        await (navigator as any).clipboard.writeText(window.location.href)
         throw new Error('URLをクリップボードにコピーしました')
       }
     } else {
       // Web Share API未対応の場合はクリップボードにコピー
-      await navigator.clipboard.writeText(window.location.href)
+      await (navigator as any).clipboard.writeText(window.location.href)
       throw new Error('URLをクリップボードにコピーしました')
     }
   }
@@ -196,7 +196,7 @@ export function useInstallPrompt() {
   }
 
   // appinstalledイベントのハンドリング
-  const handleAppInstalled = () => {
+  const handleAppInstalledEvent = () => {
     handleAppInstalled()
   }
 
@@ -206,7 +206,7 @@ export function useInstallPrompt() {
     
     // イベントリスナーの追加
     window.addEventListener('beforeinstallprompt', handleBeforeInstallPrompt)
-    window.addEventListener('appinstalled', handleAppInstalled)
+    window.addEventListener('appinstalled', handleAppInstalledEvent)
     
     // 既存のプロンプトが利用可能かチェック
     const existingPrompt = (window as any).deferredPrompt
@@ -218,7 +218,7 @@ export function useInstallPrompt() {
 
   onUnmounted(() => {
     window.removeEventListener('beforeinstallprompt', handleBeforeInstallPrompt)
-    window.removeEventListener('appinstalled', handleAppInstalled)
+    window.removeEventListener('appinstalled', handleAppInstalledEvent)
   })
 
   return {

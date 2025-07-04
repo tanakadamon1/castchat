@@ -145,7 +145,7 @@ const router = useRouter()
 const { measureAsync } = usePerformanceMonitor()
 
 // アクセシビリティ
-const postsContainerRef = ref<HTMLElement>()
+const postsContainerRef = ref<HTMLElement | null>(null)
 const { announcePageLoad, announceListInfo, announceLoading, announceLoadComplete } = useScreenReader()
 useKeyboardNavigation(postsContainerRef, {
   loop: true,

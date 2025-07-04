@@ -1,4 +1,4 @@
-import { ref, onMounted, onUnmounted, Ref } from 'vue'
+import { ref, onMounted, onUnmounted, type Ref } from 'vue'
 
 export interface KeyboardNavigationOptions {
   loop?: boolean

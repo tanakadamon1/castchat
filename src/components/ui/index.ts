@@ -20,4 +20,4 @@ export { default as EmptyState } from './EmptyState.vue'
 
 // Composables
 export { useToast, toast } from '@/composables/useToast'
-export type { Toast } from '@/composables/useToast'
+export type { Toast } from '@/stores/toast'

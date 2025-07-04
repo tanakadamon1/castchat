@@ -3,7 +3,7 @@ import { messagesService } from './messages'
 import { useAuthStore } from '@/stores/auth'
 import type { Tables } from './database.types'
 
-export type Message = Tables<'messages'>['Row']
+export type Message = Tables<'messages'>
 
 export interface MessageData {
   recipientId: string
@@ -161,7 +161,7 @@ class MessageApi {
         ...message,
         senderName: message.sender?.display_name || message.sender?.username || '匿名',
         recipientName: message.recipient?.display_name || message.recipient?.username || '匿名',
-        isOwn: message.sender_id === userId
+        isOwn: message.sender?.id === userId
       }))
 
       return {

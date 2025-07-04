@@ -97,7 +97,7 @@ export function useOffline() {
       case 'apply_to_post':
         // 応募の再実行
         const { applicationApi } = await import('@/lib/applicationApi')
-        await applicationApi.createApplication(data)
+        await applicationApi.submitApplication(data)
         break
         
       case 'update_profile':

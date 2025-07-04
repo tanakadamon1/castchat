@@ -263,12 +263,12 @@ const goHome = () => {
 }
 
 const reportError = () => {
-  const errorData = {
+  const errorData: ErrorData = {
     type: props.type,
     title: title.value,
     message: message.value,
     errorCode: props.errorCode,
-    timestamp: props.timestamp || new Date().toISOString(),
+    timestamp: (props.timestamp instanceof Date ? props.timestamp.toISOString() : props.timestamp) || new Date().toISOString(),
     userAgent: userAgent.value,
     url: window.location.href,
     severity: props.severity

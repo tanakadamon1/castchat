@@ -175,7 +175,7 @@ export function usePushNotifications() {
     const defaultOptions: NotificationOptions = {
       icon: '/icons/icon-192x192.png',
       badge: '/icons/badge-72x72.png',
-      vibrate: [200, 100, 200],
+      // vibrate: [200, 100, 200], // Not supported in standard NotificationOptions
       requireInteraction: false,
       ...options
     }
@@ -187,18 +187,18 @@ export function usePushNotifications() {
   const notifyNewMessage = (senderName: string, message: string) => {
     return showLocalNotification(`${senderName}からメッセージ`, {
       body: message.length > 100 ? `${message.substring(0, 100)}...` : message,
-      tag: 'new-message',
-      renotify: true,
-      actions: [
-        {
-          action: 'reply',
-          title: '返信'
-        },
-        {
-          action: 'view',
-          title: '表示'
-        }
-      ]
+      tag: 'new-message'
+      // renotify: true, // Not supported in standard NotificationOptions
+      // actions: [ // Not supported in standard NotificationOptions
+      //   {
+      //     action: 'reply',
+      //     title: '返信'
+      //   },
+      //   {
+      //     action: 'view',
+      //     title: '表示'
+      //   }
+      // ]
     })
   }
 
@@ -206,17 +206,17 @@ export function usePushNotifications() {
   const notifyNewApplication = (postTitle: string, applicantName: string) => {
     return showLocalNotification('新しい応募があります', {
       body: `${applicantName}さんが「${postTitle}」に応募しました`,
-      tag: 'new-application',
-      actions: [
-        {
-          action: 'view',
-          title: '確認'
-        },
-        {
-          action: 'ignore',
-          title: '後で'
-        }
-      ]
+      tag: 'new-application'
+      // actions: [ // Not supported in standard NotificationOptions
+      //   {
+      //     action: 'view',
+      //     title: '確認'
+      //   },
+      //   {
+      //     action: 'ignore',
+      //     title: '後で'
+      //   }
+      // ]
     })
   }
 

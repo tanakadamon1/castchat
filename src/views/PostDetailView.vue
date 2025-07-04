@@ -24,10 +24,10 @@
       
       <!-- Error State -->
       <ErrorState
-        v-else-if="error"
+        v-else-if="errorMessage"
         type="not-found"
         title="募集が見つかりませんでした"
-        :message="error"
+        :message="errorMessage"
         @retry="loadPost"
       />
       

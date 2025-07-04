@@ -310,7 +310,7 @@ const handleUpdateStatus = async (applicationId: string, status: string) => {
     const result = await applicationApi.updateApplicationStatus(applicationId, status as 'pending' | 'accepted' | 'rejected' | 'withdrawn')
     
     if (result.error) {
-      error(result.error)
+      toast.error(result.error)
       return
     }
     
@@ -322,7 +322,7 @@ const handleUpdateStatus = async (applicationId: string, status: string) => {
     }
     
     const statusText = status === 'accepted' ? '承認' : '却下'
-    success(`応募を${statusText}しました`)
+    toast.success(`応募を${statusText}しました`)
   } catch (err) {
     console.error('ステータス更新エラー:', err)
     toast.error('ステータス更新に失敗しました')
@@ -363,7 +363,7 @@ const handleWithdraw = async (applicationId: string) => {
     const result = await applicationApi.withdrawApplication(applicationId)
     
     if (result.error) {
-      error(result.error)
+      toast.error(result.error)
       return
     }
     

@@ -41,7 +41,7 @@
           v-for="message in messages"
           :key="message.id"
           :message="message"
-          :is-own="message.sender_id === currentUserId.value"
+          :is-own="message.sender_id === currentUserId"
         />
       </div>
 
@@ -127,7 +127,7 @@ const loadMessages = async () => {
     if (result.error) {
       throw new Error(result.error)
     }
-    messages.value = result.data || []
+    messages.value = (result.data || []) as Message[]
     
     // 未読メッセージを既読にする
     await markMessagesAsRead()

@@ -203,9 +203,7 @@ const handleSubmit = () => {
     return
   }
   
-  toast.success('Form submitted successfully!', {
-    title: 'Success'
-  })
+  toast.success('Form submitted successfully!')
 }
 
 const resetForm = () => {
@@ -228,26 +226,18 @@ const handleModalSubmit = () => {
 
 // Toast demo functions
 const showSuccessToast = () => {
-  toast.success('This is a success message!', {
-    title: 'Success'
-  })
+  toast.success('This is a success message!')
 }
 
 const showErrorToast = () => {
-  toast.error('This is an error message!', {
-    title: 'Error'
-  })
+  toast.error('This is an error message!')
 }
 
 const showWarningToast = () => {
-  toast.warning('This is a warning message!', {
-    title: 'Warning'
-  })
+  toast.warning('This is a warning message!')
 }
 
 const showInfoToast = () => {
-  toast.info('This is an info message!', {
-    title: 'Information'
-  })
+  toast.info('This is an info message!')
 }
 </script>

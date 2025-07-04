@@ -4,9 +4,9 @@ import { errorHandler, ErrorCode, type AppError } from './errors'
 import { permissionManager } from './permissions'
 import type { Tables, TablesInsert, TablesUpdate } from './database.types'
 
-export type Message = Tables<'messages'>['Row']
-export type MessageInsert = Tables<'messages'>['Insert']
-export type MessageUpdate = Tables<'messages'>['Update']
+export type Message = Tables<'messages'>
+export type MessageInsert = TablesInsert<'messages'>
+export type MessageUpdate = TablesUpdate<'messages'>
 
 export interface MessageWithDetails extends Message {
   sender?: {

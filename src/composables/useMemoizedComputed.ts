@@ -1,4 +1,4 @@
-import { computed, ComputedRef } from 'vue'
+import { computed, type ComputedRef } from 'vue'
 
 // 高コストな計算をメモ化するためのコンポーザブル
 export function useMemoizedComputed<T>(

@@ -16,7 +16,7 @@
           <div class="user-avatar-container">
             <img
               :src="recipient.avatar || '/default-avatar.png'"
-              :alt="`${recipient.name}のアバター`"
+              :alt="`${recipient.displayName}のアバター`"
               class="user-avatar"
             />
             <div
@@ -27,7 +27,7 @@
           </div>
           
           <div class="user-details">
-            <h3 class="user-name">{{ recipient?.name || 'ユーザー' }}</h3>
+            <h3 class="user-name">{{ recipient?.displayName || 'ユーザー' }}</h3>
             <span class="user-status">
               {{ recipient?.isOnline ? 'オンライン' : `最終ログイン: ${formatLastSeen(recipient?.lastSeen)}` }}
             </span>
@@ -69,13 +69,13 @@
           :key="message.id"
           class="message-wrapper"
           :class="{
-            'message-own': message.senderId === currentUserId,
+            'message-own': message.sender_id === currentUserId,
             'message-consecutive': isConsecutiveMessage(message, group, index)
           }"
         >
           <!-- アバター（他者メッセージ・非連続時のみ） -->
           <div
-            v-if="message.senderId !== currentUserId && !isConsecutiveMessage(message, group, index)"
+            v-if="message.sender_id !== currentUserId && !isConsecutiveMessage(message, group, index)"
             class="message-avatar"
           >
             <img
@@ -90,19 +90,19 @@
             <div
               class="message-bubble"
               :class="{
-                'bubble-own': message.senderId === currentUserId,
-                'bubble-other': message.senderId !== currentUserId,
-                'bubble-sending': message.status === 'sending',
-                'bubble-error': message.status === 'error'
+                'bubble-own': message.sender_id === currentUserId,
+                'bubble-other': message.sender_id !== currentUserId,
+                'bubble-sending': message.is_read === false,
+                'bubble-error': false
               }"
             >
               <!-- テキストメッセージ -->
-              <div v-if="message.type === 'text'" class="message-content">
+              <div v-if="message.message_type === 'text'" class="message-content">
                 <p class="message-text">{{ message.content }}</p>
               </div>
               
               <!-- 画像メッセージ -->
-              <div v-else-if="message.type === 'image'" class="message-image">
+              <div v-else-if="message.message_type === 'image'" class="message-image">
                 <img
                   :src="message.content"
                   alt="送信された画像"
@@ -113,26 +113,26 @@
               </div>
               
               <!-- システムメッセージ -->
-              <div v-else-if="message.type === 'system'" class="message-system">
+              <div v-else class="message-system">
                 <p class="system-text">{{ message.content }}</p>
               </div>
             </div>
             
             <!-- メッセージメタ情報 -->
             <div
-              v-if="!isConsecutiveMessage(message, group, index) || message.status === 'error'"
+              v-if="!isConsecutiveMessage(message, group, index)"
               class="message-meta"
-              :class="{ 'meta-own': message.senderId === currentUserId }"
+              :class="{ 'meta-own': message.sender_id === currentUserId }"
             >
-              <span class="message-time">{{ formatTime(message.timestamp) }}</span>
+              <span class="message-time">{{ formatTime(message.created_at) }}</span>
               
               <!-- 送信状況（自分のメッセージのみ） -->
               <span
-                v-if="message.senderId === currentUserId && message.status"
+                v-if="message.sender_id === currentUserId && message.is_read !== undefined"
                 class="message-status"
-                :class="`status-${message.status}`"
+                :class="message.is_read ? 'status-read' : 'status-sent'"
               >
-                {{ getStatusLabel(message.status) }}
+                {{ message.is_read ? '既読' : '送信済み' }}
               </span>
             </div>
           </div>
@@ -145,7 +145,7 @@
           <div class="typing-avatar">
             <img
               :src="recipient?.avatar || '/default-avatar.png'"
-              :alt="`${recipient?.name || 'ユーザー'}のアバター`"
+              :alt="`${recipient?.displayName || 'ユーザー'}のアバター`"
               class="avatar-img"
             />
           </div>
@@ -165,7 +165,7 @@
       <MessageInput
         v-model="messageText"
         :disabled="sending"
-        :placeholder="recipient ? `${recipient.name}さんにメッセージを送信` : 'メッセージを送信'"
+        :placeholder="recipient ? `${recipient.displayName}さんにメッセージを送信` : 'メッセージを送信'"
         @send="handleSendMessage"
         @typing="handleTyping"
         @file-select="handleFileSelect"
@@ -178,12 +178,12 @@
 import { ref, computed, onMounted, onUnmounted, nextTick, watch } from 'vue'
 import { ArrowLeft, X } from 'lucide-vue-next'
 import MessageInput from './MessageInput.vue'
-import type { User, Message } from '@/types'
+import type { ChatUser, ChatMessage, toChatUser, toChatMessage } from '@/types/index'
 
 interface Props {
-  recipient: User
+  recipient: ChatUser
   currentUserId: string
-  messages: Message[]
+  messages: ChatMessage[]
   isMobile?: boolean
 }
 
@@ -207,17 +207,17 @@ const typingTimeout = ref<number>()
 
 // Computed
 const groupedMessages = computed(() => {
-  const groups: Record<string, Message[]> = {}
+  const groups: Record<string, ChatMessage[]> = {}
   
   if (!props.messages || !Array.isArray(props.messages)) {
     return groups
   }
   
   props.messages.forEach(message => {
-    if (!message || !message.timestamp) return
+    if (!message || !message.created_at) return
     
     try {
-      const date = new Date(message.timestamp).toDateString()
+      const date = new Date(message.created_at).toDateString()
       if (!groups[date]) {
         groups[date] = []
       }
@@ -231,14 +231,15 @@ const groupedMessages = computed(() => {
 })
 
 // Methods
-const handleSendMessage = async (content: string, type: 'text' | 'image' = 'text') => {
-  if (sending.value) return
+const handleSendMessage = async () => {
+  if (sending.value || !messageText.value.trim()) return
   
   sending.value = true
+  const content = messageText.value
   messageText.value = ''
   
   try {
-    emit('sendMessage', content, type)
+    emit('sendMessage', content, 'text')
     await nextTick()
     scrollToBottom()
   } finally {
@@ -250,11 +251,22 @@ const handleTyping = (isTyping: boolean) => {
   emit('typing', isTyping)
 }
 
-const handleFileSelect = (file: File) => {
+const handleFileSelect = async (file: File) => {
   // ファイルアップロード処理
   // 実際の実装では画像をアップロードしてURLを取得
   const imageUrl = URL.createObjectURL(file)
-  handleSendMessage(imageUrl, 'image')
+  
+  if (sending.value) return
+  
+  sending.value = true
+  
+  try {
+    emit('sendMessage', imageUrl, 'image')
+    await nextTick()
+    scrollToBottom()
+  } finally {
+    sending.value = false
+  }
 }
 
 const handleScroll = () => {
@@ -274,14 +286,14 @@ const scrollToBottom = () => {
   })
 }
 
-const isConsecutiveMessage = (message: Message, group: Message[], index: number): boolean => {
+const isConsecutiveMessage = (message: ChatMessage, group: ChatMessage[], index: number): boolean => {
   if (index === 0) return false
   
   const prevMessage = group[index - 1]
-  const timeDiff = new Date(message.timestamp).getTime() - new Date(prevMessage.timestamp).getTime()
+  const timeDiff = new Date(message.created_at).getTime() - new Date(prevMessage.created_at).getTime()
   
   return (
-    prevMessage.senderId === message.senderId &&
+    prevMessage.sender_id === message.sender_id &&
     timeDiff < 60000 // 1分以内
   )
 }
