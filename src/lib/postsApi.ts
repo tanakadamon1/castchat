@@ -133,10 +133,12 @@ export const postsApi = {
 
       // カテゴリslugをIDに変換
       const categoryMap: Record<string, string> = {
-        'world-creation': '86701fea-6a75-4abe-bdf6-d04534043093',
-        'avatar-creation': 'b6928c39-9e2b-48f6-b4a1-8291543f4374',
-        'events': '7de2f5db-0a00-4b55-adf0-10f9ecf755a1',
         'streaming': '7c104ccc-ae25-44c8-b8b6-d8392d8b44e0',
+        'event': '7de2f5db-0a00-4b55-adf0-10f9ecf755a1',
+        'photo': 'b6928c39-9e2b-48f6-b4a1-8291543f4374',
+        'roleplay': '86701fea-6a75-4abe-bdf6-d04534043093',
+        'game': '86701fea-6a75-4abe-bdf6-d04534043093',
+        'music': '86701fea-6a75-4abe-bdf6-d04534043093',
         'other': '8878469d-a3b7-40f5-ad32-7be0846f2498'
       }
 
