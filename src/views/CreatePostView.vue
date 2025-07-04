@@ -637,6 +637,7 @@ const handleSubmit = async () => {
   }
 
   submitting.value = true
+  console.log('Starting post submission process...')
   
   try {
     await submitPost()
