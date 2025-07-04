@@ -131,15 +131,15 @@ export const postsApi = {
       console.log('postsApi.createPost: Input data:', postData)
       console.log('postsApi.createPost: User ID:', authStore.user.id)
 
-      // カテゴリslugをIDに変換
+      // カテゴリslugをIDに変換（実際のデータベースのカテゴリに合わせる）
       const categoryMap: Record<string, string> = {
-        'streaming': '7c104ccc-ae25-44c8-b8b6-d8392d8b44e0',
-        'event': '7de2f5db-0a00-4b55-adf0-10f9ecf755a1',
-        'photo': 'b6928c39-9e2b-48f6-b4a1-8291543f4374',
-        'roleplay': '86701fea-6a75-4abe-bdf6-d04534043093',
-        'game': '86701fea-6a75-4abe-bdf6-d04534043093',
-        'music': '86701fea-6a75-4abe-bdf6-d04534043093',
-        'other': '8878469d-a3b7-40f5-ad32-7be0846f2498'
+        'streaming': '7c104ccc-ae25-44c8-b8b6-d8392d8b44e0', // 配信・動画
+        'event': '7de2f5db-0a00-4b55-adf0-10f9ecf755a1',     // イベント
+        'photo': 'b6928c39-9e2b-48f6-b4a1-8291543f4374',     // アバター制作（写真に近い）
+        'roleplay': '86701fea-6a75-4abe-bdf6-d04534043093',  // ワールド制作（ロールプレイに近い）
+        'game': '86701fea-6a75-4abe-bdf6-d04534043093',      // ワールド制作（ゲームに近い）
+        'music': '7c104ccc-ae25-44c8-b8b6-d8392d8b44e0',     // 配信・動画（音楽も配信に含む）
+        'other': '8878469d-a3b7-40f5-ad32-7be0846f2498'      // その他
       }
 
       const categoryId = categoryMap[postData.category] || categoryMap['other']
@@ -153,7 +153,7 @@ export const postsApi = {
         description: postData.description,
         requirements: postData.requirements?.join ? postData.requirements.join(', ') : (typeof postData.requirements === 'string' ? postData.requirements : ''),
         recruitment_count: postData.maxParticipants || 1,
-        deadline: postData.endDate || postData.startDate || null
+        deadline: postData.endDate ? new Date(postData.endDate).toISOString().split('T')[0] : (postData.startDate ? new Date(postData.startDate).toISOString().split('T')[0] : null)
       }
       
       console.log('postsApi.createPost: Prepared data for database:', createData)
