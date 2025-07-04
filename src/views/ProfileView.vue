@@ -257,7 +257,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, onMounted } from 'vue'
+import { ref, computed, onMounted, watchEffect } from 'vue'
 import { useRouter } from 'vue-router'
 import { useAuthStore } from '@/stores/auth'
 import { useToast } from '@/composables/useToast'
@@ -469,6 +469,26 @@ const handleCancel = () => {
   isEditing.value = false
 }
 
+// editDataの初期化を監視
+const initializeEditData = () => {
+  if (profileData.value) {
+    editData.value = {
+      displayName: profileData.value.displayName,
+      username: profileData.value.username,
+      bio: profileData.value.bio,
+      discordUsername: profileData.value.discordUsername,
+      twitterUsername: profileData.value.twitterUsername,
+      vrchatUsername: profileData.value.vrchatUsername,
+      websiteUrl: profileData.value.websiteUrl
+    }
+  }
+}
+
+// profileDataの変更を監視
+watchEffect(() => {
+  initializeEditData()
+})
+
 // 初期化
 onMounted(async () => {
   if (!authStore.isAuthenticated) {
@@ -476,23 +496,7 @@ onMounted(async () => {
     return
   }
   
-  try {
-    // プロフィールデータが利用可能になるまで待機
-    if (profileData.value) {
-      // 編集データを初期化
-      editData.value = {
-        displayName: profileData.value.displayName,
-        username: profileData.value.username,
-        bio: profileData.value.bio,
-        discordUsername: profileData.value.discordUsername,
-        twitterUsername: profileData.value.twitterUsername,
-        vrchatUsername: profileData.value.vrchatUsername,
-        websiteUrl: profileData.value.websiteUrl
-      }
-    }
-  } catch (err) {
-    console.error('プロフィール取得エラー:', err)
-    toast.error('プロフィールの取得に失敗しました')
-  }
+  // 初期化を試行
+  initializeEditData()
 })
 </script>
