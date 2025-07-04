@@ -421,7 +421,7 @@ export class PostsService {
         .from('posts')
         .select(`
           *,
-          users!posts_user_id_fkey(id, username, display_name, avatar_url, is_verified),
+          users!posts_user_id_fkey(id, username, display_name, is_verified),
           post_categories!posts_category_id_fkey(id, name, slug)
         `)
         .eq('id', postId)
@@ -515,7 +515,7 @@ export class PostsService {
         .from('posts')
         .select(`
           *,
-          users!posts_user_id_fkey(id, username, display_name, avatar_url, is_verified),
+          users!posts_user_id_fkey(id, username, display_name, is_verified),
           post_categories!posts_category_id_fkey(id, name, slug)
         `, { count: 'exact' })
 

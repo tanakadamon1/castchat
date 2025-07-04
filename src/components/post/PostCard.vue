@@ -11,13 +11,11 @@
     <div class="p-4 pb-3">
       <div class="flex items-start justify-between mb-3">
         <div class="flex items-center space-x-3">
-          <LazyImage
-            :src="post.authorAvatar || '/default-avatar.png'"
-            :alt="post.authorName"
-            container-class="w-10 h-10 rounded-full"
-            image-class="w-10 h-10 rounded-full object-cover"
-            :eager="false"
-          />
+          <div class="w-10 h-10 rounded-full bg-gray-300 flex items-center justify-center">
+            <span class="text-gray-600 text-sm font-medium">
+              {{ (post.authorName || '匿名').charAt(0) }}
+            </span>
+          </div>
           <div>
             <p class="font-medium text-gray-900">{{ post.authorName }}</p>
             <p class="text-sm text-gray-500">{{ formatDate(post.createdAt) }}</p>
@@ -170,7 +168,6 @@ import { computed } from 'vue'
 import type { Post } from '@/types/post'
 import { categoryLabels, statusLabels, eventFrequencyLabels } from '@/utils/mockData'
 import { BaseButton } from '@/components/ui'
-import LazyImage from '@/components/ui/LazyImage.vue'
 
 interface Props {
   post: Post

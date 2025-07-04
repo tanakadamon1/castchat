@@ -40,11 +40,11 @@
         <div class="p-6 border-b border-gray-200">
           <div class="flex items-start justify-between mb-4">
             <div class="flex items-center space-x-3">
-              <img
-                :src="post.authorAvatar || '/default-avatar.png'"
-                :alt="post.authorName || '匿名'"
-                class="w-12 h-12 rounded-full"
-              />
+              <div class="w-12 h-12 rounded-full bg-gray-300 flex items-center justify-center">
+                <span class="text-gray-600 font-medium">
+                  {{ (post.authorName || '匿名').charAt(0) }}
+                </span>
+              </div>
               <div>
                 <h2 class="font-semibold text-gray-900">{{ post.authorName || '匿名' }}</h2>
                 <p class="text-sm text-gray-500">{{ formatDate(post.createdAt) }}に投稿</p>
