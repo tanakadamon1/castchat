@@ -12,7 +12,7 @@ console.log('🚀 統合テスト開始...')
 async function testSupabaseConnection() {
   try {
     console.log('📡 Supabase接続テスト...')
-    const { data, error } = await supabase
+    const { error } = await supabase
       .from('posts')
       .select('count')
       .limit(1)
