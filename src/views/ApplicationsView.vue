@@ -306,8 +306,10 @@ const clearSentFilters = () => {
 
 // イベントハンドラー
 const handleUpdateStatus = async (applicationId: string, status: string) => {
+  console.log('ApplicationsView: handleUpdateStatus called', { applicationId, status })
   try {
     const result = await applicationApi.updateApplicationStatus(applicationId, status as 'pending' | 'accepted' | 'rejected' | 'withdrawn')
+    console.log('ApplicationsView: updateApplicationStatus result', result)
     
     if (result.error) {
       toast.error(result.error)
@@ -330,13 +332,17 @@ const handleUpdateStatus = async (applicationId: string, status: string) => {
 }
 
 const handleViewProfile = (userId: string) => {
+  console.log('ApplicationsView: handleViewProfile called', { userId })
   router.push(`/users/${userId}`)
 }
 
 const handleSendMessage = (userId: string) => {
+  console.log('ApplicationsView: handleSendMessage called', { userId })
   // メッセージモーダルを開く
   const user = receivedApplications.value
     .find(app => app.applicantId === userId || app.user_id === userId)
+  
+  console.log('ApplicationsView: Found user for message:', user)
   
   if (user) {
     selectedRecipient.value = {
@@ -346,6 +352,7 @@ const handleSendMessage = (userId: string) => {
     }
     showMessageModal.value = true
   } else {
+    console.error('ApplicationsView: User not found for message')
     toast.error('ユーザー情報が見つかりません')
   }
 }
@@ -394,21 +401,31 @@ const loadApplications = async () => {
       errorMessage.value = receivedResult.error
       console.error('Received applications error:', receivedResult.error)
     } else {
+      console.log('Raw received applications data:', receivedResult.data)
       // データを ApplicationCard で使用する形式に変換
-      receivedApplications.value = (receivedResult.data || []).map((app: any) => ({
-        id: app.id,
-        postId: app.post_id,
-        postTitle: app.posts?.title || '募集タイトル',
-        postAuthor: app.posts?.users?.display_name || '投稿者',
-        applicantId: app.user_id,
-        applicantName: app.users?.display_name || '匿名ユーザー',
-        applicantAvatar: app.users?.avatar_url,
-        status: app.status,
-        message: app.message,
-        appliedAt: app.created_at,
-        respondedAt: app.responded_at
-      }))
-      console.log('Received applications data:', receivedApplications.value)
+      receivedApplications.value = (receivedResult.data || []).map((app: any) => {
+        console.log('Processing application:', app)
+        console.log('app.posts:', app.posts)
+        console.log('app.users:', app.users)
+        
+        const mappedApp = {
+          id: app.id,
+          postId: app.post_id,
+          postTitle: app.posts?.title || '募集タイトル',
+          postAuthor: app.posts?.users?.display_name || '投稿者',
+          applicantId: app.user_id,
+          applicantName: app.users?.display_name || '匿名ユーザー',
+          applicantAvatar: app.users?.avatar_url,
+          status: app.status,
+          message: app.message,
+          appliedAt: app.created_at,
+          respondedAt: app.responded_at
+        }
+        
+        console.log('Mapped application:', mappedApp)
+        return mappedApp
+      })
+      console.log('Final received applications data:', receivedApplications.value)
     }
 
     // 送信した応募を取得

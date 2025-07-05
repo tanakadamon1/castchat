@@ -37,7 +37,7 @@
           <BaseButton
             v-if="application.status === 'pending'"
             size="sm"
-            @click="emit('updateStatus', application.id, 'accepted')"
+            @click="handleUpdateStatus('accepted')"
           >
             承認
           </BaseButton>
@@ -45,21 +45,21 @@
             v-if="application.status === 'pending'"
             size="sm"
             variant="outline"
-            @click="emit('updateStatus', application.id, 'rejected')"
+            @click="handleUpdateStatus('rejected')"
           >
             却下
           </BaseButton>
           <BaseButton
             size="sm"
             variant="outline"
-            @click="emit('viewProfile', application.applicantId!)"
+            @click="handleViewProfile"
           >
             プロフィール
           </BaseButton>
           <BaseButton
             size="sm"
             variant="outline"
-            @click="emit('sendMessage', application.applicantId!)"
+            @click="handleSendMessage"
           >
             メッセージ
           </BaseButton>
@@ -70,7 +70,7 @@
           <BaseButton
             size="sm"
             variant="outline"
-            @click="emit('viewPost', application.postId!)"
+            @click="handleViewPost"
           >
             投稿を見る
           </BaseButton>
@@ -78,7 +78,7 @@
             v-if="application.status === 'pending'"
             size="sm"
             variant="outline"
-            @click="emit('withdraw', application.id)"
+            @click="handleWithdraw"
           >
             取り下げ
           </BaseButton>
@@ -161,6 +161,60 @@ const displayAvatar = computed(() => {
     ? props.application.applicantAvatar
     : null // 送信した応募では投稿者のアバターは表示しない
 })
+
+// イベントハンドラー
+const handleUpdateStatus = (status: string) => {
+  console.log('ApplicationCard: handleUpdateStatus called', {
+    applicationId: props.application.id,
+    status,
+    application: props.application
+  })
+  emit('updateStatus', props.application.id, status)
+}
+
+const handleViewProfile = () => {
+  console.log('ApplicationCard: handleViewProfile called', {
+    applicantId: props.application.applicantId,
+    application: props.application
+  })
+  if (props.application.applicantId) {
+    emit('viewProfile', props.application.applicantId)
+  } else {
+    console.error('ApplicationCard: No applicantId found')
+  }
+}
+
+const handleSendMessage = () => {
+  console.log('ApplicationCard: handleSendMessage called', {
+    applicantId: props.application.applicantId,
+    application: props.application
+  })
+  if (props.application.applicantId) {
+    emit('sendMessage', props.application.applicantId)
+  } else {
+    console.error('ApplicationCard: No applicantId found')
+  }
+}
+
+const handleViewPost = () => {
+  console.log('ApplicationCard: handleViewPost called', {
+    postId: props.application.postId,
+    application: props.application
+  })
+  if (props.application.postId) {
+    emit('viewPost', props.application.postId)
+  } else {
+    console.error('ApplicationCard: No postId found')
+  }
+}
+
+const handleWithdraw = () => {
+  console.log('ApplicationCard: handleWithdraw called', {
+    applicationId: props.application.id,
+    application: props.application
+  })
+  emit('withdraw', props.application.id)
+}
 
 // 日付フォーマット
 const formatDate = (dateString: string) => {
