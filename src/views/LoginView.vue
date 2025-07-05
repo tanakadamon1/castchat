@@ -45,6 +45,30 @@
         >
           セッションをクリアして再ログイン
         </button>
+
+        <!-- デバッグ情報表示ボタン -->
+        <button
+          @click="showDebugInfo = !showDebugInfo"
+          class="w-full flex justify-center py-2 px-4 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+        >
+          {{ showDebugInfo ? 'デバッグ情報を隠す' : 'デバッグ情報を表示' }}
+        </button>
+      </div>
+
+      <!-- デバッグ情報 -->
+      <div v-if="showDebugInfo" class="mt-4 p-4 bg-gray-100 rounded-lg text-xs">
+        <h3 class="font-bold mb-2">デバッグ情報:</h3>
+        <div class="space-y-1">
+          <p>
+            <strong>認証状態:</strong>
+            {{ authStore.isAuthenticated ? 'ログイン済み' : '未ログイン' }}
+          </p>
+          <p><strong>ユーザーID:</strong> {{ authStore.user?.id || 'なし' }}</p>
+          <p><strong>プロフィールID:</strong> {{ authStore.profile?.id || 'なし' }}</p>
+          <p><strong>ローディング:</strong> {{ authStore.loading ? 'はい' : 'いいえ' }}</p>
+          <p><strong>エラー:</strong> {{ authStore.error || 'なし' }}</p>
+          <p><strong>現在のURL:</strong> N/A</p>
+        </div>
       </div>
 
       <div class="text-center space-y-2">
@@ -69,9 +93,11 @@
 </template>
 
 <script setup lang="ts">
+import { ref } from 'vue'
 import { useAuthStore } from '@/stores/auth'
 
 const authStore = useAuthStore()
+const showDebugInfo = ref(false)
 
 const handleGoogleSignIn = async () => {
   console.log('Button clicked! Auth store loading:', authStore.loading)

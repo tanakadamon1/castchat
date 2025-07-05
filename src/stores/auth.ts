@@ -69,9 +69,14 @@ export const useAuthStore = defineStore('auth', () => {
 
   async function ensureUserProfile(authUser: User) {
     try {
+      console.log('Ensuring user profile for:', authUser.id)
+      console.log('User metadata:', authUser.user_metadata)
+
       let userProfile = await getUserProfile(authUser.id)
+      console.log('Existing profile:', userProfile)
 
       if (!userProfile) {
+        console.log('Creating new user profile...')
         const { user_metadata } = authUser
         const profileData: UserProfileInsert = {
           id: authUser.id,
@@ -87,10 +92,13 @@ export const useAuthStore = defineStore('auth', () => {
           is_verified: false,
         }
 
+        console.log('Profile data to create:', profileData)
         userProfile = await createUserProfile(profileData)
+        console.log('Created profile:', userProfile)
       }
 
       profile.value = userProfile
+      console.log('Profile set in store:', userProfile)
       return userProfile
     } catch (error) {
       console.error('Ensure user profile error:', error)
@@ -102,12 +110,19 @@ export const useAuthStore = defineStore('auth', () => {
     loading.value = true
     error.value = null
     try {
-      console.log('Starting Google sign-in process...')
+      console.log('=== Starting Google sign-in process ===')
+      console.log('Current URL:', window.location.href)
       console.log('Redirect URL:', `${window.location.origin}/auth/callback`)
 
       // 既存のセッションをクリア
       console.log('Clearing existing session before sign-in...')
       await supabase.auth.signOut()
+
+      // 現在のセッション状態を確認
+      const {
+        data: { session: currentSession },
+      } = await supabase.auth.getSession()
+      console.log('Current session after signOut:', currentSession)
 
       const { data, error: signInError } = await supabase.auth.signInWithOAuth({
         provider: 'google',
@@ -128,6 +143,7 @@ export const useAuthStore = defineStore('auth', () => {
       }
 
       console.log('Google sign-in initiated successfully')
+      console.log('OAuth URL:', data?.url)
       return data
     } catch (err) {
       console.error('Error signing in with Google:', err)
@@ -160,7 +176,7 @@ export const useAuthStore = defineStore('auth', () => {
     loading.value = true
     error.value = null
     try {
-      console.log('Initializing auth store...')
+      console.log('=== Initializing auth store ===')
 
       // 現在のセッションを取得
       const {
@@ -174,24 +190,32 @@ export const useAuthStore = defineStore('auth', () => {
       }
 
       console.log('Current session:', currentSession)
+      console.log('Session user:', currentSession?.user)
 
       session.value = currentSession
       user.value = currentSession?.user ?? null
 
       if (currentSession?.user) {
         console.log('User found, ensuring profile...')
-        await ensureUserProfile(currentSession.user)
+        const userProfile = await ensureUserProfile(currentSession.user)
+        console.log('User profile ensured:', userProfile)
+      } else {
+        console.log('No user found in session')
       }
 
       // 認証状態変更のリスナーを設定
       supabase.auth.onAuthStateChange(async (event: AuthChangeEvent, newSession) => {
-        console.log('Auth state changed:', event, newSession)
+        console.log('=== Auth state changed ===')
+        console.log('Event:', event)
+        console.log('New session:', newSession)
+
         session.value = newSession
         user.value = newSession?.user ?? null
 
         if (newSession?.user) {
           console.log('New user session, ensuring profile...')
-          await ensureUserProfile(newSession.user)
+          const userProfile = await ensureUserProfile(newSession.user)
+          console.log('User profile ensured:', userProfile)
         } else {
           console.log('User signed out, clearing profile...')
           profile.value = null
@@ -199,6 +223,11 @@ export const useAuthStore = defineStore('auth', () => {
       })
 
       console.log('Auth store initialized successfully')
+      console.log('Final auth state:', {
+        isAuthenticated: isAuthenticated.value,
+        user: user.value?.id,
+        profile: profile.value?.id,
+      })
     } catch (err) {
       console.error('Error initializing auth:', err)
       error.value = err instanceof Error ? err.message : 'Authentication initialization failed'

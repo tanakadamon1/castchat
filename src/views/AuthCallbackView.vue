@@ -72,14 +72,24 @@ const handleAuthCallback = async () => {
     loading.value = true
     error.value = null
 
-    console.log('Auth callback started')
+    console.log('=== Auth callback started ===')
     console.log('Current URL:', window.location.href)
     console.log('URL hash:', window.location.hash)
     console.log('URL search params:', window.location.search)
 
+    // URLパラメータを解析
+    const urlParams = new URLSearchParams(window.location.search)
+    const hashParams = new URLSearchParams(window.location.hash.substring(1))
+
+    console.log('URL params:', Object.fromEntries(urlParams.entries()))
+    console.log('Hash params:', Object.fromEntries(hashParams.entries()))
+
     // まず現在のセッションをクリア
     console.log('Clearing existing session...')
     await supabase.auth.signOut()
+
+    // 少し待ってからセッションを確認
+    await new Promise((resolve) => setTimeout(resolve, 1000))
 
     // Supabaseの認証コールバックを処理
     const { data, error: authError } = await supabase.auth.getSession()
@@ -88,12 +98,20 @@ const handleAuthCallback = async () => {
     console.log('Auth error:', authError)
 
     if (authError) {
+      console.error('Auth error details:', authError)
       throw authError
     }
 
     if (!data.session) {
-      throw new Error('セッションが見つかりません')
+      console.error('No session found after OAuth callback')
+      throw new Error('セッションが見つかりません。OAuth認証が完了していない可能性があります。')
     }
+
+    console.log('Session found:', {
+      user: data.session.user?.id,
+      email: data.session.user?.email,
+      expiresAt: data.session.expires_at,
+    })
 
     // 認証ストアを初期化
     console.log('Initializing auth store...')
@@ -120,7 +138,8 @@ const handleAuthCallback = async () => {
         }, 1500)
       }
     } else {
-      throw new Error('認証に失敗しました')
+      console.error('Auth store not authenticated after initialization')
+      throw new Error('認証に失敗しました。認証ストアの初期化に問題があります。')
     }
   } catch (err) {
     console.error('Auth callback error:', err)

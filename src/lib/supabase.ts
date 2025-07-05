@@ -12,5 +12,6 @@ export const supabase = createClient(config.supabaseUrl, config.supabaseAnonKey,
     persistSession: true,
     detectSessionInUrl: true,
     flowType: 'pkce',
+    debug: true, // デバッグモードを有効化
   },
 })
