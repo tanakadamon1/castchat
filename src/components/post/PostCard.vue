@@ -1,6 +1,6 @@
 <template>
   <article
-    class="bg-white rounded-lg shadow-sm border border-gray-200 hover:shadow-md transition-shadow duration-200 overflow-hidden focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
+    class="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 hover:shadow-md transition-shadow duration-200 overflow-hidden focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
     :aria-label="`${post.title}の募集投稿`"
     data-post-card
     tabindex="0"
@@ -11,8 +11,8 @@
     <div class="p-4 pb-3">
       <div class="flex items-start justify-between mb-3">
         <div>
-          <p class="font-medium text-gray-900">{{ post.authorName }}</p>
-          <p class="text-sm text-gray-500">{{ formatDate(post.createdAt) }}</p>
+          <p class="font-medium text-gray-900 dark:text-gray-100">{{ post.authorName }}</p>
+          <p class="text-sm text-gray-500 dark:text-gray-400">{{ formatDate(post.createdAt) }}</p>
         </div>
         
         <div class="flex items-center space-x-2">
@@ -22,11 +22,11 @@
         </div>
       </div>
       
-      <h3 class="text-lg font-semibold text-gray-900 mb-2 line-clamp-2">
+      <h3 class="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-2 line-clamp-2">
         {{ post.title }}
       </h3>
       
-      <p class="text-gray-600 text-sm mb-3 line-clamp-3">
+      <p class="text-gray-600 dark:text-gray-300 text-sm mb-3 line-clamp-3">
         {{ post.description }}
       </p>
       
@@ -62,7 +62,7 @@
     
     <!-- Details -->
     <div class="px-4 pb-3 space-y-2">
-      <div class="flex items-center text-sm text-gray-600">
+      <div class="flex items-center text-sm text-gray-600 dark:text-gray-400">
         <svg class="w-4 h-4 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.998 1.998 0 013 12V7a2 2 0 012-2z" />
         </svg>
@@ -71,7 +71,7 @@
       
       <div
         v-if="post.eventFrequency"
-        class="flex items-center text-sm text-blue-600"
+        class="flex items-center text-sm text-blue-600 dark:text-blue-400"
       >
         <svg class="w-4 h-4 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
@@ -81,7 +81,7 @@
       
       <div
         v-if="post.deadline"
-        class="flex items-center text-sm text-red-600"
+        class="flex items-center text-sm text-red-600 dark:text-red-400"
       >
         <svg class="w-4 h-4 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
@@ -91,7 +91,7 @@
       
       <div
         v-if="post.worldName"
-        class="flex items-center text-sm text-blue-600"
+        class="flex items-center text-sm text-blue-600 dark:text-blue-400"
       >
         <svg class="w-4 h-4 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3.055 11H5a2 2 0 012 2v1a2 2 0 002 2 2 2 0 012 2v2.945M8 3.935V5.5A2.5 2.5 0 0010.5 8h.5a2 2 0 012 2 2 2 0 104 0 2 2 0 012-2h1.064M15 20.488V18a2 2 0 012-2h3.064" />
@@ -109,13 +109,13 @@
         <span
           v-for="tag in post.tags.slice(0, 4)"
           :key="tag"
-          class="inline-flex items-center px-2 py-1 rounded-md text-xs font-medium bg-gray-100 text-gray-800"
+          class="inline-flex items-center px-2 py-1 rounded-md text-xs font-medium bg-gray-100 dark:bg-gray-700 text-gray-800 dark:text-gray-200"
         >
           #{{ tag }}
         </span>
         <span
           v-if="post.tags.length > 4"
-          class="inline-flex items-center px-2 py-1 rounded-md text-xs font-medium bg-gray-100 text-gray-500"
+          class="inline-flex items-center px-2 py-1 rounded-md text-xs font-medium bg-gray-100 dark:bg-gray-700 text-gray-500 dark:text-gray-400"
         >
           +{{ post.tags.length - 4 }}
         </span>
@@ -123,9 +123,9 @@
     </div>
     
     <!-- Footer -->
-    <div class="px-4 py-3 bg-gray-50 border-t border-gray-100">
+    <div class="px-4 py-3 bg-gray-50 dark:bg-gray-700 border-t border-gray-100 dark:border-gray-600">
       <div class="flex items-center justify-between">
-        <div class="flex items-center space-x-4 text-sm text-gray-600">
+        <div class="flex items-center space-x-4 text-sm text-gray-600 dark:text-gray-400">
           
           <span class="flex items-center">
             <svg class="w-4 h-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -228,9 +228,9 @@ const statusBadgeClasses = computed(() => {
   const baseClasses = 'inline-flex items-center px-2 py-1 rounded-full text-xs font-medium'
   
   const variants = {
-    active: 'bg-green-100 text-green-800',
-    closed: 'bg-gray-100 text-gray-800',
-    draft: 'bg-yellow-100 text-yellow-800'
+    active: 'bg-green-100 dark:bg-green-900 text-green-800 dark:text-green-200',
+    closed: 'bg-gray-100 dark:bg-gray-700 text-gray-800 dark:text-gray-200',
+    draft: 'bg-yellow-100 dark:bg-yellow-900 text-yellow-800 dark:text-yellow-200'
   }
   
   return `${baseClasses} ${variants[props.post.status]}`

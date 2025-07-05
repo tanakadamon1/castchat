@@ -98,14 +98,14 @@ let timeoutId: NodeJS.Timeout | null = null
 
 const toastClasses = computed(() => {
   const baseClasses = [
-    'max-w-sm w-full bg-white shadow-lg rounded-lg pointer-events-auto ring-1 ring-black ring-opacity-5'
+    'max-w-sm w-full bg-white dark:bg-gray-800 shadow-lg rounded-lg pointer-events-auto ring-1 ring-black dark:ring-gray-600 ring-opacity-5'
   ]
   
   const typeClasses = {
-    success: 'border-l-4 border-green-400',
-    error: 'border-l-4 border-red-400',
-    warning: 'border-l-4 border-yellow-400',
-    info: 'border-l-4 border-blue-400'
+    success: 'border-l-4 border-green-400 dark:border-green-500',
+    error: 'border-l-4 border-red-400 dark:border-red-500',
+    warning: 'border-l-4 border-yellow-400 dark:border-yellow-500',
+    info: 'border-l-4 border-blue-400 dark:border-blue-500'
   }
   
   return [
@@ -128,28 +128,28 @@ const iconComponent = computed(() => {
 
 const iconClasses = computed(() => {
   const classes = {
-    success: 'text-green-400',
-    error: 'text-red-400',
-    warning: 'text-yellow-400',
-    info: 'text-blue-400'
+    success: 'text-green-400 dark:text-green-500',
+    error: 'text-red-400 dark:text-red-500',
+    warning: 'text-yellow-400 dark:text-yellow-500',
+    info: 'text-blue-400 dark:text-blue-500'
   }
   
   return classes[props.type]
 })
 
 const titleClasses = computed(() => {
-  return 'text-sm font-medium text-gray-900'
+  return 'text-sm font-medium text-gray-900 dark:text-gray-100'
 })
 
 const messageClasses = computed(() => {
-  const baseClasses = 'text-sm text-gray-500'
+  const baseClasses = 'text-sm text-gray-500 dark:text-gray-400'
   return props.title ? `mt-1 ${baseClasses}` : baseClasses
 })
 
 const closeButtonClasses = computed(() => {
   return [
-    'inline-flex rounded-md text-gray-400 hover:text-gray-500',
-    'focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500'
+    'inline-flex rounded-md text-gray-400 dark:text-gray-500 hover:text-gray-500 dark:hover:text-gray-400',
+    'focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 dark:focus:ring-indigo-400'
   ].join(' ')
 })
 

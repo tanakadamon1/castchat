@@ -84,24 +84,24 @@ const buttonClasses = computed(() => {
   
   const variantClasses = {
     primary: [
-      'bg-indigo-600 text-white shadow-sm hover:bg-indigo-500',
-      'focus-visible:outline-indigo-600'
+      'bg-indigo-600 dark:bg-indigo-500 text-white shadow-sm hover:bg-indigo-500 dark:hover:bg-indigo-400',
+      'focus-visible:outline-indigo-600 dark:focus-visible:outline-indigo-500'
     ],
     secondary: [
-      'bg-white text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300',
-      'hover:bg-gray-50 focus-visible:outline-indigo-600'
+      'bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 shadow-sm ring-1 ring-inset ring-gray-300 dark:ring-gray-600',
+      'hover:bg-gray-50 dark:hover:bg-gray-700 focus-visible:outline-indigo-600 dark:focus-visible:outline-indigo-500'
     ],
     outline: [
-      'border border-gray-300 bg-transparent text-gray-700',
-      'hover:bg-gray-50 focus-visible:outline-indigo-600'
+      'border border-gray-300 dark:border-gray-600 bg-transparent text-gray-700 dark:text-gray-300',
+      'hover:bg-gray-50 dark:hover:bg-gray-800 focus-visible:outline-indigo-600 dark:focus-visible:outline-indigo-500'
     ],
     ghost: [
-      'bg-transparent text-gray-700 hover:bg-gray-100',
-      'focus-visible:outline-indigo-600'
+      'bg-transparent text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800',
+      'focus-visible:outline-indigo-600 dark:focus-visible:outline-indigo-500'
     ],
     danger: [
-      'bg-red-600 text-white shadow-sm hover:bg-red-500',
-      'focus-visible:outline-red-600'
+      'bg-red-600 dark:bg-red-500 text-white shadow-sm hover:bg-red-500 dark:hover:bg-red-400',
+      'focus-visible:outline-red-600 dark:focus-visible:outline-red-500'
     ]
   }
   

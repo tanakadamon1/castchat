@@ -31,22 +31,22 @@
 
         <!-- Quick Links -->
         <div>
-          <h3 class="text-sm font-semibold text-gray-900 tracking-wider uppercase mb-4">
+          <h3 class="text-sm font-semibold text-gray-900 dark:text-gray-100 tracking-wider uppercase mb-4">
             クイックリンク
           </h3>
           <ul class="space-y-2">
             <li>
-              <router-link to="/posts" class="text-gray-600 hover:text-gray-900 text-sm">
+              <router-link to="/posts" class="text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-100 text-sm">
                 募集一覧
               </router-link>
             </li>
             <li>
-              <router-link to="/posts/create" class="text-gray-600 hover:text-gray-900 text-sm">
+              <router-link to="/posts/create" class="text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-100 text-sm">
                 募集投稿
               </router-link>
             </li>
             <li>
-              <router-link to="/profile" class="text-gray-600 hover:text-gray-900 text-sm">
+              <router-link to="/profile" class="text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-100 text-sm">
                 プロフィール
               </router-link>
             </li>
@@ -55,27 +55,27 @@
 
         <!-- Support -->
         <div>
-          <h3 class="text-sm font-semibold text-gray-900 tracking-wider uppercase mb-4">
+          <h3 class="text-sm font-semibold text-gray-900 dark:text-gray-100 tracking-wider uppercase mb-4">
             サポート
           </h3>
           <ul class="space-y-2">
             <li>
-              <a href="#" class="text-gray-600 hover:text-gray-900 text-sm">
+              <a href="#" class="text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-100 text-sm">
                 ヘルプセンター
               </a>
             </li>
             <li>
-              <a href="#" class="text-gray-600 hover:text-gray-900 text-sm">
+              <a href="#" class="text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-100 text-sm">
                 利用規約
               </a>
             </li>
             <li>
-              <a href="#" class="text-gray-600 hover:text-gray-900 text-sm">
+              <a href="#" class="text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-100 text-sm">
                 プライバシーポリシー
               </a>
             </li>
             <li>
-              <a href="#" class="text-gray-600 hover:text-gray-900 text-sm">
+              <a href="#" class="text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-100 text-sm">
                 お問い合わせ
               </a>
             </li>
@@ -83,16 +83,16 @@
         </div>
       </div>
 
-      <div class="mt-8 pt-8 border-t border-gray-200">
+      <div class="mt-8 pt-8 border-t border-gray-200 dark:border-gray-700">
         <div class="flex justify-between items-center">
-          <p class="text-gray-400 text-sm">
+          <p class="text-gray-400 dark:text-gray-500 text-sm">
             © 2024 VRChatキャスト募集掲示板. All rights reserved.
           </p>
           <div class="flex space-x-6">
-            <a href="#" class="text-gray-400 hover:text-gray-500 text-sm">
+            <a href="#" class="text-gray-400 dark:text-gray-500 hover:text-gray-500 dark:hover:text-gray-400 text-sm">
               プライバシー
             </a>
-            <a href="#" class="text-gray-400 hover:text-gray-500 text-sm">
+            <a href="#" class="text-gray-400 dark:text-gray-500 hover:text-gray-500 dark:hover:text-gray-400 text-sm">
               利用規約
             </a>
           </div>
