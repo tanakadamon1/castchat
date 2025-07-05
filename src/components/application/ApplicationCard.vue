@@ -66,21 +66,32 @@
       </div>
     </div>
 
-    <!-- メッセージプレビュー -->
-    <div v-if="application.message" class="mt-4 pt-4 border-t">
-      <p class="text-sm text-gray-600 font-medium mb-2 dark:text-gray-300">応募メッセージ:</p>
-      <p
-        class="text-sm text-gray-800 line-clamp-3 dark:text-gray-100 dark:bg-gray-800 dark:rounded-md dark:p-2"
-      >
-        {{ application.message }}
-      </p>
-      <button
-        v-if="application.message.length > 100"
-        @click="showFullMessage = !showFullMessage"
-        class="text-sm text-indigo-600 hover:text-indigo-700 mt-1 dark:text-indigo-300 dark:hover:text-indigo-400"
-      >
-        {{ showFullMessage ? '折りたたむ' : 'もっと見る' }}
-      </button>
+    <!-- 応募内容プレビュー（受信した応募のみ詳細表示） -->
+    <div v-if="type === 'received'" class="mt-4 pt-4 border-t space-y-2">
+      <div v-if="application.message">
+        <p class="text-sm text-gray-600 font-medium mb-1 dark:text-gray-300">応募メッセージ</p>
+        <p
+          class="text-sm text-gray-800 dark:text-gray-100 dark:bg-gray-800 dark:rounded-md dark:p-2"
+        >
+          {{ application.message }}
+        </p>
+      </div>
+      <div v-if="application.experience">
+        <p class="text-sm text-gray-600 font-medium mb-1 dark:text-gray-300">
+          関連する経験・スキル（任意）
+        </p>
+        <p class="text-sm text-gray-800 dark:text-gray-100">{{ application.experience }}</p>
+      </div>
+      <div v-if="application.availability">
+        <p class="text-sm text-gray-600 font-medium mb-1 dark:text-gray-300">
+          参加可能な時間帯（任意）
+        </p>
+        <p class="text-sm text-gray-800 dark:text-gray-100">{{ application.availability }}</p>
+      </div>
+      <div v-if="application.contactPreference">
+        <p class="text-sm text-gray-600 font-medium mb-1 dark:text-gray-300">連絡可能な方法</p>
+        <p class="text-sm text-gray-800 dark:text-gray-100">{{ application.contactPreference }}</p>
+      </div>
     </div>
 
     <!-- 展開されたメッセージ -->
@@ -113,6 +124,10 @@ interface Application {
   message?: string
   appliedAt: string
   respondedAt?: string | null
+  experience?: string
+  availability?: string
+  portfolio_url?: string
+  contactPreference?: string
 }
 
 interface Props {
