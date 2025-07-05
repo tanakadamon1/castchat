@@ -29,17 +29,15 @@ export const useAuthStore = defineStore('auth', () => {
   const permissions = computed(() => usePermissions(profile.value))
   const sessionState = computed(() => ({
     isValid: !!session.value && sessionManager.isSessionValid(session.value),
-    expiresAt: session.value?.expires_at ? new Date(session.value.expires_at * 1000).getTime() : null,
-    timeUntilExpiry: sessionManager.formatTimeUntilExpiry(session.value)
+    expiresAt: session.value?.expires_at
+      ? new Date(session.value.expires_at * 1000).getTime()
+      : null,
+    timeUntilExpiry: sessionManager.formatTimeUntilExpiry(session.value),
   }))
 
   async function getUserProfile(userId: string): Promise<UserProfile | null> {
     try {
-      const { data, error } = await supabase
-        .from('users')
-        .select('*')
-        .eq('id', userId)
-        .single()
+      const { data, error } = await supabase.from('users').select('*').eq('id', userId).single()
 
       if (error) {
         console.error('Get user profile error:', error)
@@ -55,11 +53,7 @@ export const useAuthStore = defineStore('auth', () => {
 
   async function createUserProfile(profileData: UserProfileInsert): Promise<UserProfile | null> {
     try {
-      const { data, error } = await supabase
-        .from('users')
-        .insert(profileData)
-        .select()
-        .single()
+      const { data, error } = await supabase.from('users').insert(profileData).select().single()
 
       if (error) {
         console.error('Create user profile error:', error)
@@ -90,7 +84,7 @@ export const useAuthStore = defineStore('auth', () => {
           discord_username: null,
           website_url: null,
           role: 'user',
-          is_verified: false
+          is_verified: false,
         }
 
         userProfile = await createUserProfile(profileData)
@@ -110,24 +104,25 @@ export const useAuthStore = defineStore('auth', () => {
     try {
       console.log('Starting Google sign-in process...')
       console.log('Redirect URL:', `${window.location.origin}/auth/callback`)
-      
+
       const { data, error: signInError } = await supabase.auth.signInWithOAuth({
         provider: 'google',
         options: {
           redirectTo: `${window.location.origin}/auth/callback`,
           queryParams: {
-            prompt: 'select_account'
-          }
-        }
+            access_type: 'offline',
+            prompt: 'consent',
+          },
+        },
       })
-      
+
       console.log('OAuth response:', { data, error: signInError })
-      
+
       if (signInError) {
         console.error('OAuth sign-in error:', signInError)
         throw signInError
       }
-      
+
       console.log('Google sign-in initiated successfully')
       return data
     } catch (err) {
@@ -145,7 +140,7 @@ export const useAuthStore = defineStore('auth', () => {
     try {
       const { error: signOutError } = await sessionManager.signOut()
       if (signOutError) throw signOutError
-      
+
       // データクリア
       await clearUserData()
     } catch (err) {
@@ -161,31 +156,45 @@ export const useAuthStore = defineStore('auth', () => {
     loading.value = true
     error.value = null
     try {
-      const sessionState = await sessionManager.getCurrentSession()
-      session.value = sessionState.session
-      user.value = sessionState.user
+      console.log('Initializing auth store...')
 
-      if (sessionState.session?.user) {
-        await ensureUserProfile(sessionState.session.user)
+      // 現在のセッションを取得
+      const {
+        data: { session: currentSession },
+        error: sessionError,
+      } = await supabase.auth.getSession()
+
+      if (sessionError) {
+        console.error('Session error:', sessionError)
+        throw sessionError
       }
 
-      // Start session monitoring
-      sessionManager.startSessionMonitoring()
+      console.log('Current session:', currentSession)
 
+      session.value = currentSession
+      user.value = currentSession?.user ?? null
+
+      if (currentSession?.user) {
+        console.log('User found, ensuring profile...')
+        await ensureUserProfile(currentSession.user)
+      }
+
+      // 認証状態変更のリスナーを設定
       supabase.auth.onAuthStateChange(async (event: AuthChangeEvent, newSession) => {
         console.log('Auth state changed:', event, newSession)
         session.value = newSession
         user.value = newSession?.user ?? null
 
         if (newSession?.user) {
+          console.log('New user session, ensuring profile...')
           await ensureUserProfile(newSession.user)
-          // Restart session monitoring for new session
-          sessionManager.startSessionMonitoring()
         } else {
+          console.log('User signed out, clearing profile...')
           profile.value = null
-          sessionManager.stopSessionMonitoring()
         }
       })
+
+      console.log('Auth store initialized successfully')
     } catch (err) {
       console.error('Error initializing auth:', err)
       error.value = err instanceof Error ? err.message : 'Authentication initialization failed'
@@ -233,8 +242,9 @@ export const useAuthStore = defineStore('auth', () => {
       loading.value = true
       error.value = null
 
-      const { session: refreshedSession, error: refreshError } = await sessionManager.refreshSession()
-      
+      const { session: refreshedSession, error: refreshError } =
+        await sessionManager.refreshSession()
+
       if (refreshError || !refreshedSession) {
         throw refreshError || new Error('Failed to refresh session')
       }
@@ -255,7 +265,7 @@ export const useAuthStore = defineStore('auth', () => {
   async function validateSession() {
     try {
       const sessionState = await sessionManager.validateAndRefreshSession()
-      
+
       session.value = sessionState.session
       user.value = sessionState.user
 
@@ -278,11 +288,11 @@ export const useAuthStore = defineStore('auth', () => {
     error.value = null
     try {
       const { error: resetError } = await supabase.auth.resetPasswordForEmail(email, {
-        redirectTo: `${window.location.origin}/auth/callback?type=recovery`
+        redirectTo: `${window.location.origin}/auth/callback?type=recovery`,
       })
-      
+
       if (resetError) throw resetError
-      
+
       return { data: true, error: null }
     } catch (err) {
       console.error('Password reset error:', err)
@@ -299,13 +309,16 @@ export const useAuthStore = defineStore('auth', () => {
       loading.value = true
       error.value = null
 
-      const { data: { session: newSession }, error: refreshError } = await supabase.auth.refreshSession()
-      
+      const {
+        data: { session: newSession },
+        error: refreshError,
+      } = await supabase.auth.refreshSession()
+
       if (refreshError) throw refreshError
-      
+
       session.value = newSession
       user.value = newSession?.user ?? null
-      
+
       if (newSession?.user) {
         await ensureUserProfile(newSession.user)
       } else {
@@ -327,17 +340,17 @@ export const useAuthStore = defineStore('auth', () => {
     try {
       // セッション監視停止
       sessionManager.stopSessionMonitoring()
-      
+
       // ローカルストレージクリア
       localStorage.removeItem('supabase.auth.token')
       sessionStorage.clear()
-      
+
       // 状態リセット
       user.value = null
       session.value = null
       profile.value = null
       error.value = null
-      
+
       return true
     } catch (err) {
       console.error('Clear user data error:', err)
@@ -366,6 +379,6 @@ export const useAuthStore = defineStore('auth', () => {
     validateSession,
     resetPassword,
     forceRefreshSession,
-    clearUserData
+    clearUserData,
   }
 })

@@ -3,15 +3,22 @@
     <div class="max-w-md w-full space-y-8">
       <div class="text-center">
         <div v-if="loading" class="space-y-4">
-          <div class="inline-block animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
+          <div
+            class="inline-block animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"
+          ></div>
           <h2 class="text-2xl font-bold text-gray-900">認証中...</h2>
           <p class="text-gray-600">Googleアカウントで認証しています</p>
         </div>
-        
+
         <div v-else-if="error" class="space-y-4">
           <div class="text-red-500">
             <svg class="mx-auto h-12 w-12" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.732-.833-2.5 0L4.268 19.5c-.77.833.192 2.5 1.732 2.5z"></path>
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.732-.833-2.5 0L4.268 19.5c-.77.833.192 2.5 1.732 2.5z"
+              ></path>
             </svg>
           </div>
           <h2 class="text-2xl font-bold text-gray-900">認証エラー</h2>
@@ -27,7 +34,12 @@
         <div v-else class="space-y-4">
           <div class="text-green-500">
             <svg class="mx-auto h-12 w-12" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M5 13l4 4L19 7"
+              ></path>
             </svg>
           </div>
           <h2 class="text-2xl font-bold text-gray-900">認証完了</h2>
@@ -65,59 +77,30 @@ const handleAuthCallback = async () => {
     console.log('URL hash:', window.location.hash)
     console.log('URL search params:', window.location.search)
 
-    // URLフラグメントからトークンを取得
-    const hashParams = new URLSearchParams(window.location.hash.substring(1))
-    const accessToken = hashParams.get('access_token')
-    const refreshToken = hashParams.get('refresh_token')
-    const type = hashParams.get('type')
-    const errorParam = hashParams.get('error')
-    const errorDescription = hashParams.get('error_description')
+    // Supabaseの認証コールバックを処理
+    const { data, error: authError } = await supabase.auth.getSession()
 
-    console.log('Hash params:', {
-      access_token: accessToken ? 'present' : 'missing',
-      refresh_token: refreshToken ? 'present' : 'missing',
-      type,
-      error: errorParam,
-      error_description: errorDescription
-    })
+    console.log('Session data:', data)
+    console.log('Auth error:', authError)
 
-    // エラーパラメータをチェック
-    if (errorParam) {
-      throw new Error(errorDescription || errorParam)
+    if (authError) {
+      throw authError
     }
 
-    if (accessToken && refreshToken) {
-      console.log('Setting session with tokens...')
-      // セッションを設定
-      const { data, error: sessionError } = await supabase.auth.setSession({
-        access_token: accessToken,
-        refresh_token: refreshToken
-      })
-
-      console.log('Session set result:', { data, error: sessionError })
-
-      if (sessionError) throw sessionError
-
-      if (type === 'recovery') {
-        // パスワードリセットの場合
-        toast.success('パスワードリセットが完了しました。新しいパスワードを設定してください。')
-        setTimeout(() => {
-          router.push('/profile?tab=security')
-        }, 1500)
-        return
-      }
+    if (!data.session) {
+      throw new Error('セッションが見つかりません')
     }
 
-    // 通常の認証処理
+    // 認証ストアを初期化
     console.log('Initializing auth store...')
     await authStore.initialize()
-    
+
     console.log('Auth store state:', {
       isAuthenticated: authStore.isAuthenticated,
       user: authStore.user?.id,
-      userProfile: authStore.userProfile?.id
+      profile: authStore.profile?.id,
     })
-    
+
     if (authStore.isAuthenticated) {
       if (isRecovery.value) {
         toast.success('パスワードリセットが完了しました')
@@ -127,7 +110,7 @@ const handleAuthCallback = async () => {
       } else {
         toast.success('ログインしました')
         setTimeout(() => {
-          const redirectTo = route.query.redirect as string || '/'
+          const redirectTo = (route.query.redirect as string) || '/'
           console.log('Redirecting to:', redirectTo)
           router.push(redirectTo)
         }, 1500)
