@@ -383,20 +383,32 @@ const handleWithdraw = async (applicationId: string) => {
 // データ読み込み関数
 const loadApplications = async () => {
   try {
+    console.log('Loading applications...')
+    
     // 受信した応募を取得
+    console.log('Fetching received applications...')
     const receivedResult = await applicationApi.getReceivedApplications()
+    console.log('Received applications result:', receivedResult)
+    
     if (receivedResult.error) {
       errorMessage.value = receivedResult.error
+      console.error('Received applications error:', receivedResult.error)
     } else {
       receivedApplications.value = receivedResult.data || []
+      console.log('Received applications data:', receivedApplications.value)
     }
 
     // 送信した応募を取得
+    console.log('Fetching sent applications...')
     const sentResult = await applicationApi.getMyApplications()
+    console.log('Sent applications result:', sentResult)
+    
     if (sentResult.error) {
       errorMessage.value = sentResult.error
+      console.error('Sent applications error:', sentResult.error)
     } else {
       sentApplications.value = sentResult.data || []
+      console.log('Sent applications data:', sentApplications.value)
     }
   } catch (err) {
     errorMessage.value = 'データの読み込みに失敗しました'

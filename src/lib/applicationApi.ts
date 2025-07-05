@@ -164,11 +164,21 @@ class ApplicationApi {
         }
       }
 
-      const result = await applicationsService.getPostApplications(
-        postId || '',
-        userId,
-        profile || undefined
-      )
+      let result
+      if (postId) {
+        // 特定の投稿の応募を取得
+        result = await applicationsService.getPostApplications(
+          postId,
+          userId,
+          profile || undefined
+        )
+      } else {
+        // 全ての受信応募を取得
+        result = await applicationsService.getAllReceivedApplications(
+          userId,
+          profile || undefined
+        )
+      }
 
       if (result.error) {
         return {

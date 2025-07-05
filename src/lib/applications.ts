@@ -598,6 +598,87 @@ export class ApplicationsService {
     }
   }
 
+  async getAllReceivedApplications(
+    userId: string,
+    userProfile?: Tables<'users'>
+  ): Promise<ApplicationsApiResult<ApplicationWithDetails[]>> {
+    try {
+      // 権限チェック
+      if (!userProfile) {
+        return {
+          data: null,
+          error: errorHandler.createError(
+            ErrorCode.PERMISSION_DENIED,
+            'Insufficient permissions to view applications',
+            `User ${userId} is not authenticated`
+          )
+        }
+      }
+
+      // ユーザーの投稿IDを取得
+      const { data: userPosts, error: postsError } = await supabase
+        .from('posts')
+        .select('id')
+        .eq('user_id', userId)
+
+      if (postsError) {
+        return {
+          data: null,
+          error: errorHandler.handleError(postsError, {
+            operation: 'get_user_posts_for_applications',
+            userId
+          })
+        }
+      }
+
+      if (!userPosts || userPosts.length === 0) {
+        return {
+          data: [],
+          error: null,
+          count: 0
+        }
+      }
+
+      const postIds = userPosts.map(p => p.id)
+
+      // 全ての応募を取得
+      const { data, error } = await supabase
+        .from('applications')
+        .select(`
+          *,
+          posts!applications_post_id_fkey(id, title, user_id, status, deadline),
+          users!applications_user_id_fkey(id, display_name, avatar_url, is_verified)
+        `)
+        .in('post_id', postIds)
+        .order('created_at', { ascending: false })
+
+      if (error) {
+        return {
+          data: null,
+          error: errorHandler.handleError(error, {
+            operation: 'get_all_received_applications',
+            userId,
+            postIds
+          })
+        }
+      }
+
+      return {
+        data: data || [],
+        error: null,
+        count: data?.length || 0
+      }
+    } catch (err) {
+      return {
+        data: null,
+        error: errorHandler.handleError(err, {
+          operation: 'get_all_received_applications',
+          userId
+        })
+      }
+    }
+  }
+
   async getApplicationStatistics(
     postId: string | undefined,
     userId: string,
