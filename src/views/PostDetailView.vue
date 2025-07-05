@@ -221,25 +221,15 @@
         </div>
         
         <!-- Action Footer -->
-        <div class="p-6 bg-gray-50 border-t border-gray-200">
+        <div class="p-6 bg-gray-50 dark:bg-gray-800 border-t border-gray-200 dark:border-gray-700">
           <div class="flex flex-col sm:flex-row gap-4">
             <BaseButton
-              v-if="post.status === 'published' || post.status === 'active'"
               size="lg"
               class="flex-1"
+              :disabled="!canApply"
               @click="handleApply"
             >
-              この募集に応募する
-            </BaseButton>
-            
-            <BaseButton
-              v-else
-              size="lg"
-              variant="secondary"
-              disabled
-              class="flex-1"
-            >
-              募集は終了しました
+              {{ applyButtonText }}
             </BaseButton>
             
             <BaseButton
@@ -325,6 +315,33 @@ const imageGridClasses = computed(() => {
   if (count === 1) return 'grid-cols-1'
   if (count === 2) return 'grid-cols-1 md:grid-cols-2'
   return 'grid-cols-1 md:grid-cols-2 lg:grid-cols-3'
+})
+
+const canApply = computed(() => {
+  console.log('canApply check:', {
+    hasPost: !!post.value,
+    isAuthenticated: authStore.isAuthenticated,
+    postStatus: post.value?.status,
+    postUserId: post.value?.user_id,
+    currentUserId: authStore.user?.id,
+    isOwnPost: post.value?.user_id === authStore.user?.id
+  })
+  
+  if (!post.value) return false
+  if (!authStore.isAuthenticated) return false
+  if (post.value.status !== 'published' && post.value.status !== 'active') return false
+  
+  // 自分の投稿には応募できない
+  if (post.value.user_id === authStore.user?.id) return false
+  
+  return true
+})
+
+const applyButtonText = computed(() => {
+  if (!authStore.isAuthenticated) return 'ログインして応募'
+  if (post.value?.user_id === authStore.user?.id) return '自分の投稿です'
+  if (post.value?.status !== 'published' && post.value?.status !== 'active') return '募集は終了しました'
+  return 'この募集に応募する'
 })
 
 const getContactLink = (method: string, value: string) => {

@@ -538,7 +538,7 @@ export class ApplicationsService {
       }
 
       // 投稿のステータス確認
-      if (post.status !== 'published') {
+      if (post.status !== 'published' && post.status !== 'active') {
         return {
           data: {
             canApply: false,
