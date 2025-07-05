@@ -16,7 +16,6 @@ export interface NotificationWithDetails extends Notification {
   }
   relatedUser?: {
     id: string
-    username: string
     display_name: string
     avatar_url: string | null
   }

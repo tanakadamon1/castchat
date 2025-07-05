@@ -18,7 +18,6 @@ export interface ApplicationWithDetails extends Application {
   }
   user?: {
     id: string
-    username: string
     display_name: string
     avatar_url: string | null
     is_verified: boolean
@@ -400,7 +399,7 @@ export class ApplicationsService {
         .select(`
           *,
           posts!applications_post_id_fkey(id, title, user_id, status, deadline),
-          users!applications_user_id_fkey(id, username, display_name, avatar_url, is_verified)
+          users!applications_user_id_fkey(id, display_name, avatar_url, is_verified)
         `)
         .eq('user_id', userId)
         .order('created_at', { ascending: false })
@@ -472,7 +471,7 @@ export class ApplicationsService {
         .select(`
           *,
           posts!applications_post_id_fkey(id, title, user_id, status, deadline),
-          users!applications_user_id_fkey(id, username, display_name, avatar_url, is_verified)
+          users!applications_user_id_fkey(id, display_name, avatar_url, is_verified)
         `)
         .eq('post_id', postId)
         .order('created_at', { ascending: false })
