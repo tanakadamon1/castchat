@@ -77,6 +77,10 @@ const handleAuthCallback = async () => {
     console.log('URL hash:', window.location.hash)
     console.log('URL search params:', window.location.search)
 
+    // まず現在のセッションをクリア
+    console.log('Clearing existing session...')
+    await supabase.auth.signOut()
+
     // Supabaseの認証コールバックを処理
     const { data, error: authError } = await supabase.auth.getSession()
 

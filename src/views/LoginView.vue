@@ -11,7 +11,7 @@
       <div class="mt-8 space-y-6">
         <button
           @click="handleGoogleSignIn"
-          :disabled="false"
+          :disabled="authStore.loading"
           class="group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 disabled:opacity-50 disabled:cursor-not-allowed"
         >
           <span class="absolute left-0 inset-y-0 flex items-center pl-3">
@@ -35,6 +35,15 @@
             </svg>
           </span>
           {{ authStore.loading ? 'サインイン中...' : 'Googleでサインイン' }}
+        </button>
+
+        <!-- セッションクリアボタン -->
+        <button
+          @click="handleClearSession"
+          :disabled="authStore.loading"
+          class="w-full flex justify-center py-2 px-4 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 disabled:opacity-50 disabled:cursor-not-allowed"
+        >
+          セッションをクリアして再ログイン
         </button>
       </div>
 
@@ -79,6 +88,18 @@ const handleGoogleSignIn = async () => {
   } catch (error) {
     console.error('Login failed:', error)
     // Handle error (show toast, etc.)
+  }
+}
+
+const handleClearSession = async () => {
+  try {
+    console.log('Clearing session...')
+    await authStore.forceSignOut()
+    console.log('Session cleared successfully')
+    // ページをリロードして完全にリセット
+    window.location.reload()
+  } catch (error) {
+    console.error('Failed to clear session:', error)
   }
 }
 </script>

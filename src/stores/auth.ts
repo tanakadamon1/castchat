@@ -105,6 +105,10 @@ export const useAuthStore = defineStore('auth', () => {
       console.log('Starting Google sign-in process...')
       console.log('Redirect URL:', `${window.location.origin}/auth/callback`)
 
+      // 既存のセッションをクリア
+      console.log('Clearing existing session before sign-in...')
+      await supabase.auth.signOut()
+
       const { data, error: signInError } = await supabase.auth.signInWithOAuth({
         provider: 'google',
         options: {
@@ -341,8 +345,13 @@ export const useAuthStore = defineStore('auth', () => {
       // セッション監視停止
       sessionManager.stopSessionMonitoring()
 
-      // ローカルストレージクリア
-      localStorage.removeItem('supabase.auth.token')
+      // ローカルストレージクリア（Supabaseの認証トークン）
+      const supabaseKeys = Object.keys(localStorage).filter(
+        (key) => key.startsWith('sb-') || key.includes('supabase'),
+      )
+      supabaseKeys.forEach((key) => localStorage.removeItem(key))
+
+      // セッションストレージクリア
       sessionStorage.clear()
 
       // 状態リセット
@@ -355,6 +364,18 @@ export const useAuthStore = defineStore('auth', () => {
     } catch (err) {
       console.error('Clear user data error:', err)
       return false
+    }
+  }
+
+  // 強制ログアウト機能
+  async function forceSignOut() {
+    try {
+      console.log('Force signing out...')
+      await supabase.auth.signOut()
+      await clearUserData()
+      console.log('Force sign out completed')
+    } catch (error) {
+      console.error('Force sign out error:', error)
     }
   }
 
@@ -380,5 +401,6 @@ export const useAuthStore = defineStore('auth', () => {
     resetPassword,
     forceRefreshSession,
     clearUserData,
+    forceSignOut,
   }
 })
