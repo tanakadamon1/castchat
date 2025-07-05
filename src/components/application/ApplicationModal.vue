@@ -66,7 +66,7 @@
 
         <!-- 連絡可能な方法 -->
         <div>
-          <label class="block text-sm font-medium text-gray-700 mb-2">
+          <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
             連絡可能な方法 <span class="text-red-500">*</span>
           </label>
           <div class="space-y-2">
@@ -181,14 +181,25 @@ const messageRules = {
 
 // 連絡方法が選択されているかチェック
 const hasSelectedContactMethod = computed(() => {
-  return Object.values(formData.value.contactMethods).some(selected => selected)
+  const hasContact = Object.values(formData.value.contactMethods).some(selected => selected)
+  console.log('Contact methods:', formData.value.contactMethods, 'hasContact:', hasContact)
+  return hasContact
 })
 
 // フォームの有効性チェック
 const isFormValid = computed(() => {
-  return !hasErrors.value && 
+  const isValid = !hasErrors.value && 
          formData.value.message.trim().length >= 10 && 
          hasSelectedContactMethod.value
+  
+  console.log('Form validation:', {
+    hasErrors: hasErrors.value,
+    messageLength: formData.value.message.trim().length,
+    hasContactMethod: hasSelectedContactMethod.value,
+    isValid
+  })
+  
+  return isValid
 })
 
 // 日付フォーマット

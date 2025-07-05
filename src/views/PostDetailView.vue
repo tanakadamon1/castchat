@@ -323,8 +323,9 @@ const canApply = computed(() => {
     isAuthenticated: authStore.isAuthenticated,
     postStatus: post.value?.status,
     postUserId: post.value?.user_id,
+    postAuthorId: post.value?.authorId,
     currentUserId: authStore.user?.id,
-    isOwnPost: post.value?.user_id === authStore.user?.id
+    isOwnPost: (post.value?.user_id === authStore.user?.id) || (post.value?.authorId === authStore.user?.id)
   })
   
   if (!post.value) return false
@@ -332,14 +333,14 @@ const canApply = computed(() => {
   if (post.value.status !== 'published' && post.value.status !== 'active') return false
   
   // 自分の投稿には応募できない
-  if (post.value.user_id === authStore.user?.id) return false
+  if (post.value.user_id === authStore.user?.id || post.value.authorId === authStore.user?.id) return false
   
   return true
 })
 
 const applyButtonText = computed(() => {
   if (!authStore.isAuthenticated) return 'ログインして応募'
-  if (post.value?.user_id === authStore.user?.id) return '自分の投稿です'
+  if (post.value?.user_id === authStore.user?.id || post.value?.authorId === authStore.user?.id) return '自分の投稿です'
   if (post.value?.status !== 'published' && post.value?.status !== 'active') return '募集は終了しました'
   return 'この募集に応募する'
 })
