@@ -14,7 +14,7 @@
             <User class="w-6 h-6" />
           </div>
         </div>
-        
+
         <div class="min-w-0 flex-1">
           <div class="flex items-center gap-2 mb-1">
             <h3 class="font-semibold text-gray-900 truncate">{{ displayName }}</h3>
@@ -49,31 +49,11 @@
           >
             却下
           </BaseButton>
-          <BaseButton
-            size="sm"
-            variant="outline"
-            @click="handleViewProfile"
-          >
-            プロフィール
-          </BaseButton>
-          <BaseButton
-            size="sm"
-            variant="outline"
-            @click="handleSendMessage"
-          >
-            メッセージ
-          </BaseButton>
         </template>
 
         <!-- 送信した応募の場合 -->
         <template v-if="type === 'sent'">
-          <BaseButton
-            size="sm"
-            variant="outline"
-            @click="handleViewPost"
-          >
-            投稿を見る
-          </BaseButton>
+          <BaseButton size="sm" variant="outline" @click="handleViewPost"> 投稿を見る </BaseButton>
           <BaseButton
             v-if="application.status === 'pending'"
             size="sm"
@@ -145,7 +125,7 @@ const showFullMessage = ref(false)
 
 // 表示する名前とタイトル
 const displayName = computed(() => {
-  return props.type === 'received' 
+  return props.type === 'received'
     ? props.application.applicantName || '匿名ユーザー'
     : props.application.postAuthor || '投稿者'
 })
@@ -157,9 +137,7 @@ const displayTitle = computed(() => {
 })
 
 const displayAvatar = computed(() => {
-  return props.type === 'received' 
-    ? props.application.applicantAvatar
-    : null // 送信した応募では投稿者のアバターは表示しない
+  return props.type === 'received' ? props.application.applicantAvatar : null // 送信した応募では投稿者のアバターは表示しない
 })
 
 // イベントハンドラー
@@ -167,39 +145,15 @@ const handleUpdateStatus = (status: string) => {
   console.log('ApplicationCard: handleUpdateStatus called', {
     applicationId: props.application.id,
     status,
-    application: props.application
+    application: props.application,
   })
   emit('updateStatus', props.application.id, status)
-}
-
-const handleViewProfile = () => {
-  console.log('ApplicationCard: handleViewProfile called', {
-    applicantId: props.application.applicantId,
-    application: props.application
-  })
-  if (props.application.applicantId) {
-    emit('viewProfile', props.application.applicantId)
-  } else {
-    console.error('ApplicationCard: No applicantId found')
-  }
-}
-
-const handleSendMessage = () => {
-  console.log('ApplicationCard: handleSendMessage called', {
-    applicantId: props.application.applicantId,
-    application: props.application
-  })
-  if (props.application.applicantId) {
-    emit('sendMessage', props.application.applicantId)
-  } else {
-    console.error('ApplicationCard: No applicantId found')
-  }
 }
 
 const handleViewPost = () => {
   console.log('ApplicationCard: handleViewPost called', {
     postId: props.application.postId,
-    application: props.application
+    application: props.application,
   })
   if (props.application.postId) {
     emit('viewPost', props.application.postId)
@@ -211,7 +165,7 @@ const handleViewPost = () => {
 const handleWithdraw = () => {
   console.log('ApplicationCard: handleWithdraw called', {
     applicationId: props.application.id,
-    application: props.application
+    application: props.application,
   })
   emit('withdraw', props.application.id)
 }
@@ -222,7 +176,7 @@ const formatDate = (dateString: string) => {
   const now = new Date()
   const diffMs = now.getTime() - date.getTime()
   const diffDays = Math.floor(diffMs / (1000 * 60 * 60 * 24))
-  
+
   if (diffDays === 0) {
     return '今日'
   } else if (diffDays === 1) {
@@ -233,7 +187,7 @@ const formatDate = (dateString: string) => {
     return date.toLocaleDateString('ja-JP', {
       year: 'numeric',
       month: 'numeric',
-      day: 'numeric'
+      day: 'numeric',
     })
   }
 }
