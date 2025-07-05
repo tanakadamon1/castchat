@@ -72,22 +72,6 @@
               </p>
             </div>
 
-            <!-- ユーザー名 -->
-            <div>
-              <label class="block text-sm font-medium text-gray-700 mb-1">
-                ユーザー名
-              </label>
-              <BaseInput
-                v-if="isEditing"
-                v-model="editData.username"
-                placeholder="username"
-                :error="getFieldError('username')"
-                @blur="validateField('username', editData.username, usernameRules)"
-              />
-              <p v-else class="text-gray-600">
-                @{{ profileData.username || 'なし' }}
-              </p>
-            </div>
 
             <!-- 自己紹介 -->
             <div>
@@ -263,7 +247,6 @@ const profileData = computed(() => {
   const profile = authStore.profile
   return {
     id: profile.id,
-    username: profile.username || '',
     displayName: profile.display_name || '',
     bio: profile.bio || '',
     avatarUrl: profile.avatar_url || '',
@@ -280,7 +263,6 @@ const profileData = computed(() => {
 // 編集用データ
 const editData = ref({
   displayName: '',
-  username: '',
   bio: '',
   discordUsername: '',
   twitterUsername: '',
@@ -297,18 +279,12 @@ const displayNameRules = {
   message: '表示名は1文字以上50文字以内で入力してください'
 }
 
-const usernameRules = {
-  ...commonRules.username,
-  required: true
-}
-
 // フォームの有効性
 const isFormValid = computed(() => {
-  const hasRequiredFields = editData.value.displayName?.trim() && editData.value.username?.trim()
+  const hasRequiredFields = editData.value.displayName?.trim()
   console.log('Form validation:', {
     hasErrors: hasErrors.value,
     displayName: editData.value.displayName,
-    username: editData.value.username,
     hasRequiredFields,
     errors: errors.value,
     isValid: !hasErrors.value && hasRequiredFields
@@ -415,7 +391,6 @@ const handleSave = async () => {
     // 実際のAPIを使用してプロフィールを更新
     await authStore.updateProfile({
       display_name: editData.value.displayName,
-      username: editData.value.username,
       bio: editData.value.bio,
       discord_username: editData.value.discordUsername,
       twitter_username: editData.value.twitterUsername,
@@ -439,7 +414,6 @@ const handleCancel = () => {
   // 編集データをリセット
   editData.value = {
     displayName: profileData.value.displayName,
-    username: profileData.value.username,
     bio: profileData.value.bio,
     discordUsername: profileData.value.discordUsername,
     twitterUsername: profileData.value.twitterUsername,
@@ -455,7 +429,6 @@ const initializeEditData = () => {
   if (profileData.value) {
     editData.value = {
       displayName: profileData.value.displayName,
-      username: profileData.value.username,
       bio: profileData.value.bio,
       discordUsername: profileData.value.discordUsername,
       twitterUsername: profileData.value.twitterUsername,

@@ -21,7 +21,7 @@ export const useAuthStore = defineStore('auth', () => {
   const isAuthenticated = computed(() => !!user.value && !!session.value)
   const isProfileComplete = computed(() => {
     if (!profile.value) return false
-    return !!(profile.value.username && profile.value.display_name)
+    return !!profile.value.display_name
   })
 
   const userRole = computed(() => profile.value?.role || 'user')
@@ -81,7 +81,6 @@ export const useAuthStore = defineStore('auth', () => {
         const { user_metadata } = authUser
         const profileData: UserProfileInsert = {
           id: authUser.id,
-          username: user_metadata?.preferred_username || authUser.email?.split('@')[0] || 'user',
           display_name: user_metadata?.full_name || user_metadata?.name || 'Anonymous User',
           avatar_url: user_metadata?.avatar_url || user_metadata?.picture,
           bio: null,

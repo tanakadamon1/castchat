@@ -445,7 +445,6 @@ export type Database = {
           role: Database["public"]["Enums"]["user_role"]
           twitter_username: string | null
           updated_at: string
-          username: string
           vrchat_username: string | null
           website_url: string | null
         }
@@ -460,7 +459,6 @@ export type Database = {
           role?: Database["public"]["Enums"]["user_role"]
           twitter_username?: string | null
           updated_at?: string
-          username: string
           vrchat_username?: string | null
           website_url?: string | null
         }
@@ -475,7 +473,6 @@ export type Database = {
           role?: Database["public"]["Enums"]["user_role"]
           twitter_username?: string | null
           updated_at?: string
-          username?: string
           vrchat_username?: string | null
           website_url?: string | null
         }

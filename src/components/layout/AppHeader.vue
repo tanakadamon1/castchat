@@ -54,11 +54,11 @@
               >
                 <img
                   class="h-8 w-8 rounded-full"
-                  :src="authStore.user?.user_metadata?.avatar_url || '/default-avatar.png'"
-                  :alt="authStore.user?.user_metadata?.full_name || 'ユーザー'"
+                  :src="authStore.profile?.avatar_url || authStore.user?.user_metadata?.avatar_url || '/default-avatar.png'"
+                  :alt="authStore.profile?.display_name || authStore.user?.user_metadata?.full_name || 'ユーザー'"
                 />
                 <span class="hidden md:block text-gray-700 dark:text-gray-300 transition-colors duration-200">
-                  {{ authStore.user?.user_metadata?.full_name || 'ユーザー' }}
+                  {{ authStore.profile?.display_name || authStore.user?.user_metadata?.full_name || 'ユーザー' }}
                 </span>
               </button>
 

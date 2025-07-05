@@ -1,13 +1,25 @@
--- Fix auth trigger for automatic user profile creation
+-- Debug user creation trigger with detailed error logging
 
--- Create function to handle new user creation
+-- Create function to handle new user creation with detailed debugging
 CREATE OR REPLACE FUNCTION public.handle_new_user()
 RETURNS TRIGGER AS $$
 DECLARE
   username_val TEXT;
   display_name_val TEXT;
   avatar_url_val TEXT;
+  debug_info JSONB;
 BEGIN
+  -- Log the incoming data
+  debug_info := jsonb_build_object(
+    'user_id', NEW.id,
+    'email', NEW.email,
+    'raw_user_meta_data', NEW.raw_user_meta_data,
+    'app_metadata', NEW.app_metadata,
+    'created_at', NEW.created_at
+  );
+  
+  RAISE LOG 'handle_new_user called with: %', debug_info;
+  
   -- Generate username with better uniqueness handling
   username_val := COALESCE(
     NEW.raw_user_meta_data->>'preferred_username',
@@ -28,6 +40,9 @@ BEGIN
     NEW.raw_user_meta_data->>'avatar_url',
     NEW.raw_user_meta_data->>'picture'
   );
+
+  RAISE LOG 'Generated values - username: %, display_name: %, avatar_url: %', 
+    username_val, display_name_val, avatar_url_val;
 
   -- Insert into public.users with better error handling
   INSERT INTO public.users (
@@ -61,9 +76,13 @@ BEGIN
     NOW()
   );
   
+  RAISE LOG 'Successfully inserted user profile for user_id: %', NEW.id;
   RETURN NEW;
+  
 EXCEPTION
   WHEN unique_violation THEN
+    RAISE LOG 'Unique violation for username: %. Trying with different suffix...', username_val;
+    
     -- If username already exists, try with a different suffix
     username_val := split_part(NEW.email, '@', 1) || '_' || substr(md5(random()::text), 1, 8);
     
@@ -97,11 +116,20 @@ EXCEPTION
       NOW(),
       NOW()
     );
+    
+    RAISE LOG 'Successfully inserted user profile with new username: % for user_id: %', username_val, NEW.id;
     RETURN NEW;
+    
   WHEN OTHERS THEN
-    -- Log the error and re-raise
-    RAISE LOG 'Error in handle_new_user: %', SQLERRM;
-    RAISE;
+    -- Log detailed error information
+    RAISE LOG 'Error in handle_new_user for user_id %: %', NEW.id, SQLERRM;
+    RAISE LOG 'Error details - SQLSTATE: %, SQLERRM: %', SQLSTATE, SQLERRM;
+    RAISE LOG 'Generated values that failed - username: %, display_name: %, avatar_url: %', 
+      username_val, display_name_val, avatar_url_val;
+    
+    -- Re-raise the error with more context
+    RAISE EXCEPTION 'Failed to create user profile for user_id %: % (SQLSTATE: %)', 
+      NEW.id, SQLERRM, SQLSTATE;
 END;
 $$ LANGUAGE plpgsql SECURITY DEFINER;
 
@@ -114,72 +142,31 @@ CREATE TRIGGER on_auth_user_created
   FOR EACH ROW
   EXECUTE FUNCTION public.handle_new_user();
 
--- Fix any existing auth users that don't have profiles
-INSERT INTO public.users (
-  id,
-  username,
-  display_name,
-  avatar_url,
-  bio,
-  vrchat_username,
-  twitter_username,
-  discord_username,
-  website_url,
-  role,
-  is_verified,
-  created_at,
-  updated_at
-)
-SELECT 
-  au.id,
-  COALESCE(
-    au.raw_user_meta_data->>'preferred_username',
-    au.raw_user_meta_data->>'username',
-    au.raw_user_meta_data->>'name',
-    split_part(au.email, '@', 1) || '_' || substr(md5(random()::text), 1, 6)
-  ),
-  COALESCE(
-    au.raw_user_meta_data->>'full_name',
-    au.raw_user_meta_data->>'name',
-    split_part(au.email, '@', 1)
-  ),
-  COALESCE(
-    au.raw_user_meta_data->>'avatar_url',
-    au.raw_user_meta_data->>'picture'
-  ),
-  '', -- bio
-  NULL, -- vrchat_username
-  NULL, -- twitter_username
-  NULL, -- discord_username
-  NULL, -- website_url
-  'user', -- role
-  false, -- is_verified
-  au.created_at,
-  au.created_at
-FROM auth.users au
-LEFT JOIN public.users pu ON au.id = pu.id
-WHERE pu.id IS NULL;
-
--- Add RLS policies for users table
+-- Ensure RLS policies are correct
 ALTER TABLE public.users ENABLE ROW LEVEL SECURITY;
 
--- Drop existing policies if they exist
+-- Drop and recreate all policies
+DROP POLICY IF EXISTS "Service role full access" ON public.users;
 DROP POLICY IF EXISTS "Users can view all profiles" ON public.users;
 DROP POLICY IF EXISTS "Users can update own profile" ON public.users;
-DROP POLICY IF EXISTS "Service role full access" ON public.users;
+DROP POLICY IF EXISTS "Users can insert own profile" ON public.users;
 
--- Policy: Users can view all profiles
+-- Service role can do anything (for triggers)
+CREATE POLICY "Service role full access" ON public.users
+  FOR ALL USING (auth.role() = 'service_role');
+
+-- Users can view all profiles
 CREATE POLICY "Users can view all profiles" ON public.users
   FOR SELECT USING (true);
 
--- Policy: Users can update their own profile
+-- Users can update their own profile
 CREATE POLICY "Users can update own profile" ON public.users
   FOR UPDATE USING (auth.uid() = id);
 
--- Policy: Users can insert their own profile (for triggers)
+-- Users can insert their own profile (for triggers)
 CREATE POLICY "Users can insert own profile" ON public.users
   FOR INSERT WITH CHECK (auth.uid() = id);
 
--- Policy: Service role can do anything (for triggers)
-CREATE POLICY "Service role full access" ON public.users
-  FOR ALL USING (auth.role() = 'service_role');
+-- Grant necessary permissions to the function
+GRANT USAGE ON SCHEMA public TO service_role;
+GRANT ALL ON public.users TO service_role; 

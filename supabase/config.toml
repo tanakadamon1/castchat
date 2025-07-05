@@ -1,9 +1,5 @@
 # Supabase Project Configuration
 
-[project]
-# Project ID will be set when linked to a Supabase project
-id = ""
-
 [api]
 enabled = true
 port = 54321
@@ -57,7 +53,3 @@ enabled = false
 
 [mailer]
 # Email settings will be configured in Supabase dashboard
-
-[server]
-# Regional configuration
-region = "ap-northeast-1"

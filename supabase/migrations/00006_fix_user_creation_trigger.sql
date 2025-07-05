@@ -1,6 +1,6 @@
--- Fix auth trigger for automatic user profile creation
+-- Fix user creation trigger to resolve "Database error saving new user"
 
--- Create function to handle new user creation
+-- Create function to handle new user creation with better error handling
 CREATE OR REPLACE FUNCTION public.handle_new_user()
 RETURNS TRIGGER AS $$
 DECLARE
@@ -160,7 +160,7 @@ FROM auth.users au
 LEFT JOIN public.users pu ON au.id = pu.id
 WHERE pu.id IS NULL;
 
--- Add RLS policies for users table
+-- Update RLS policies for users table
 ALTER TABLE public.users ENABLE ROW LEVEL SECURITY;
 
 -- Drop existing policies if they exist
@@ -182,4 +182,4 @@ CREATE POLICY "Users can insert own profile" ON public.users
 
 -- Policy: Service role can do anything (for triggers)
 CREATE POLICY "Service role full access" ON public.users
-  FOR ALL USING (auth.role() = 'service_role');
+  FOR ALL USING (auth.role() = 'service_role'); 
