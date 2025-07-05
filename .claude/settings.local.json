@@ -120,7 +120,9 @@
       "mcp__supabase__list_projects",
       "mcp__supabase__list_tables",
       "Bash(git restore:*)",
-      "Bash(npx serve:*)"
+      "Bash(npx serve:*)",
+      "mcp__supabase__get_project",
+      "mcp__supabase__get_advisors"
     ],
     "deny": []
   }
