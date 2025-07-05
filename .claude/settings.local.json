@@ -121,7 +121,8 @@
       "mcp__supabase__list_tables",
       "Bash(git restore:*)",
       "Bash(npx serve:*)",
-      "Bash(diff:*)"
+      "Bash(diff:*)",
+      "Bash(npm run lint:*)"
     ],
     "deny": []
   }

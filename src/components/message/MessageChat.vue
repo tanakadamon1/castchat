@@ -176,9 +176,9 @@
 
 <script setup lang="ts">
 import { ref, computed, onMounted, onUnmounted, nextTick, watch } from 'vue'
-import { ArrowLeft, X } from 'lucide-vue-next'
+import { ArrowLeft } from 'lucide-vue-next'
 import MessageInput from './MessageInput.vue'
-import type { ChatUser, ChatMessage, toChatUser, toChatMessage } from '@/types/index'
+import type { ChatUser, ChatMessage } from '@/types/index'
 
 interface Props {
   recipient: ChatUser
@@ -339,20 +339,9 @@ const formatLastSeen = (lastSeen?: string): string => {
     if (diffMinutes < 1440) return `${Math.floor(diffMinutes / 60)}時間前`
     
     return date.toLocaleDateString('ja-JP')
-  } catch (error) {
+  } catch {
     return '不明'
   }
-}
-
-const getStatusLabel = (status: string): string => {
-  const labels = {
-    sending: '送信中...',
-    sent: '送信済み',
-    delivered: '配信済み',
-    read: '既読',
-    error: '送信失敗'
-  }
-  return labels[status as keyof typeof labels] || ''
 }
 
 const openImageModal = (imageUrl: string) => {

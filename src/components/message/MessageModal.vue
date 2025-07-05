@@ -70,7 +70,7 @@ import BaseModal from '@/components/ui/BaseModal.vue'
 import LoadingSpinner from '@/components/ui/LoadingSpinner.vue'
 import MessageBubble from './MessageBubble.vue'
 import MessageInput from './MessageInput.vue'
-import type { RealtimePostgresChangesPayload } from '@supabase/supabase-js'
+import type { RealtimePostgresChangesPayload, RealtimeChannel } from '@supabase/supabase-js'
 
 interface Recipient {
   id: string
@@ -100,7 +100,7 @@ interface Props {
 }
 
 const props = defineProps<Props>()
-const emit = defineEmits<{
+defineEmits<{
   close: []
 }>()
 
@@ -112,7 +112,7 @@ const messages = ref<Message[]>([])
 const newMessage = ref('')
 const loading = ref(false)
 const sending = ref(false)
-const realtimeSubscription = ref<any>(null)
+const realtimeSubscription = ref<RealtimeChannel | null>(null)
 const messagesContainer = ref<HTMLElement>()
 
 const currentUserId = computed(() => authStore.user?.id || '')
@@ -264,7 +264,7 @@ const setupRealtimeSubscription = () => {
         table: 'messages',
         filter: `or(and(sender_id.eq.${currentUserId.value},recipient_id.eq.${props.recipient.id}),and(sender_id.eq.${props.recipient.id},recipient_id.eq.${currentUserId.value}))`
       },
-      (payload: RealtimePostgresChangesPayload<any>) => {
+      (payload: RealtimePostgresChangesPayload<Message>) => {
         if (payload.new) {
           const newMessage = payload.new as Message
           
@@ -302,7 +302,7 @@ const setupRealtimeSubscription = () => {
         table: 'messages',
         filter: `or(and(sender_id.eq.${currentUserId.value},recipient_id.eq.${props.recipient.id}),and(sender_id.eq.${props.recipient.id},recipient_id.eq.${currentUserId.value}))`
       },
-      (payload: RealtimePostgresChangesPayload<any>) => {
+      (payload: RealtimePostgresChangesPayload<Message>) => {
         if (payload.new) {
           const updatedMessage = payload.new as Message
           const index = messages.value.findIndex(msg => msg.id === updatedMessage.id)

@@ -148,9 +148,17 @@ interface Props {
 
 const props = defineProps<Props>()
 
+interface ApplicationData {
+  postId: string
+  message: string
+  experience: string
+  availability: string
+  contactMethods: string[]
+}
+
 const emit = defineEmits<{
   close: []
-  submit: [applicationData: any]
+  submit: [applicationData: ApplicationData]
 }>()
 
 const { validate: validateField, getFieldError, hasErrors } = useValidation()
@@ -223,8 +231,8 @@ const handleSubmit = async () => {
       experience: formData.value.experience.trim(),
       availability: formData.value.availability.trim(),
       contactMethods: Object.entries(formData.value.contactMethods)
-        .filter(([_, selected]) => selected)
-        .map(([method, _]) => method)
+        .filter(([, selected]) => selected)
+        .map(([method]) => method)
     }
     
     emit('submit', applicationData)

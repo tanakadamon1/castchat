@@ -53,7 +53,7 @@ interface Props {
   showDropdown?: boolean
 }
 
-const props = withDefaults(defineProps<Props>(), {
+withDefaults(defineProps<Props>(), {
   compact: false,
   showDropdown: false
 })

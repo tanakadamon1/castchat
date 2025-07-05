@@ -1,4 +1,4 @@
-import { ref, nextTick } from 'vue'
+import { ref } from 'vue'
 
 export interface ScreenReaderOptions {
   politeness?: 'polite' | 'assertive' | 'off'

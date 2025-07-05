@@ -343,7 +343,6 @@ const isFormValid = computed(() => {
     displayName: editData.value.displayName,
     username: editData.value.username,
     hasRequiredFields,
-    errors: errors.value,
     isValid: !hasErrors.value && hasRequiredFields
   })
   // 一時的に簡素化 - hasErrorsチェックを外す
