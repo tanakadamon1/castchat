@@ -84,14 +84,8 @@ const handleAuthCallback = async () => {
     console.log('URL params:', Object.fromEntries(urlParams.entries()))
     console.log('Hash params:', Object.fromEntries(hashParams.entries()))
 
-    // まず現在のセッションをクリア
-    console.log('Clearing existing session...')
-    await supabase.auth.signOut()
-
-    // 少し待ってからセッションを確認
-    await new Promise((resolve) => setTimeout(resolve, 1000))
-
     // Supabaseの認証コールバックを処理
+    console.log('Processing OAuth callback...')
     const { data, error: authError } = await supabase.auth.getSession()
 
     console.log('Session data:', data)
