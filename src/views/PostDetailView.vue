@@ -1,5 +1,5 @@
 <template>
-  <div class="min-h-screen bg-gray-50">
+  <div class="min-h-screen bg-gray-50 dark:bg-gray-900">
     <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
       <!-- Back Button -->
       <div class="mb-6">
@@ -34,7 +34,7 @@
       <!-- Post Detail -->
       <div
         v-else-if="post"
-        class="bg-white rounded-lg shadow-sm overflow-hidden"
+        class="bg-white dark:bg-gray-800 rounded-lg shadow-sm overflow-hidden"
       >
         <!-- Header -->
         <div class="p-6 border-b border-gray-200">
@@ -224,7 +224,7 @@
         <div class="p-6 bg-gray-50 border-t border-gray-200">
           <div class="flex flex-col sm:flex-row gap-4">
             <BaseButton
-              v-if="post.status === 'active'"
+              v-if="post.status === 'published' || post.status === 'active'"
               size="lg"
               class="flex-1"
               @click="handleApply"
@@ -472,9 +472,19 @@ const closeImageViewer = () => {
 const handleApplicationSubmit = async (applicationData: any) => {
   try {
     const { applicationApi } = await import('@/lib/applicationApi')
-    const result = await applicationApi.submitApplication(applicationData)
+    
+    // データ形式を変換
+    const submitData = {
+      postId: applicationData.postId,
+      message: applicationData.message,
+      portfolio_url: applicationData.experience || null // experienceをportfolio_urlとして使用
+    }
+    
+    console.log('Submitting application:', submitData)
+    const result = await applicationApi.submitApplication(submitData)
     
     if (result.error) {
+      console.error('Application error:', result.error)
       toast.error(result.error)
       return
     }

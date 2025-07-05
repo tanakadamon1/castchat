@@ -3,7 +3,7 @@
     <div class="p-6">
       <!-- ヘッダー -->
       <div class="flex items-center justify-between mb-6">
-        <h2 class="text-xl font-bold text-gray-900">応募申請</h2>
+        <h2 class="text-xl font-bold text-gray-900 dark:text-white">応募申請</h2>
         <button
           @click="emit('close')"
           class="text-gray-400 hover:text-gray-600"
@@ -13,9 +13,9 @@
       </div>
 
       <!-- 投稿情報 -->
-      <div class="mb-6 p-4 bg-gray-50 rounded-lg">
-        <h3 class="font-semibold text-gray-900 mb-2">{{ post.title }}</h3>
-        <div class="flex items-center text-sm text-gray-600">
+      <div class="mb-6 p-4 bg-gray-50 dark:bg-gray-700 rounded-lg">
+        <h3 class="font-semibold text-gray-900 dark:text-white mb-2">{{ post.title }}</h3>
+        <div class="flex items-center text-sm text-gray-600 dark:text-gray-300">
           <User class="w-4 h-4 mr-1" />
           <span>{{ post.authorName }}</span>
           <span class="mx-2">•</span>
