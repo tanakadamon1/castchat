@@ -153,7 +153,7 @@ const emit = defineEmits<{
   submit: [applicationData: any]
 }>()
 
-const { validate: validateField, getFieldError, hasErrors } = useValidation()
+const { validate: validateField, getFieldError, hasErrors, errors } = useValidation()
 
 // フォームデータ
 const formData = ref({
@@ -188,14 +188,28 @@ const hasSelectedContactMethod = computed(() => {
 
 // フォームの有効性チェック
 const isFormValid = computed(() => {
-  const isValid = !hasErrors.value && 
-         formData.value.message.trim().length >= 10 && 
-         hasSelectedContactMethod.value
+  // メッセージが10文字以上かチェック
+  const messageValid = formData.value.message.trim().length >= 10
+  
+  // 連絡方法が選択されているかチェック
+  const contactValid = hasSelectedContactMethod.value
+  
+  // 実際のエラーがあるかチェック（空のエラー配列は無視）
+  const actualErrors = Object.values(errors.value).filter(errorArray => errorArray && errorArray.length > 0)
+  const hasActualErrors = actualErrors.length > 0
+  
+  const isValid = !hasActualErrors && messageValid && contactValid
   
   console.log('Form validation:', {
     hasErrors: hasErrors.value,
+    hasActualErrors,
+    actualErrors,
+    errorsObject: errors.value,
     messageLength: formData.value.message.trim().length,
+    messageValid,
     hasContactMethod: hasSelectedContactMethod.value,
+    contactValid,
+    contactMethods: formData.value.contactMethods,
     isValid
   })
   
