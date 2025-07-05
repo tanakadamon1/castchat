@@ -67,7 +67,9 @@
           <p><strong>プロフィールID:</strong> {{ authStore.profile?.id || 'なし' }}</p>
           <p><strong>ローディング:</strong> {{ authStore.loading ? 'はい' : 'いいえ' }}</p>
           <p><strong>エラー:</strong> {{ authStore.error || 'なし' }}</p>
-          <p><strong>現在のURL:</strong> N/A</p>
+          <p><strong>現在のURL:</strong> {{ debugInfo.currentUrl }}</p>
+          <p><strong>URLパラメータ:</strong> {{ debugInfo.urlParams }}</p>
+          <p><strong>ハッシュ:</strong> {{ debugInfo.hash }}</p>
         </div>
       </div>
 
@@ -93,26 +95,45 @@
 </template>
 
 <script setup lang="ts">
-import { ref } from 'vue'
+import { ref, computed } from 'vue'
 import { useAuthStore } from '@/stores/auth'
 
 const authStore = useAuthStore()
 const showDebugInfo = ref(false)
 
+// デバッグ情報用のcomputedプロパティ
+const debugInfo = computed(() => ({
+  currentUrl: typeof window !== 'undefined' ? window.location.href : 'N/A',
+  urlParams: typeof window !== 'undefined' ? window.location.search || 'なし' : 'N/A',
+  hash: typeof window !== 'undefined' ? window.location.hash || 'なし' : 'N/A',
+}))
+
 const handleGoogleSignIn = async () => {
+  console.log('=== Google Sign-In Started ===')
   console.log('Button clicked! Auth store loading:', authStore.loading)
   console.log('Current auth state:', {
     isAuthenticated: authStore.isAuthenticated,
     user: authStore.user?.id,
     profile: authStore.profile?.id,
   })
+  console.log('Current URL:', window.location.href)
+  console.log('URL params:', window.location.search)
+  console.log('Hash:', window.location.hash)
 
   try {
+    console.log('Calling authStore.signInWithGoogle()...')
     const result = await authStore.signInWithGoogle()
     console.log('Sign-in result:', result)
+    console.log('=== Google Sign-In Completed ===')
     // OAuth redirect will handle navigation
   } catch (error) {
+    console.error('=== Google Sign-In Failed ===')
     console.error('Login failed:', error)
+    console.error('Error details:', {
+      name: error instanceof Error ? error.name : 'Unknown',
+      message: error instanceof Error ? error.message : String(error),
+      stack: error instanceof Error ? error.stack : 'No stack trace',
+    })
     // Handle error (show toast, etc.)
   }
 }

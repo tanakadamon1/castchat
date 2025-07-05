@@ -1,10 +1,11 @@
-import { ref, computed, readonly } from 'vue'
 import { defineStore } from 'pinia'
+import { ref, computed } from 'vue'
 import { supabase } from '@/lib/supabase'
 import type { User, Session, AuthChangeEvent } from '@supabase/supabase-js'
 import type { Tables, TablesInsert, TablesUpdate } from '@/lib/database.types'
 import { sessionManager } from '@/lib/session'
 import { usePermissions } from '@/lib/permissions'
+import { config } from '@/config/env'
 
 type UserProfile = Tables<'users'>
 type UserProfileInsert = TablesInsert<'users'>
@@ -112,20 +113,38 @@ export const useAuthStore = defineStore('auth', () => {
     try {
       console.log('=== Starting Google sign-in process ===')
       console.log('Current URL:', window.location.href)
+      console.log('Origin:', window.location.origin)
       console.log('Redirect URL:', `${window.location.origin}/auth/callback`)
+      console.log('Supabase URL:', config.supabaseUrl)
+      console.log('Auth store state before sign-in:', {
+        isAuthenticated: isAuthenticated.value,
+        user: user.value?.id,
+        profile: profile.value?.id,
+        loading: loading.value,
+        error: error.value,
+      })
 
       // 既存のセッションをクリア
       console.log('Clearing existing session before sign-in...')
-      await supabase.auth.signOut()
+      const { error: signOutError } = await supabase.auth.signOut()
+      if (signOutError) {
+        console.warn('Sign out error (this might be normal):', signOutError)
+      }
 
       // 現在のセッション状態を確認
       const {
         data: { session: currentSession },
+        error: sessionError,
       } = await supabase.auth.getSession()
+
+      if (sessionError) {
+        console.warn('Session check error:', sessionError)
+      }
       console.log('Current session after signOut:', currentSession)
 
-      const { data, error: signInError } = await supabase.auth.signInWithOAuth({
-        provider: 'google',
+      // OAuth設定を詳細にログ
+      const oauthConfig = {
+        provider: 'google' as const,
         options: {
           redirectTo: `${window.location.origin}/auth/callback`,
           queryParams: {
@@ -133,20 +152,55 @@ export const useAuthStore = defineStore('auth', () => {
             prompt: 'consent',
           },
         },
-      })
+      }
+      console.log('OAuth config:', oauthConfig)
 
-      console.log('OAuth response:', { data, error: signInError })
+      const { data, error: signInError } = await supabase.auth.signInWithOAuth(oauthConfig)
+
+      console.log('OAuth response:', {
+        data: {
+          url: data?.url,
+          provider: data?.provider,
+          hasUrl: !!data?.url,
+        },
+        error: signInError,
+      })
 
       if (signInError) {
         console.error('OAuth sign-in error:', signInError)
+        console.error('Error details:', {
+          name: signInError.name,
+          message: signInError.message,
+          status: signInError.status,
+        })
         throw signInError
       }
 
+      if (!data?.url) {
+        console.error('No OAuth URL returned')
+        throw new Error('OAuth URLが返されませんでした')
+      }
+
       console.log('Google sign-in initiated successfully')
-      console.log('OAuth URL:', data?.url)
+      console.log('OAuth URL:', data.url)
+      console.log('Redirecting to OAuth URL...')
+
+      // リダイレクト前の最終確認
+      console.log('Final state before redirect:', {
+        loading: loading.value,
+        error: error.value,
+        hasOAuthUrl: !!data.url,
+      })
+
       return data
     } catch (err) {
+      console.error('=== Google Sign-In Error ===')
       console.error('Error signing in with Google:', err)
+      console.error('Error details:', {
+        name: err instanceof Error ? err.name : 'Unknown',
+        message: err instanceof Error ? err.message : String(err),
+        stack: err instanceof Error ? err.stack : 'No stack trace',
+      })
       error.value = err instanceof Error ? err.message : 'Google sign-in failed'
       throw err
     } finally {
@@ -409,11 +463,11 @@ export const useAuthStore = defineStore('auth', () => {
   }
 
   return {
-    user: readonly(user),
-    session: readonly(session),
-    profile: readonly(profile),
-    loading: readonly(loading),
-    error: readonly(error),
+    user: computed(() => user.value),
+    session: computed(() => session.value),
+    profile: computed(() => profile.value),
+    loading: computed(() => loading.value),
+    error: computed(() => error.value),
     isAuthenticated,
     isProfileComplete,
     userRole,
