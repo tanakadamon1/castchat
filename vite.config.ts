@@ -8,7 +8,7 @@ import { VitePWA } from 'vite-plugin-pwa'
 // https://vite.dev/config/
 export default defineConfig(({ mode }) => {
   const env = loadEnv(mode, process.cwd(), '')
-  
+
   return {
     plugins: [
       vue(),
@@ -25,14 +25,14 @@ export default defineConfig(({ mode }) => {
                 cacheName: 'google-fonts-cache',
                 expiration: {
                   maxEntries: 10,
-                  maxAgeSeconds: 60 * 60 * 24 * 365 // 1 year
+                  maxAgeSeconds: 60 * 60 * 24 * 365, // 1 year
                 },
                 cacheableResponse: {
-                  statuses: [0, 200]
-                }
-              }
-            }
-          ]
+                  statuses: [0, 200],
+                },
+              },
+            },
+          ],
         },
         includeAssets: ['favicon.ico', 'icons/*.png'],
         manifestFilename: 'manifest.webmanifest',
@@ -51,36 +51,36 @@ export default defineConfig(({ mode }) => {
               src: 'icons/icon-192x192.png',
               sizes: '192x192',
               type: 'image/png',
-              purpose: 'any maskable'
+              purpose: 'any maskable',
             },
             {
               src: 'icons/icon-512x512.png',
               sizes: '512x512',
               type: 'image/png',
-              purpose: 'any maskable'
+              purpose: 'any maskable',
             },
             {
               src: 'icons/apple-touch-icon.png',
               sizes: '180x180',
-              type: 'image/png'
+              type: 'image/png',
             },
             {
               src: 'icons/favicon-32x32.png',
               sizes: '32x32',
-              type: 'image/png'
+              type: 'image/png',
             },
             {
               src: 'icons/favicon-16x16.png',
               sizes: '16x16',
-              type: 'image/png'
-            }
-          ]
-        }
-      })
+              type: 'image/png',
+            },
+          ],
+        },
+      }),
     ],
     resolve: {
       alias: {
-        '@': fileURLToPath(new URL('./src', import.meta.url))
+        '@': fileURLToPath(new URL('./src', import.meta.url)),
       },
     },
     server: {
@@ -91,16 +91,16 @@ export default defineConfig(({ mode }) => {
           'http://localhost:5173',
           'http://localhost:54321', // Supabase local
           'https://*.supabase.co',
-          env.VITE_APP_URL || 'http://localhost:5173'
+          env.VITE_APP_URL || 'http://localhost:5173',
         ],
-        credentials: true
+        credentials: true,
       },
       headers: {
         'X-Frame-Options': 'DENY',
         'X-Content-Type-Options': 'nosniff',
         'X-XSS-Protection': '1; mode=block',
-        'Referrer-Policy': 'strict-origin-when-cross-origin'
-      }
+        'Referrer-Policy': 'strict-origin-when-cross-origin',
+      },
     },
     build: {
       target: 'es2022',
@@ -111,37 +111,84 @@ export default defineConfig(({ mode }) => {
         output: {
           manualChunks: (id) => {
             // Vue関連のvendorチャンク
-            if (id.includes('node_modules/vue') || 
-                id.includes('node_modules/vue-router') || 
-                id.includes('node_modules/pinia')) {
+            if (
+              id.includes('node_modules/vue') ||
+              id.includes('node_modules/vue-router') ||
+              id.includes('node_modules/pinia')
+            ) {
               return 'vue-vendor'
             }
-            
+
             // UI関連のチャンク
-            if (id.includes('node_modules/lucide-vue-next') ||
-                id.includes('node_modules/@heroicons')) {
+            if (
+              id.includes('node_modules/lucide-vue-next') ||
+              id.includes('node_modules/@heroicons')
+            ) {
               return 'ui-vendor'
             }
-            
+
             // Supabase関連のチャンク
             if (id.includes('node_modules/@supabase')) {
               return 'supabase-vendor'
             }
-            
+
             // その他のvendor
             if (id.includes('node_modules')) {
               return 'vendor'
             }
-            
-            // コンポーネント別チャンク
-            if (id.includes('/src/components/ui/')) {
-              return 'ui-components'
+
+            // UIコンポーネントを個別にチャンク分割して循環依存を回避
+            if (id.includes('/src/components/ui/BaseButton.vue')) {
+              return 'ui-base-button'
             }
-            
+
+            if (id.includes('/src/components/ui/BaseModal.vue')) {
+              return 'ui-base-modal'
+            }
+
+            if (
+              id.includes('/src/components/ui/BaseInput.vue') ||
+              id.includes('/src/components/ui/BaseTextarea.vue') ||
+              id.includes('/src/components/ui/BaseSelect.vue') ||
+              id.includes('/src/components/ui/BaseCheckbox.vue')
+            ) {
+              return 'ui-form-components'
+            }
+
+            if (
+              id.includes('/src/components/ui/LoadingSpinner.vue') ||
+              id.includes('/src/components/ui/ErrorState.vue') ||
+              id.includes('/src/components/ui/EmptyState.vue')
+            ) {
+              return 'ui-state-components'
+            }
+
+            if (
+              id.includes('/src/components/ui/ImageViewer.vue') ||
+              id.includes('/src/components/ui/LazyImage.vue')
+            ) {
+              return 'ui-image-components'
+            }
+
+            if (
+              id.includes('/src/components/ui/BaseToast.vue') ||
+              id.includes('/src/components/ui/ToastContainer.vue')
+            ) {
+              return 'ui-toast-components'
+            }
+
+            if (
+              id.includes('/src/components/ui/BasePagination.vue') ||
+              id.includes('/src/components/ui/DarkModeToggle.vue') ||
+              id.includes('/src/components/ui/SkeletonLoader.vue')
+            ) {
+              return 'ui-other-components'
+            }
+
             if (id.includes('/src/components/message/')) {
               return 'message-components'
             }
-            
+
             if (id.includes('/src/components/post/')) {
               return 'post-components'
             }
@@ -154,9 +201,16 @@ export default defineConfig(({ mode }) => {
               return `js/${name}-[hash].js`
             }
             return 'js/[name]-[hash].js'
-          }
+          },
         },
-        external: id => id.includes('workbox-')
+        external: (id) => id.includes('workbox-'),
+        onwarn(warning, warn) {
+          // 循環依存関係の警告を抑制
+          if (warning.code === 'CIRCULAR_DEPENDENCY') {
+            return
+          }
+          warn(warning)
+        },
       },
       // 圧縮オプション
       minify: 'terser',
@@ -164,12 +218,13 @@ export default defineConfig(({ mode }) => {
         compress: {
           drop_console: mode === 'production',
           drop_debugger: mode === 'production',
-          pure_funcs: mode === 'production' ? ['console.log', 'console.info'] : []
-        }
-      }
+          pure_funcs: mode === 'production' ? ['console.log', 'console.info'] : [],
+        },
+      },
     },
     optimizeDeps: {
-      include: ['vue', 'vue-router', 'pinia']
-    }
+      include: ['vue', 'vue-router', 'pinia', 'lucide-vue-next', '@supabase/supabase-js'],
+      exclude: ['workbox-window'],
+    },
   }
 })

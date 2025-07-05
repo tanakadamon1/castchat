@@ -5,10 +5,7 @@
         <h3 class="text-lg font-semibold text-gray-900">
           画像ビューア ({{ currentIndex + 1 }} / {{ images.length }})
         </h3>
-        <button
-          @click="$emit('close')"
-          class="text-gray-400 hover:text-gray-600 transition-colors"
-        >
+        <button @click="$emit('close')" class="text-gray-400 hover:text-gray-600 transition-colors">
           <X class="w-6 h-6" />
         </button>
       </div>
@@ -52,36 +49,30 @@
           class="flex-shrink-0 w-16 h-16 rounded-lg overflow-hidden border-2 transition-colors"
           :class="index === currentIndex ? 'border-indigo-500' : 'border-transparent'"
         >
-          <img
-            :src="image"
-            :alt="`サムネイル ${index + 1}`"
-            class="w-full h-full object-cover"
-          />
+          <img :src="image" :alt="`サムネイル ${index + 1}`" class="w-full h-full object-cover" />
         </button>
       </div>
     </div>
 
     <template #footer>
       <div class="flex justify-between items-center">
-        <div class="text-sm text-gray-500">
-          キーボード: ← → で画像を切り替え、ESCで閉じる
-        </div>
-        
+        <div class="text-sm text-gray-500">キーボード: ← → で画像を切り替え、ESCで閉じる</div>
+
         <div class="flex gap-2">
-          <BaseButton
-            variant="outline"
+          <button
             @click="downloadImage"
+            class="inline-flex items-center px-3 py-2 border border-gray-300 shadow-sm text-sm leading-4 font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
           >
             <Download class="w-4 h-4 mr-2" />
             ダウンロード
-          </BaseButton>
-          
-          <BaseButton
-            variant="outline"
+          </button>
+
+          <button
             @click="$emit('close')"
+            class="inline-flex items-center px-3 py-2 border border-gray-300 shadow-sm text-sm leading-4 font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
           >
             閉じる
-          </BaseButton>
+          </button>
         </div>
       </div>
     </template>
@@ -92,7 +83,6 @@
 import { ref, computed, watch, onMounted, onUnmounted } from 'vue'
 import { X, ChevronLeft, ChevronRight, Download } from 'lucide-vue-next'
 import BaseModal from './BaseModal.vue'
-import BaseButton from './BaseButton.vue'
 
 interface Props {
   show: boolean
@@ -105,7 +95,7 @@ interface Emits {
 }
 
 const props = withDefaults(defineProps<Props>(), {
-  initialIndex: 0
+  initialIndex: 0,
 })
 
 const emit = defineEmits<Emits>()
@@ -133,14 +123,14 @@ const downloadImage = async () => {
     const response = await fetch(currentImage.value)
     const blob = await response.blob()
     const url = window.URL.createObjectURL(blob)
-    
+
     const a = document.createElement('a')
     a.href = url
     a.download = `image-${currentIndex.value + 1}.jpg`
     document.body.appendChild(a)
     a.click()
     document.body.removeChild(a)
-    
+
     window.URL.revokeObjectURL(url)
   } catch (error) {
     console.error('Failed to download image:', error)
@@ -150,7 +140,7 @@ const downloadImage = async () => {
 // キーボードショートカット
 const handleKeydown = (event: KeyboardEvent) => {
   if (!props.show) return
-  
+
   switch (event.key) {
     case 'ArrowLeft':
       event.preventDefault()
@@ -168,15 +158,21 @@ const handleKeydown = (event: KeyboardEvent) => {
 }
 
 // プロップス変更時にインデックスをリセット
-watch(() => props.initialIndex, (newIndex) => {
-  currentIndex.value = newIndex
-})
+watch(
+  () => props.initialIndex,
+  (newIndex) => {
+    currentIndex.value = newIndex
+  },
+)
 
-watch(() => props.show, (show) => {
-  if (show) {
-    currentIndex.value = props.initialIndex
-  }
-})
+watch(
+  () => props.show,
+  (show) => {
+    if (show) {
+      currentIndex.value = props.initialIndex
+    }
+  },
+)
 
 onMounted(() => {
   document.addEventListener('keydown', handleKeydown)

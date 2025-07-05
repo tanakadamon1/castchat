@@ -2,12 +2,7 @@
   <div :class="containerClasses">
     <div class="text-center">
       <div class="mx-auto flex items-center justify-center w-12 h-12 rounded-full bg-gray-100">
-        <svg
-          class="w-6 h-6 text-gray-400"
-          fill="none"
-          viewBox="0 0 24 24"
-          stroke="currentColor"
-        >
+        <svg class="w-6 h-6 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
           <path
             v-if="type === 'search'"
             stroke-linecap="round"
@@ -31,26 +26,24 @@
           />
         </svg>
       </div>
-      
+
       <h3 class="mt-4 text-lg font-medium text-gray-900">
         {{ title }}
       </h3>
-      
+
       <p class="mt-2 text-sm text-gray-600 max-w-md mx-auto">
         {{ message }}
       </p>
-      
-      <div
-        v-if="actionText || $slots.actions"
-        class="mt-6"
-      >
+
+      <div v-if="actionText || $slots.actions" class="mt-6">
         <slot name="actions">
-          <BaseButton
+          <button
             v-if="actionText"
             @click="$emit('action')"
+            class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
           >
             {{ actionText }}
-          </BaseButton>
+          </button>
         </slot>
       </div>
     </div>
@@ -59,7 +52,6 @@
 
 <script setup lang="ts">
 import { computed } from 'vue'
-import BaseButton from './BaseButton.vue'
 
 interface Props {
   type?: 'general' | 'search' | 'posts' | 'applications'
@@ -75,44 +67,44 @@ interface Emits {
 
 const props = withDefaults(defineProps<Props>(), {
   type: 'general',
-  fullHeight: false
+  fullHeight: false,
 })
 
 defineEmits<Emits>()
 
 const containerClasses = computed(() => {
   const baseClasses = 'flex items-center justify-center'
-  
+
   if (props.fullHeight) {
     return `${baseClasses} min-h-[400px]`
   }
-  
+
   return `${baseClasses} py-12`
 })
 
 const title = computed(() => {
   if (props.title) return props.title
-  
+
   const titles = {
     general: 'データがありません',
     search: '検索結果が見つかりませんでした',
     posts: '募集投稿がありません',
-    applications: '応募がありません'
+    applications: '応募がありません',
   }
-  
+
   return titles[props.type]
 })
 
 const message = computed(() => {
   if (props.message) return props.message
-  
+
   const messages = {
     general: '現在表示できるデータがありません。',
     search: '別のキーワードで検索するか、フィルター条件を変更してみてください。',
     posts: '現在募集中の投稿がありません。新しい募集を投稿してみませんか？',
-    applications: 'まだ応募がありません。もう少しお待ちください。'
+    applications: 'まだ応募がありません。もう少しお待ちください。',
   }
-  
+
   return messages[props.type]
 })
 </script>

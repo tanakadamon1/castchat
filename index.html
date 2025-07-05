@@ -1,16 +1,51 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="ja">
   <head>
-    <meta charset="UTF-8">
-    <link rel="icon" href="/favicon.ico">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="theme-color" content="#6366f1">
-    <link rel="manifest" href="/manifest.webmanifest">
-    <link rel="apple-touch-icon" href="/icons/apple-touch-icon.png">
+    <meta charset="UTF-8" />
+    <link rel="icon" href="/favicon.ico" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="theme-color" content="#6366f1" />
+    <link rel="manifest" href="/manifest.webmanifest" />
+    <link rel="apple-touch-icon" href="/icons/apple-touch-icon.png" />
     <title>CastChat - VRChat Cast Recruitment</title>
   </head>
   <body>
-    <div id="app"></div>
+    <div id="app">
+      <!-- フォールバックメッセージ -->
+      <div
+        id="fallback"
+        style="display: none; text-align: center; padding: 2rem; font-family: system-ui, sans-serif"
+      >
+        <h1>CastChat</h1>
+        <p>アプリケーションの読み込み中にエラーが発生しました。</p>
+        <p>ページを再読み込みしてください。</p>
+        <button
+          onclick="window.location.reload()"
+          style="
+            padding: 0.5rem 1rem;
+            background: #6366f1;
+            color: white;
+            border: none;
+            border-radius: 0.375rem;
+            cursor: pointer;
+          "
+        >
+          再読み込み
+        </button>
+      </div>
+    </div>
     <script type="module" src="/src/main.ts"></script>
+    <script>
+      // グローバルエラーハンドリング
+      window.addEventListener('error', function (event) {
+        console.error('Global error:', event.error)
+        document.getElementById('fallback').style.display = 'block'
+      })
+
+      window.addEventListener('unhandledrejection', function (event) {
+        console.error('Unhandled promise rejection:', event.reason)
+        document.getElementById('fallback').style.display = 'block'
+      })
+    </script>
   </body>
 </html>
