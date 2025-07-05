@@ -198,32 +198,6 @@
         </div>
       </div>
 
-      <!-- アクティビティ統計 -->
-      <div class="bg-white rounded-lg shadow-sm border p-6 mb-8">
-        <h2 class="text-lg font-semibold text-gray-900 mb-4">アクティビティ</h2>
-        
-        <div class="grid grid-cols-2 md:grid-cols-4 gap-6">
-          <div class="text-center">
-            <div class="text-2xl font-bold text-indigo-600">{{ stats.postsCount }}</div>
-            <div class="text-sm text-gray-600">投稿数</div>
-          </div>
-          
-          <div class="text-center">
-            <div class="text-2xl font-bold text-green-600">{{ stats.applicationsReceived }}</div>
-            <div class="text-sm text-gray-600">受信応募</div>
-          </div>
-          
-          <div class="text-center">
-            <div class="text-2xl font-bold text-blue-600">{{ stats.applicationsSent }}</div>
-            <div class="text-sm text-gray-600">送信応募</div>
-          </div>
-          
-          <div class="text-center">
-            <div class="text-2xl font-bold text-purple-600">{{ stats.successfulMatches }}</div>
-            <div class="text-sm text-gray-600">成功マッチ</div>
-          </div>
-        </div>
-      </div>
 
         <!-- アクションボタン -->
         <div v-if="isEditing" class="flex flex-col sm:flex-row gap-4">
@@ -314,13 +288,6 @@ const editData = ref({
   websiteUrl: ''
 })
 
-// 統計データ（モック）
-const stats = ref({
-  postsCount: 12,
-  applicationsReceived: 45,
-  applicationsSent: 8,
-  successfulMatches: 15
-})
 
 // バリデーションルール
 const displayNameRules = {
