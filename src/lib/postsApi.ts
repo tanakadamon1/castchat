@@ -26,6 +26,7 @@ export const postsApi = {
     sortBy?: string
     limit?: number
     offset?: number
+    user_id?: string
   }): Promise<PostsResponse> {
     try {
       const page = filters.offset ? Math.floor(filters.offset / (filters.limit || 10)) + 1 : 1
@@ -60,6 +61,7 @@ export const postsApi = {
         category_id: filters.category,
         search: filters.search,
         status: filters.status === 'active' ? 'published' : (filters.status as any),
+        user_id: filters.user_id,
         sort_by: sortBy,
         sort_order: sortOrder,
         limit: filters.limit || 10,

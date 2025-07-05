@@ -1,12 +1,12 @@
 <template>
-  <div class="min-h-screen bg-gray-50">
+  <div class="min-h-screen bg-gray-50 dark:bg-gray-900">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
       <!-- Header -->
       <div class="mb-8">
         <div class="flex items-center justify-between">
           <div>
-            <h1 class="text-3xl font-bold text-gray-900 mb-2">マイ投稿</h1>
-            <p class="text-gray-600">あなたが投稿した募集一覧</p>
+            <h1 class="text-3xl font-bold text-gray-900 dark:text-white mb-2">マイ投稿</h1>
+            <p class="text-gray-600 dark:text-gray-300">あなたが投稿した募集一覧</p>
           </div>
           
           <BaseButton
@@ -23,7 +23,7 @@
       
       <!-- Stats -->
       <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
-        <div class="bg-white rounded-lg shadow-sm p-6">
+        <div class="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-6">
           <div class="flex items-center">
             <div class="p-2 bg-blue-100 rounded-lg">
               <svg class="w-6 h-6 text-blue-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -31,13 +31,13 @@
               </svg>
             </div>
             <div class="ml-4">
-              <p class="text-sm font-medium text-gray-600">総投稿数</p>
-              <p class="text-2xl font-semibold text-gray-900">{{ totalPosts }}</p>
+              <p class="text-sm font-medium text-gray-600 dark:text-gray-400">総投稿数</p>
+              <p class="text-2xl font-semibold text-gray-900 dark:text-white">{{ totalPosts }}</p>
             </div>
           </div>
         </div>
         
-        <div class="bg-white rounded-lg shadow-sm p-6">
+        <div class="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-6">
           <div class="flex items-center">
             <div class="p-2 bg-green-100 rounded-lg">
               <svg class="w-6 h-6 text-green-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -45,13 +45,13 @@
               </svg>
             </div>
             <div class="ml-4">
-              <p class="text-sm font-medium text-gray-600">募集中</p>
-              <p class="text-2xl font-semibold text-gray-900">{{ activePosts }}</p>
+              <p class="text-sm font-medium text-gray-600 dark:text-gray-400">募集中</p>
+              <p class="text-2xl font-semibold text-gray-900 dark:text-white">{{ activePosts }}</p>
             </div>
           </div>
         </div>
         
-        <div class="bg-white rounded-lg shadow-sm p-6">
+        <div class="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-6">
           <div class="flex items-center">
             <div class="p-2 bg-yellow-100 rounded-lg">
               <svg class="w-6 h-6 text-yellow-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -59,13 +59,13 @@
               </svg>
             </div>
             <div class="ml-4">
-              <p class="text-sm font-medium text-gray-600">総応募数</p>
-              <p class="text-2xl font-semibold text-gray-900">{{ totalApplications }}</p>
+              <p class="text-sm font-medium text-gray-600 dark:text-gray-400">総応募数</p>
+              <p class="text-2xl font-semibold text-gray-900 dark:text-white">{{ totalApplications }}</p>
             </div>
           </div>
         </div>
         
-        <div class="bg-white rounded-lg shadow-sm p-6">
+        <div class="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-6">
           <div class="flex items-center">
             <div class="p-2 bg-purple-100 rounded-lg">
               <svg class="w-6 h-6 text-purple-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -74,8 +74,8 @@
               </svg>
             </div>
             <div class="ml-4">
-              <p class="text-sm font-medium text-gray-600">総閲覧数</p>
-              <p class="text-2xl font-semibold text-gray-900">{{ totalViews }}</p>
+              <p class="text-sm font-medium text-gray-600 dark:text-gray-400">総閲覧数</p>
+              <p class="text-2xl font-semibold text-gray-900 dark:text-white">{{ totalViews }}</p>
             </div>
           </div>
         </div>
@@ -243,8 +243,7 @@ const loadPosts = async (showLoading = true) => {
       sortBy: sortBy.value,
       limit: perPage.value,
       offset: (currentPage.value - 1) * perPage.value,
-      // TODO: ユーザーフィルターを追加
-      // user_id: authStore.user.id
+      user_id: authStore.user.id
     })
     
     if (result.error) {
