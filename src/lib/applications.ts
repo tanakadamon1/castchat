@@ -193,7 +193,7 @@ export class ApplicationsService {
         .from('applications')
         .select(`
           *,
-          posts!applications_post_id_fkey(user_id)
+          posts(user_id)
         `)
         .eq('id', applicationId)
         .single()
@@ -210,13 +210,14 @@ export class ApplicationsService {
       }
 
       // 権限チェック
+      const postOwnerId = (existingApplication.posts as any)?.user_id
       const canUpdate = userProfile && (
         // 応募者本人の場合
         existingApplication.user_id === userId ||
         // 投稿者の場合（ステータス変更のみ）
-        (existingApplication.posts.user_id === userId && updateData.status) ||
+        (postOwnerId === userId && updateData.status) ||
         // 管理者の場合
-        permissionManager.canManageApplication(userProfile, existingApplication.posts.user_id)
+        permissionManager.canManageApplication(userProfile, postOwnerId)
       )
 
       if (!canUpdate) {
@@ -265,7 +266,7 @@ export class ApplicationsService {
             .from('applications')
             .select(`
               user_id,
-              posts!applications_post_id_fkey(title)
+              posts(title)
             `)
             .eq('id', applicationId)
             .single()

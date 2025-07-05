@@ -394,7 +394,20 @@ const loadApplications = async () => {
       errorMessage.value = receivedResult.error
       console.error('Received applications error:', receivedResult.error)
     } else {
-      receivedApplications.value = receivedResult.data || []
+      // データを ApplicationCard で使用する形式に変換
+      receivedApplications.value = (receivedResult.data || []).map((app: any) => ({
+        id: app.id,
+        postId: app.post_id,
+        postTitle: app.posts?.title || '募集タイトル',
+        postAuthor: app.posts?.users?.display_name || '投稿者',
+        applicantId: app.user_id,
+        applicantName: app.users?.display_name || '匿名ユーザー',
+        applicantAvatar: app.users?.avatar_url,
+        status: app.status,
+        message: app.message,
+        appliedAt: app.created_at,
+        respondedAt: app.responded_at
+      }))
       console.log('Received applications data:', receivedApplications.value)
     }
 
@@ -407,7 +420,20 @@ const loadApplications = async () => {
       errorMessage.value = sentResult.error
       console.error('Sent applications error:', sentResult.error)
     } else {
-      sentApplications.value = sentResult.data || []
+      // データを ApplicationCard で使用する形式に変換
+      sentApplications.value = (sentResult.data || []).map((app: any) => ({
+        id: app.id,
+        postId: app.post_id,
+        postTitle: app.posts?.title || '募集タイトル',
+        postAuthor: app.posts?.users?.display_name || '投稿者',
+        applicantId: app.user_id,
+        applicantName: app.users?.display_name || '匿名ユーザー',
+        applicantAvatar: app.users?.avatar_url,
+        status: app.status,
+        message: app.message,
+        appliedAt: app.created_at,
+        respondedAt: app.responded_at
+      }))
       console.log('Sent applications data:', sentApplications.value)
     }
   } catch (err) {
