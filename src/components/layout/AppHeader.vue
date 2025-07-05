@@ -95,15 +95,9 @@
           <template v-else>
             <router-link
               to="/login"
-              class="text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white px-3 py-2 rounded-md text-sm font-medium transition-colors duration-200"
-            >
-              ログイン
-            </router-link>
-            <router-link
-              to="/register"
               class="bg-indigo-500 hover:bg-indigo-600 dark:bg-indigo-500 dark:hover:bg-indigo-600 text-white px-4 py-2 rounded-md text-sm font-medium transition-colors duration-200"
             >
-              新規登録
+              ログイン
             </router-link>
           </template>
         </div>
@@ -143,17 +137,10 @@
           <template v-if="!authStore.isAuthenticated">
             <router-link
               to="/login"
-              class="text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white block px-3 py-2 rounded-md text-base font-medium transition-colors duration-200"
-              @click="showMobileMenu = false"
-            >
-              ログイン
-            </router-link>
-            <router-link
-              to="/register"
               class="bg-indigo-500 hover:bg-indigo-600 dark:bg-indigo-500 dark:hover:bg-indigo-600 text-white block px-3 py-2 rounded-md text-base font-medium transition-colors duration-200"
               @click="showMobileMenu = false"
             >
-              新規登録
+              ログイン
             </router-link>
           </template>
           

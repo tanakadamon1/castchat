@@ -73,21 +73,9 @@
         </div>
       </div>
 
-      <div class="text-center space-y-2">
+      <div class="text-center">
         <p class="text-sm text-gray-600">
-          アカウントをお持ちでない場合は、
-          <router-link to="/register" class="font-medium text-indigo-600 hover:text-indigo-500">
-            こちらから登録
-          </router-link>
-        </p>
-        <p class="text-sm text-gray-600">
-          パスワードを忘れた場合は、
-          <router-link
-            to="/reset-password"
-            class="font-medium text-indigo-600 hover:text-indigo-500"
-          >
-            パスワードリセット
-          </router-link>
+          初めての方も上記ボタンからログインできます
         </p>
       </div>
     </div>
