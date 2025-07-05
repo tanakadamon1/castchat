@@ -1,0 +1,23 @@
+<svg width='180' height='180' xmlns='http://www.w3.org/2000/svg'>
+  <defs>
+    <linearGradient id='bg' x1='0%' y1='0%' x2='100%' y2='100%'>
+      <stop offset='0%' stop-color='#6366f1'/>
+      <stop offset='100%' stop-color='#4f46e5'/>
+    </linearGradient>
+  </defs>
+  <rect width='100%' height='100%' fill='url(#bg)' rx='32'/>
+  
+  <!-- VR Headset (scaled for 180x180) -->
+  <rect x='45' y='63' width='90' height='42' rx='14' fill='white'/>
+  
+  <!-- Lenses -->
+  <circle cx='67' cy='84' r='12' fill='#1E40AF'/>
+  <circle cx='67' cy='84' r='7' fill='#60A5FA'/>
+  <circle cx='113' cy='84' r='12' fill='#1E40AF'/>
+  <circle cx='113' cy='84' r='7' fill='#60A5FA'/>
+  
+  <!-- Chat Bubble -->
+  <circle cx='133' cy='56' r='14' fill='#10b981'/>
+  <polygon points='123,63 126,67 119,70' fill='#10b981'/>
+  <text x='133' y='62' text-anchor='middle' fill='white' font-size='8'>💬</text>
+</svg>

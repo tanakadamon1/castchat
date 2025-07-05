@@ -285,7 +285,7 @@ const handleEditPost = (postId: string) => {
   router.push(`/posts/edit/${postId}`)
 }
 
-const handleDeletePost = async () => {
+const handleDeletePost = async (postId: string) => {
   if (!confirm('この投稿を削除しますか？この操作は取り消せません。')) {
     return
   }

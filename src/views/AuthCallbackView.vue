@@ -68,7 +68,7 @@ const handleAuthCallback = async () => {
 
     if (accessToken && refreshToken) {
       // セッションを設定
-      const { error: sessionError } = await supabase.auth.setSession({
+      const { data, error: sessionError } = await supabase.auth.setSession({
         access_token: accessToken,
         refresh_token: refreshToken
       })

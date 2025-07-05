@@ -20,18 +20,6 @@ export interface PostWithDetails extends Post {
   images?: PostImage[]
   application_count?: number
   is_favorited?: boolean
-  post_type?: string
-  contact_method?: string
-  contact_value?: string
-  payment_info?: string
-  start_date?: string
-  end_date?: string
-  event_frequency?: string
-  event_weekday?: number
-  event_time?: string
-  event_week_of_month?: number
-  event_specific_date?: string
-  post_images?: any[]
 }
 
 export interface PostCreateData {
@@ -174,7 +162,7 @@ export class PostsService {
         world_name: postData.world_name || null,
         recruitment_count: postData.recruitment_count || 1,
         deadline: postData.deadline || null,
-        // Remove post_type from insert data as it doesn't exist in the database schema
+        post_type: postData.post_type || 'volunteer',
         contact_method: postData.contact_method || null,
         contact_value: postData.contact_value || null,
         payment_info: postData.payment_info || null,
@@ -302,12 +290,11 @@ export class PostsService {
       if (updateData.world_name !== undefined) updatePayload.world_name = updateData.world_name
       if (updateData.recruitment_count !== undefined) updatePayload.recruitment_count = updateData.recruitment_count
       if (updateData.deadline !== undefined) updatePayload.deadline = updateData.deadline
-      // Remove non-existent fields from update payload
-      // if (updateData.post_type !== undefined) updatePayload.post_type = updateData.post_type
-      // if (updateData.contact_method !== undefined) updatePayload.contact_method = updateData.contact_method
-      // if (updateData.contact_value !== undefined) updatePayload.contact_value = updateData.contact_value
-      // if (updateData.payment_info !== undefined) updatePayload.payment_info = updateData.payment_info
-      // if (updateData.start_date !== undefined) updatePayload.start_date = updateData.start_date
+      if (updateData.post_type !== undefined) updatePayload.post_type = updateData.post_type
+      if (updateData.contact_method !== undefined) updatePayload.contact_method = updateData.contact_method
+      if (updateData.contact_value !== undefined) updatePayload.contact_value = updateData.contact_value
+      if (updateData.payment_info !== undefined) updatePayload.payment_info = updateData.payment_info
+      if (updateData.start_date !== undefined) updatePayload.start_date = updateData.start_date
       if (updateData.end_date !== undefined) updatePayload.end_date = updateData.end_date
       if (updateData.min_participants !== undefined) updatePayload.min_participants = updateData.min_participants
       if (updateData.status !== undefined) {

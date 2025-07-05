@@ -129,7 +129,7 @@ interface Emits {
   (e: 'refresh'): void
 }
 
-withDefaults(defineProps<Props>(), {
+const props = withDefaults(defineProps<Props>(), {
   loading: false
 })
 

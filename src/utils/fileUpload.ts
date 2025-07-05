@@ -51,7 +51,7 @@ export class FileUploadService {
       const filePath = this.generateFilePath(file.name, options.bucket, userId)
       
       // Supabase Storageにアップロード
-      const { error } = await supabase.storage
+      const { data, error } = await supabase.storage
         .from(options.bucket)
         .upload(filePath, processedFile, {
           cacheControl: '3600',
@@ -298,7 +298,9 @@ export class FileUploadService {
     const randomSuffix = Math.random().toString(36).substring(2, 8)
     const fileExt = originalName.split('.').pop()?.toLowerCase() || ''
     
-    // File name sanitization is done but not used in this simple implementation
+    const sanitizedName = originalName
+      .replace(/[^a-zA-Z0-9.-]/g, '_')
+      .replace(/_{2,}/g, '_')
     
     if (userId) {
       return `${userId}/${bucket}-${timestamp}-${randomSuffix}.${fileExt}`

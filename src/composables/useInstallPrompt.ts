@@ -15,7 +15,7 @@ export function useInstallPrompt() {
   const checkInstallability = () => {
     // 既にインストール済みかチェック
     if (window.matchMedia('(display-mode: standalone)').matches ||
-        (window.navigator as Navigator & { standalone?: boolean }).standalone === true) {
+        (window.navigator as any).standalone === true) {
       isInstalled.value = true
       return
     }
@@ -171,16 +171,12 @@ export function useInstallPrompt() {
       } catch (error) {
         console.error('Failed to share:', error)
         // フォールバック: クリップボードにコピー
-        if (navigator.clipboard) {
-          await navigator.clipboard.writeText(window.location.href)
-        }
+        await (navigator as any).clipboard.writeText(window.location.href)
         throw new Error('URLをクリップボードにコピーしました')
       }
     } else {
       // Web Share API未対応の場合はクリップボードにコピー
-      if (navigator.clipboard) {
-        await navigator.clipboard.writeText(window.location.href)
-      }
+      await (navigator as any).clipboard.writeText(window.location.href)
       throw new Error('URLをクリップボードにコピーしました')
     }
   }
@@ -213,7 +209,7 @@ export function useInstallPrompt() {
     window.addEventListener('appinstalled', handleAppInstalledEvent)
     
     // 既存のプロンプトが利用可能かチェック
-    const existingPrompt = (window as Window & { deferredPrompt?: BeforeInstallPromptEvent }).deferredPrompt
+    const existingPrompt = (window as any).deferredPrompt
     if (existingPrompt) {
       deferredPrompt.value = existingPrompt
       isInstallable.value = true

@@ -59,7 +59,7 @@ export const postsApi = {
       const result = await postsService.getPosts({
         category_id: filters.category,
         search: filters.search,
-        status: filters.status === 'active' ? 'published' : (filters.status as string),
+        status: filters.status === 'active' ? 'published' : (filters.status as any),
         sort_by: sortBy,
         sort_order: sortOrder,
         limit: filters.limit || 10,
@@ -75,11 +75,11 @@ export const postsApi = {
         id: post.id,
         title: post.title,
         description: post.description,
-        category: (post.post_categories?.slug as string) || 'other',
-        status: (post.status === 'published' ? 'active' : 'closed') as 'active' | 'closed',
+        category: (post.post_categories?.slug as any) || 'other',
+        status: (post.status === 'published' ? 'active' : 'closed') as any,
         deadline: post.deadline || undefined,
         maxParticipants: post.recruitment_count || 1,
-        contactMethod: (post.contact_method as string) || 'form',
+        contactMethod: (post.contact_method as any) || 'form',
         contactValue: post.contact_value || '',
         requirements: post.requirements ? post.requirements.split(',').map(r => r.trim()) : [],
         tags: post.post_tags?.map(pt => pt.tags?.name).filter(Boolean) || [],
@@ -124,11 +124,11 @@ export const postsApi = {
         id: post.id,
         title: post.title,
         description: post.description,
-        category: (post.post_categories?.slug as string) || 'other',
-        status: (post.status === 'published' ? 'active' : 'closed') as 'active' | 'closed',
+        category: (post.post_categories?.slug as any) || 'other',
+        status: (post.status === 'published' ? 'active' : 'closed') as any,
         deadline: post.deadline || undefined,
         maxParticipants: post.recruitment_count || 1,
-        contactMethod: (post.contact_method as string) || 'form',
+        contactMethod: (post.contact_method as any) || 'form',
         contactValue: post.contact_value || '',
         requirements: post.requirements ? post.requirements.split(',').map(r => r.trim()) : [],
         tags: post.post_tags?.map(pt => pt.tags?.name).filter(Boolean) || [],
@@ -154,7 +154,7 @@ export const postsApi = {
   },
 
   // 投稿作成
-  async createPost(postData: PostCreateData): Promise<PostResponse> {
+  async createPost(postData: any): Promise<PostResponse> {
     try {
       const authStore = useAuthStore()
       
@@ -265,7 +265,7 @@ export const postsApi = {
         title: insertedPost.title,
         description: insertedPost.description,
         category: postData.category, // 元のカテゴリ値を使用
-        status: 'active' as 'active' | 'closed',
+        status: 'active' as any,
         deadline: insertedPost.deadline || undefined,
         maxParticipants: insertedPost.recruitment_count || 1,
         contactMethod: postData.contactMethod,
@@ -296,7 +296,7 @@ export const postsApi = {
       console.error('Error constructor:', error?.constructor?.name)
       console.error('Error stack:', error?.stack)
       console.error('=== ERROR END ===')
-      return { data: null, error: `予期しないエラー: ${(error as Error)?.message || 'Unknown error'}` }
+      return { data: null, error: `予期しないエラー: ${error?.message || 'Unknown error'}` }
     }
   },
 
@@ -336,10 +336,10 @@ export const postsApi = {
         return { data: null, error: error.message }
       }
 
-      return { data: data as Post }
+      return { data: data as any }
     } catch (error) {
       console.error('Test creation error:', error)
-      return { data: null, error: (error as Error)?.message || 'Test failed' }
+      return { data: null, error: error?.message || 'Test failed' }
     }
   }
 }

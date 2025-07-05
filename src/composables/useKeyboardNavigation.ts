@@ -111,7 +111,7 @@ export function useKeyboardNavigation(
   }
 
   const handleKeydown = (event: KeyboardEvent) => {
-    const { key, ctrlKey, altKey } = event
+    const { key, ctrlKey, altKey, shiftKey } = event
 
     switch (key) {
       case 'ArrowDown':

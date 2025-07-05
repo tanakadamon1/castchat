@@ -126,7 +126,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted, computed, shallowRef } from 'vue'
+import { ref, reactive, onMounted, computed, shallowRef } from 'vue'
 import { useRouter } from 'vue-router'
 import type { Post, PostFilter } from '@/types/post'
 import PostCard from '@/components/post/PostCard.vue'
@@ -261,7 +261,7 @@ const handleEditPost = (postId: string) => {
   router.push(`/posts/edit/${postId}`)
 }
 
-const handleDeletePost = async () => {
+const handleDeletePost = async (postId: string) => {
   if (!confirm('この投稿を削除しますか？この操作は取り消せません。')) {
     return
   }

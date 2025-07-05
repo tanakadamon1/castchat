@@ -209,14 +209,7 @@ const activeFiltersCount = computed(() => {
   return count
 })
 
-interface QuickFilter {
-  key: string
-  label: string
-  type: 'type' | 'category' | 'special'
-  value: string
-}
-
-const quickFilterClasses = (filter: QuickFilter) => {
+const quickFilterClasses = (filter: any) => {
   const baseClasses = 'px-3 py-1.5 text-sm font-medium rounded-full border transition-colors duration-200'
   const isActive = isQuickFilterActive(filter)
   
@@ -228,7 +221,7 @@ const quickFilterClasses = (filter: QuickFilter) => {
 }
 
 // Methods
-const isQuickFilterActive = (filter: QuickFilter) => {
+const isQuickFilterActive = (filter: any) => {
   if (filter.type === 'type') {
     return filters.value.type === filter.value
   }
@@ -242,7 +235,7 @@ const isQuickFilterActive = (filter: QuickFilter) => {
   return false
 }
 
-const toggleQuickFilter = (filter: QuickFilter) => {
+const toggleQuickFilter = (filter: any) => {
   if (filter.type === 'type') {
     filters.value.type = filters.value.type === filter.value ? undefined : filter.value
   } else if (filter.type === 'category') {

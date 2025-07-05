@@ -1,0 +1,29 @@
+<svg width='512' height='512' xmlns='http://www.w3.org/2000/svg'>
+  <defs>
+    <linearGradient id='bg' x1='0%' y1='0%' x2='100%' y2='100%'>
+      <stop offset='0%' stop-color='#6366f1'/>
+      <stop offset='100%' stop-color='#4f46e5'/>
+    </linearGradient>
+  </defs>
+  <rect width='100%' height='100%' fill='url(#bg)'/>
+  
+  <!-- VR Headset Body -->
+  <rect x='128' y='180' width='256' height='120' rx='40' fill='white'/>
+  
+  <!-- Left Lens -->
+  <circle cx='190' cy='240' r='35' fill='#1E40AF'/>
+  <circle cx='190' cy='240' r='20' fill='#60A5FA'/>
+  
+  <!-- Right Lens -->
+  <circle cx='322' cy='240' r='35' fill='#1E40AF'/>
+  <circle cx='322' cy='240' r='20' fill='#60A5FA'/>
+  
+  <!-- Chat Bubble -->
+  <circle cx='380' cy='160' r='40' fill='#10b981'/>
+  <polygon points='350,180 360,190 340,200' fill='#10b981'/>
+  <text x='380' y='170' text-anchor='middle' fill='white' font-size='24'>💬</text>
+  
+  <!-- Sound Waves -->
+  <path d='M 156 240 A 100 100 0 0 1 356 240' stroke='#a7f3d0' stroke-width='3' fill='none' opacity='0.6'/>
+  <path d='M 136 240 A 120 120 0 0 1 376 240' stroke='#a7f3d0' stroke-width='2' fill='none' opacity='0.4'/>
+</svg>

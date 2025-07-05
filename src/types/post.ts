@@ -22,13 +22,6 @@ export interface Post {
   eventTime?: string // HH:MM format
   eventWeekOfMonth?: number // 1=First, 2=Second, 3=Third, 4=Fourth
   eventSpecificDate?: string // For one-time events
-  // Legacy fields for compatibility
-  startDate?: string
-  endDate?: string
-  paymentInfo?: string
-  postType?: string
-  type?: string
-  viewsCount?: number
 }
 
 export type PostCategory = 
@@ -40,13 +33,6 @@ export type PostCategory =
   | 'roleplay' // ロールプレイ
   | 'games' // ゲーム
   | 'other' // その他
-  // Legacy categories for compatibility
-  | 'photo'
-  | 'streaming'
-  | 'video'
-  | 'event'
-  | 'voice'
-  | 'modeling'
 
 export type EventFrequency = 
   | 'once' // 単発
@@ -71,7 +57,6 @@ export interface PostFilter {
   tags?: string[]
   status?: PostStatus
   sortBy?: 'newest' | 'oldest' | 'deadline' | 'popular'
-  type?: string // Legacy field for compatibility
 }
 
 export interface PostListResponse {
