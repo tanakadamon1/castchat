@@ -108,17 +108,27 @@ export const useAuthStore = defineStore('auth', () => {
     loading.value = true
     error.value = null
     try {
+      console.log('Starting Google sign-in process...')
+      console.log('Redirect URL:', `${window.location.origin}/auth/callback`)
+      
       const { data, error: signInError } = await supabase.auth.signInWithOAuth({
         provider: 'google',
         options: {
           redirectTo: `${window.location.origin}/auth/callback`,
           queryParams: {
-            access_type: 'offline',
-            prompt: 'consent'
+            prompt: 'select_account'
           }
         }
       })
-      if (signInError) throw signInError
+      
+      console.log('OAuth response:', { data, error: signInError })
+      
+      if (signInError) {
+        console.error('OAuth sign-in error:', signInError)
+        throw signInError
+      }
+      
+      console.log('Google sign-in initiated successfully')
       return data
     } catch (err) {
       console.error('Error signing in with Google:', err)

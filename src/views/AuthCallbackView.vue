@@ -60,18 +60,41 @@ const handleAuthCallback = async () => {
     loading.value = true
     error.value = null
 
+    console.log('Auth callback started')
+    console.log('Current URL:', window.location.href)
+    console.log('URL hash:', window.location.hash)
+    console.log('URL search params:', window.location.search)
+
     // URLフラグメントからトークンを取得
     const hashParams = new URLSearchParams(window.location.hash.substring(1))
     const accessToken = hashParams.get('access_token')
     const refreshToken = hashParams.get('refresh_token')
     const type = hashParams.get('type')
+    const errorParam = hashParams.get('error')
+    const errorDescription = hashParams.get('error_description')
+
+    console.log('Hash params:', {
+      access_token: accessToken ? 'present' : 'missing',
+      refresh_token: refreshToken ? 'present' : 'missing',
+      type,
+      error: errorParam,
+      error_description: errorDescription
+    })
+
+    // エラーパラメータをチェック
+    if (errorParam) {
+      throw new Error(errorDescription || errorParam)
+    }
 
     if (accessToken && refreshToken) {
+      console.log('Setting session with tokens...')
       // セッションを設定
       const { data, error: sessionError } = await supabase.auth.setSession({
         access_token: accessToken,
         refresh_token: refreshToken
       })
+
+      console.log('Session set result:', { data, error: sessionError })
 
       if (sessionError) throw sessionError
 
@@ -86,7 +109,14 @@ const handleAuthCallback = async () => {
     }
 
     // 通常の認証処理
+    console.log('Initializing auth store...')
     await authStore.initialize()
+    
+    console.log('Auth store state:', {
+      isAuthenticated: authStore.isAuthenticated,
+      user: authStore.user?.id,
+      userProfile: authStore.userProfile?.id
+    })
     
     if (authStore.isAuthenticated) {
       if (isRecovery.value) {
@@ -98,6 +128,7 @@ const handleAuthCallback = async () => {
         toast.success('ログインしました')
         setTimeout(() => {
           const redirectTo = route.query.redirect as string || '/'
+          console.log('Redirecting to:', redirectTo)
           router.push(redirectTo)
         }, 1500)
       }
