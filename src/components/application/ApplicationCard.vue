@@ -68,20 +68,29 @@
 
     <!-- メッセージプレビュー -->
     <div v-if="application.message" class="mt-4 pt-4 border-t">
-      <p class="text-sm text-gray-600 font-medium mb-2">応募メッセージ:</p>
-      <p class="text-sm text-gray-800 line-clamp-3">{{ application.message }}</p>
+      <p class="text-sm text-gray-600 font-medium mb-2 dark:text-gray-300">応募メッセージ:</p>
+      <p
+        class="text-sm text-gray-800 line-clamp-3 dark:text-gray-100 dark:bg-gray-800 dark:rounded-md dark:p-2"
+      >
+        {{ application.message }}
+      </p>
       <button
         v-if="application.message.length > 100"
         @click="showFullMessage = !showFullMessage"
-        class="text-sm text-indigo-600 hover:text-indigo-700 mt-1"
+        class="text-sm text-indigo-600 hover:text-indigo-700 mt-1 dark:text-indigo-300 dark:hover:text-indigo-400"
       >
         {{ showFullMessage ? '折りたたむ' : 'もっと見る' }}
       </button>
     </div>
 
     <!-- 展開されたメッセージ -->
-    <div v-if="showFullMessage && application.message" class="mt-2 p-3 bg-gray-50 rounded-md">
-      <p class="text-sm text-gray-800 whitespace-pre-wrap">{{ application.message }}</p>
+    <div
+      v-if="showFullMessage && application.message"
+      class="mt-2 p-3 bg-gray-50 rounded-md dark:bg-gray-800"
+    >
+      <p class="text-sm text-gray-800 whitespace-pre-wrap dark:text-gray-100">
+        {{ application.message }}
+      </p>
     </div>
   </div>
 </template>
