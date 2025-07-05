@@ -66,6 +66,14 @@
       </div>
     </div>
 
+    <!-- 送信した応募のメッセージプレビュー -->
+    <div v-if="type === 'sent' && application.message" class="mt-4 pt-4 border-t">
+      <p class="text-sm text-gray-600 font-medium mb-1 dark:text-gray-300">送信したメッセージ</p>
+      <p class="text-sm text-gray-800 dark:text-gray-100 line-clamp-2">
+        {{ application.message }}
+      </p>
+    </div>
+
     <!-- 応募内容プレビュー（受信した応募のみ詳細表示） -->
     <div v-if="type === 'received'" class="mt-4 pt-4 border-t space-y-2">
       <div v-if="application.message">
@@ -218,6 +226,13 @@ const formatDate = (dateString: string) => {
 </script>
 
 <style scoped>
+.line-clamp-2 {
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
 .line-clamp-3 {
   display: -webkit-box;
   -webkit-line-clamp: 3;

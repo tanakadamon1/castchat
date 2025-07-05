@@ -495,7 +495,9 @@ const handleApplicationSubmit = async (applicationData: any) => {
     const submitData = {
       postId: applicationData.postId,
       message: applicationData.message,
-      portfolio_url: applicationData.experience || null // experienceをportfolio_urlとして使用
+      portfolio_url: applicationData.experience || null, // experienceをportfolio_urlとして使用
+      availability: applicationData.availability || null,
+      contactMethods: applicationData.contactMethods || []
     }
     
     console.log('Submitting application:', submitData)
