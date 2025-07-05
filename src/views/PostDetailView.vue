@@ -75,15 +75,15 @@
         <div class="p-6">
           <!-- Description -->
           <section class="mb-8">
-            <h3 class="text-lg font-semibold text-gray-900 mb-3">募集内容</h3>
-            <div class="prose prose-sm max-w-none text-gray-700 whitespace-pre-wrap">
+            <h3 class="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-3">募集内容</h3>
+            <div class="prose prose-sm max-w-none text-gray-700 dark:text-gray-300 whitespace-pre-wrap">
               {{ post.description }}
             </div>
           </section>
           
           <!-- Images -->
           <section v-if="post.images && post.images.length > 0" class="mb-8">
-            <h3 class="text-lg font-semibold text-gray-900 mb-4">関連画像</h3>
+            <h3 class="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-4">関連画像</h3>
             <div class="grid gap-4" :class="imageGridClasses">
               <div
                 v-for="(image, index) in post.images"
@@ -109,21 +109,21 @@
           
           <!-- Details Grid -->
           <section class="mb-8">
-            <h3 class="text-lg font-semibold text-gray-900 mb-4">詳細情報</h3>
+            <h3 class="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-4">詳細情報</h3>
             
             <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
               <!-- Event Schedule -->
               <div
                 v-if="post.eventFrequency"
-                class="bg-blue-50 rounded-lg p-4"
+                class="bg-blue-50 dark:bg-blue-900/20 rounded-lg p-4"
               >
                 <div class="flex items-center mb-2">
-                  <svg class="w-5 h-5 text-blue-600 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <svg class="w-5 h-5 text-blue-600 dark:text-blue-400 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
                   </svg>
-                  <span class="font-medium text-blue-900">開催日時</span>
+                  <span class="font-medium text-blue-900 dark:text-blue-100">開催日時</span>
                 </div>
-                <p class="text-blue-800">
+                <p class="text-blue-800 dark:text-blue-200">
                   {{ formatEventTime(post) }}
                 </p>
               </div>
@@ -131,49 +131,49 @@
               <!-- Deadline -->
               <div
                 v-if="post.deadline"
-                class="bg-red-50 rounded-lg p-4"
+                class="bg-red-50 dark:bg-red-900/20 rounded-lg p-4"
               >
                 <div class="flex items-center mb-2">
-                  <svg class="w-5 h-5 text-red-600 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <svg class="w-5 h-5 text-red-600 dark:text-red-400 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
                   </svg>
-                  <span class="font-medium text-red-900">応募締切</span>
+                  <span class="font-medium text-red-900 dark:text-red-100">応募締切</span>
                 </div>
-                <p class="text-red-800">{{ formatDate(post.deadline) }}</p>
+                <p class="text-red-800 dark:text-red-200">{{ formatDate(post.deadline) }}</p>
               </div>
               
               <!-- World -->
               <div
                 v-if="post.worldName"
-                class="bg-blue-50 rounded-lg p-4"
+                class="bg-blue-50 dark:bg-blue-900/20 rounded-lg p-4"
               >
                 <div class="flex items-center mb-2">
-                  <svg class="w-5 h-5 text-blue-600 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <svg class="w-5 h-5 text-blue-600 dark:text-blue-400 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3.055 11H5a2 2 0 012 2v1a2 2 0 002 2 2 2 0 012 2v2.945M8 3.935V5.5A2.5 2.5 0 0010.5 8h.5a2 2 0 012 2 2 2 0 104 0 2 2 0 012-2h1.064M15 20.488V18a2 2 0 012-2h3.064" />
                   </svg>
-                  <span class="font-medium text-blue-900">ワールド</span>
+                  <span class="font-medium text-blue-900 dark:text-blue-100">ワールド</span>
                 </div>
-                <p class="text-blue-800">{{ post.worldName }}</p>
+                <p class="text-blue-800 dark:text-blue-200">{{ post.worldName }}</p>
               </div>
               
               <!-- Contact -->
               <div 
                 v-if="post.contactMethod && post.contactValue"
-                class="bg-gray-50 rounded-lg p-4"
+                class="bg-gray-50 dark:bg-gray-800 rounded-lg p-4"
               >
                 <div class="flex items-center mb-2">
-                  <svg class="w-5 h-5 text-gray-600 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <svg class="w-5 h-5 text-gray-600 dark:text-gray-400 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
                   </svg>
-                  <span class="font-medium text-gray-900">連絡方法</span>
+                  <span class="font-medium text-gray-900 dark:text-gray-100">連絡方法</span>
                 </div>
-                <p class="text-gray-700">
+                <p class="text-gray-700 dark:text-gray-300">
                   {{ contactMethodLabels[post.contactMethod] || post.contactMethod }}:
                   <a 
                     :href="getContactLink(post.contactMethod, post.contactValue)"
                     :target="post.contactMethod === 'discord' ? '_self' : '_blank'"
                     :rel="post.contactMethod === 'discord' ? '' : 'noopener noreferrer'"
-                    class="text-blue-600 hover:text-blue-800 underline ml-1"
+                    class="text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300 underline ml-1"
                   >
                     {{ post.contactValue }}
                   </a>
