@@ -84,6 +84,16 @@ const router = createRouter({
       name: 'privacy-policy',
       component: () => import('../views/PrivacyPolicyView.vue'),
     },
+    {
+      path: '/terms-of-service',
+      name: 'terms-of-service',
+      component: () => import('../views/TermsOfServiceView.vue'),
+    },
+    {
+      path: '/commercial-transaction',
+      name: 'commercial-transaction',
+      component: () => import('../views/CommercialTransactionView.vue'),
+    },
   ],
 })
 

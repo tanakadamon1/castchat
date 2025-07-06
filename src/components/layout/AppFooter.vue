@@ -65,13 +65,18 @@
               </a>
             </li>
             <li>
-              <a href="#" class="text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-100 text-sm">
+              <router-link to="/terms-of-service" class="text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-100 text-sm">
                 利用規約
-              </a>
+              </router-link>
             </li>
             <li>
               <router-link to="/privacy-policy" class="text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-100 text-sm">
                 プライバシーポリシー
+              </router-link>
+            </li>
+            <li>
+              <router-link to="/commercial-transaction" class="text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-100 text-sm">
+                特定商取引法に基づく表記
               </router-link>
             </li>
             <li>
@@ -92,9 +97,9 @@
             <router-link to="/privacy-policy" class="text-gray-400 dark:text-gray-500 hover:text-gray-500 dark:hover:text-gray-400 text-sm">
               プライバシー
             </router-link>
-            <a href="#" class="text-gray-400 dark:text-gray-500 hover:text-gray-500 dark:hover:text-gray-400 text-sm">
+            <router-link to="/terms-of-service" class="text-gray-400 dark:text-gray-500 hover:text-gray-500 dark:hover:text-gray-400 text-sm">
               利用規約
-            </a>
+            </router-link>
           </div>
         </div>
       </div>
