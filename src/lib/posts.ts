@@ -521,7 +521,8 @@ export class PostsService {
           users!posts_user_id_fkey(id, display_name, is_verified),
           post_categories!posts_category_id_fkey(id, name, slug),
           post_images(url, display_order),
-          post_tags(tags(name))
+          post_tags(tags(name)),
+          applications(id)
         `, { count: 'exact' })
 
       // フィルター適用
@@ -593,8 +594,14 @@ export class PostsService {
         }
       }
 
+      // 応募件数を含めたデータに変換
+      const postsWithDetails = (data || []).map(post => ({
+        ...post,
+        application_count: post.applications?.length || 0
+      }))
+
       return { 
-        data: data || [], 
+        data: postsWithDetails, 
         error: null,
         count: count || 0
       }
