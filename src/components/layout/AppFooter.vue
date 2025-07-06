@@ -70,9 +70,9 @@
               </a>
             </li>
             <li>
-              <a href="#" class="text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-100 text-sm">
+              <router-link to="/privacy-policy" class="text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-100 text-sm">
                 プライバシーポリシー
-              </a>
+              </router-link>
             </li>
             <li>
               <a href="#" class="text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-100 text-sm">
@@ -89,9 +89,9 @@
             © 2024 VRChatキャスト募集掲示板. All rights reserved.
           </p>
           <div class="flex space-x-6">
-            <a href="#" class="text-gray-400 dark:text-gray-500 hover:text-gray-500 dark:hover:text-gray-400 text-sm">
+            <router-link to="/privacy-policy" class="text-gray-400 dark:text-gray-500 hover:text-gray-500 dark:hover:text-gray-400 text-sm">
               プライバシー
-            </a>
+            </router-link>
             <a href="#" class="text-gray-400 dark:text-gray-500 hover:text-gray-500 dark:hover:text-gray-400 text-sm">
               利用規約
             </a>
