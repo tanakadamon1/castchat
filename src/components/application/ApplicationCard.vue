@@ -1,27 +1,15 @@
 <template>
-  <div class="bg-white rounded-lg border shadow-sm p-6">
+  <div class="bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 shadow-sm p-6">
     <div class="flex flex-col lg:flex-row lg:items-start gap-4">
       <!-- 左側：ユーザー情報またはポスト情報 -->
-      <div class="flex items-center gap-3 lg:min-w-0 lg:flex-1">
-        <div class="w-12 h-12 rounded-full bg-gray-200 overflow-hidden flex-shrink-0">
-          <img
-            v-if="displayAvatar"
-            :src="displayAvatar"
-            :alt="displayName"
-            class="w-full h-full object-cover"
-          />
-          <div v-else class="w-full h-full flex items-center justify-center text-gray-400">
-            <User class="w-6 h-6" />
-          </div>
-        </div>
-
+      <div class="flex items-start gap-3 lg:min-w-0 lg:flex-1">
         <div class="min-w-0 flex-1">
           <div class="flex items-center gap-2 mb-1">
-            <h3 class="font-semibold text-gray-900 truncate">{{ displayName }}</h3>
+            <h3 class="font-semibold text-gray-900 dark:text-gray-100 truncate">{{ displayName }}</h3>
             <ApplicationStatusBadge :status="application.status" />
           </div>
-          <p class="text-sm text-gray-600 truncate">{{ displayTitle }}</p>
-          <p class="text-xs text-gray-500 mt-1">
+          <p class="text-sm text-gray-600 dark:text-gray-400 truncate">{{ displayTitle }}</p>
+          <p class="text-xs text-gray-500 dark:text-gray-500 mt-1">
             {{ formatDate(application.appliedAt) }}に応募
             <span v-if="application.respondedAt" class="ml-2">
               • {{ formatDate(application.respondedAt) }}に回答
@@ -67,38 +55,46 @@
     </div>
 
     <!-- 送信した応募のメッセージプレビュー -->
-    <div v-if="type === 'sent' && application.message" class="mt-4 pt-4 border-t">
-      <p class="text-sm text-gray-600 font-medium mb-1 dark:text-gray-300">送信したメッセージ</p>
-      <p class="text-sm text-gray-800 dark:text-gray-100 line-clamp-2">
-        {{ application.message }}
-      </p>
-    </div>
-
-    <!-- 応募内容プレビュー（受信した応募のみ詳細表示） -->
-    <div v-if="type === 'received'" class="mt-4 pt-4 border-t space-y-2">
-      <div v-if="application.message">
-        <p class="text-sm text-gray-600 font-medium mb-1 dark:text-gray-300">応募メッセージ</p>
-        <p
-          class="text-sm text-gray-800 dark:text-gray-100 dark:bg-gray-800 dark:rounded-md dark:p-2"
-        >
+    <div v-if="type === 'sent' && application.message" class="mt-4 pt-4 border-t border-gray-200 dark:border-gray-700">
+      <p class="text-sm font-bold text-gray-700 mb-2 dark:text-gray-200">送信したメッセージ</p>
+      <div class="bg-gray-50 dark:bg-gray-800 rounded-lg p-3">
+        <p class="text-sm text-gray-800 dark:text-gray-100 line-clamp-2">
           {{ application.message }}
         </p>
       </div>
+    </div>
+
+    <!-- 応募内容プレビュー（受信した応募のみ詳細表示） -->
+    <div v-if="type === 'received'" class="mt-4 pt-4 border-t border-gray-200 dark:border-gray-700 space-y-3">
+      <div v-if="application.message">
+        <p class="text-sm font-bold text-gray-700 mb-2 dark:text-gray-200">応募メッセージ</p>
+        <div class="bg-gray-50 dark:bg-gray-800 rounded-lg p-3">
+          <p class="text-sm text-gray-800 dark:text-gray-100 whitespace-pre-wrap">
+            {{ application.message }}
+          </p>
+        </div>
+      </div>
       <div v-if="application.experience">
-        <p class="text-sm text-gray-600 font-medium mb-1 dark:text-gray-300">
+        <p class="text-sm font-bold text-gray-700 mb-2 dark:text-gray-200">
           関連する経験・スキル（任意）
         </p>
-        <p class="text-sm text-gray-800 dark:text-gray-100">{{ application.experience }}</p>
+        <div class="bg-gray-50 dark:bg-gray-800 rounded-lg p-3">
+          <p class="text-sm text-gray-800 dark:text-gray-100 whitespace-pre-wrap">{{ application.experience }}</p>
+        </div>
       </div>
       <div v-if="application.availability">
-        <p class="text-sm text-gray-600 font-medium mb-1 dark:text-gray-300">
+        <p class="text-sm font-bold text-gray-700 mb-2 dark:text-gray-200">
           参加可能な時間帯（任意）
         </p>
-        <p class="text-sm text-gray-800 dark:text-gray-100">{{ application.availability }}</p>
+        <div class="bg-gray-50 dark:bg-gray-800 rounded-lg p-3">
+          <p class="text-sm text-gray-800 dark:text-gray-100">{{ application.availability }}</p>
+        </div>
       </div>
       <div v-if="application.contactPreference">
-        <p class="text-sm text-gray-600 font-medium mb-1 dark:text-gray-300">連絡可能な方法</p>
-        <p class="text-sm text-gray-800 dark:text-gray-100">{{ application.contactPreference }}</p>
+        <p class="text-sm font-bold text-gray-700 mb-2 dark:text-gray-200">連絡可能な方法</p>
+        <div class="bg-gray-50 dark:bg-gray-800 rounded-lg p-3">
+          <p class="text-sm text-gray-800 dark:text-gray-100">{{ application.contactPreference }}</p>
+        </div>
       </div>
     </div>
 

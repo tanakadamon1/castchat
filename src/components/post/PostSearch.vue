@@ -12,7 +12,7 @@
         v-model="searchQuery"
         type="text"
         placeholder="募集内容を検索..."
-        class="block w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+        class="block w-full pl-10 pr-4 py-3 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
         @input="handleSearchInput"
         @keydown.enter="handleSearch"
       />
@@ -46,7 +46,7 @@
     <div class="flex items-center justify-between">
       <button
         type="button"
-        class="flex items-center text-sm text-gray-600 hover:text-gray-900"
+        class="flex items-center text-sm text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-100"
         @click="showAdvanced = !showAdvanced"
       >
         <svg
@@ -63,7 +63,7 @@
       
       <div
         v-if="hasActiveFilters"
-        class="text-sm text-gray-600"
+        class="text-sm text-gray-600 dark:text-gray-400"
       >
         {{ activeFiltersCount }} 個のフィルターが適用中
         <button
@@ -87,7 +87,7 @@
     >
       <div
         v-if="showAdvanced"
-        class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 p-4 bg-gray-50 rounded-lg"
+        class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 p-4 bg-gray-50 dark:bg-gray-800 rounded-lg"
       >
         <BaseSelect
           v-model="filters.category"
@@ -97,6 +97,7 @@
           @change="handleFilterChange"
         />
         
+        <!-- 募集タイプは現在使用されていないため非表示
         <BaseSelect
           v-model="filters.type"
           label="募集タイプ"
@@ -104,6 +105,7 @@
           :options="typeOptions"
           @change="handleFilterChange"
         />
+        -->
         
         <BaseSelect
           v-model="filters.status"
@@ -151,30 +153,29 @@ const filters = ref<PostFilter>({
 
 // Quick filter options
 const quickFilters = ref([
-  { key: 'paid', label: '有償のみ', type: 'type', value: 'paid' },
-  { key: 'streaming', label: '配信', type: 'category', value: 'streaming' },
-  { key: 'video', label: '動画制作', type: 'category', value: 'video' },
-  { key: 'event', label: 'イベント', type: 'category', value: 'event' },
+  { key: 'customer-service', label: '接客', type: 'category', value: 'customer-service' },
+  { key: 'meetings', label: '集会', type: 'category', value: 'meetings' },
+  { key: 'music-dance', label: '音楽・ダンス', type: 'category', value: 'music-dance' },
+  { key: 'games', label: 'ゲーム', type: 'category', value: 'games' },
   { key: 'deadline_soon', label: '締切間近', type: 'special', value: 'deadline_soon' }
 ])
 
 // Select options
 const categoryOptions = [
   { label: 'すべて', value: '' },
-  { label: '動画制作', value: 'video' },
-  { label: '配信', value: 'streaming' },
-  { label: 'イベント', value: 'event' },
-  { label: '写真撮影', value: 'photo' },
-  { label: 'モデリング', value: 'modeling' },
-  { label: 'ボイス', value: 'voice' },
+  { label: '接客', value: 'customer-service' },
+  { label: '集会', value: 'meetings' },
+  { label: '音楽・ダンス', value: 'music-dance' },
+  { label: '出会い', value: 'social' },
+  { label: '初心者', value: 'beginners' },
+  { label: 'ロールプレイ', value: 'roleplay' },
+  { label: 'ゲーム', value: 'games' },
   { label: 'その他', value: 'other' }
 ]
 
 const typeOptions = [
-  { label: 'すべて', value: '' },
-  { label: '有償', value: 'paid' },
-  { label: '無償', value: 'volunteer' },
-  { label: 'コラボ', value: 'collaboration' }
+  { label: 'すべて', value: '' }
+  // 募集タイプは現在使用されていないため、オプションを削除
 ]
 
 const statusOptions = [
@@ -217,7 +218,7 @@ const quickFilterClasses = (filter: any) => {
     return `${baseClasses} bg-indigo-600 text-white border-indigo-600`
   }
   
-  return `${baseClasses} bg-white text-gray-700 border-gray-300 hover:bg-gray-50`
+  return `${baseClasses} bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 border-gray-300 dark:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-700`
 }
 
 // Methods
@@ -281,6 +282,7 @@ const clearAllFilters = () => {
 
 const handleFilterChange = () => {
   emit('update:modelValue', { ...filters.value })
+  emit('search')
 }
 
 // Watch for external changes

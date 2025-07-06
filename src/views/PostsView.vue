@@ -1,10 +1,10 @@
 <template>
-  <div class="min-h-screen bg-gray-50">
+  <div class="min-h-screen bg-gray-50 dark:bg-gray-900">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
       <!-- Header -->
       <div class="mb-8">
-        <h1 class="text-3xl font-bold text-gray-900 mb-2">募集一覧</h1>
-        <p class="text-gray-600">VRChatでのキャスト募集・応募情報</p>
+        <h1 class="text-3xl font-bold text-gray-900 dark:text-gray-100 mb-2">募集一覧</h1>
+        <p class="text-gray-600 dark:text-gray-400">VRChatでのキャスト募集・応募情報</p>
       </div>
       
       <!-- Search and Filters -->
@@ -17,7 +17,7 @@
       
       <!-- Results Summary -->
       <div class="mb-6 flex items-center justify-between">
-        <div class="text-sm text-gray-600">
+        <div class="text-sm text-gray-600 dark:text-gray-400">
           <span v-if="!loading">
             {{ total }} 件の募集が見つかりました
           </span>
@@ -71,9 +71,9 @@
           v-if="loading && posts.length > 0"
           class="fixed top-4 left-1/2 transform -translate-x-1/2 z-40"
         >
-          <div class="bg-white rounded-lg shadow-lg px-4 py-2 flex items-center space-x-2">
+          <div class="bg-white dark:bg-gray-800 rounded-lg shadow-lg px-4 py-2 flex items-center space-x-2">
             <LoadingSpinner size="sm" />
-            <span class="text-sm text-gray-600">更新中...</span>
+            <span class="text-sm text-gray-600 dark:text-gray-400">更新中...</span>
           </div>
         </div>
         
@@ -86,7 +86,7 @@
           aria-live="polite"
         >
           <div v-if="posts.length === 0" class="col-span-full text-center py-8">
-            <p class="text-gray-500">投稿がありません</p>
+            <p class="text-gray-500 dark:text-gray-400">投稿がありません</p>
           </div>
           <PostCard
             v-for="post in posts"
@@ -126,7 +126,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, reactive, onMounted, computed, shallowRef } from 'vue'
+import { ref, reactive, onMounted, computed, shallowRef, watch } from 'vue'
 import { useRouter } from 'vue-router'
 import type { Post, PostFilter } from '@/types/post'
 import PostCard from '@/components/post/PostCard.vue'
@@ -164,7 +164,8 @@ const currentPage = ref(1)
 const perPage = ref(10)
 
 const filters = ref<PostFilter>({
-  sortBy: 'newest'
+  sortBy: 'newest',
+  status: 'active' // デフォルトで募集中のみ表示
 })
 
 // 画像ビューア関連
@@ -291,6 +292,12 @@ const closeImageViewer = () => {
   selectedImages.value = []
   selectedImageIndex.value = 0
 }
+
+// Watch for filter changes
+watch(filters, () => {
+  currentPage.value = 1
+  loadPosts()
+}, { deep: true })
 
 // Lifecycle
 onMounted(() => {
