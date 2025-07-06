@@ -68,7 +68,7 @@ export const postsApi = {
         page
       }
       
-      console.log('postsApi.getPosts: Query parameters:', queryParams)
+      // console.log('postsApi.getPosts: Query parameters:', queryParams)
       const result = await postsService.getPosts(queryParams)
 
       if (result.error) {
@@ -163,19 +163,10 @@ export const postsApi = {
     try {
       const authStore = useAuthStore()
       
-      console.log('=== POST CREATION DEBUG START ===')
-      console.log('Auth store:', authStore)
-      console.log('Auth store user:', authStore.user)
-      console.log('Auth store isAuthenticated:', authStore.isAuthenticated)
-      
       if (!authStore.user?.id) {
         console.error('No user ID found in auth store')
         return { data: null, error: 'ログインが必要です' }
       }
-
-      console.log('postsApi.createPost: Input data:', JSON.stringify(postData, null, 2))
-      console.log('postsApi.createPost: User ID:', authStore.user.id)
-      console.log('postsApi.createPost: User object:', JSON.stringify(authStore.user, null, 2))
 
       // カテゴリslugをIDに変換（新しいカテゴリに合わせる）
       const categoryMap: Record<string, string> = {
@@ -190,7 +181,6 @@ export const postsApi = {
       }
 
       const categoryId = categoryMap[postData.category] || categoryMap['other']
-      console.log('postsApi.createPost: Category mapping:', postData.category, '->', categoryId)
 
       // フロントエンドのデータをバックエンド形式に変換
       const createData = {
@@ -209,8 +199,6 @@ export const postsApi = {
         event_time: postData.eventTime || null,
         event_week_of_month: postData.eventWeekOfMonth || null
       }
-      
-      console.log('postsApi.createPost: Prepared data for database:', createData)
 
       // Supabaseに直接挿入
       const { data: insertedPost, error: insertError } = await supabase
@@ -218,17 +206,9 @@ export const postsApi = {
         .insert([createData])
         .select()
         .single()
-
-      console.log('postsApi.createPost: Supabase insert result:', { insertedPost, insertError })
-      console.log('=== DETAILED ERROR ANALYSIS ===')
       
       if (insertError) {
-        console.error('postsApi.createPost: Insert error:', insertError)
-        console.error('Error code:', insertError.code)
-        console.error('Error message:', insertError.message)
-        console.error('Error details:', insertError.details)
-        console.error('Error hint:', insertError.hint)
-        console.error('=== ERROR END ===')
+        console.error('postsApi.createPost: Insert error:', insertError.message)
         return { data: null, error: `データベースエラー: ${insertError.message}` }
       }
 
@@ -237,31 +217,21 @@ export const postsApi = {
       }
 
       // 画像がある場合、post_imagesテーブルに保存
-      console.log('postsApi.createPost: Checking images in postData:', postData.images)
       if (postData.images && postData.images.length > 0) {
-        console.log('postsApi.createPost: Inserting images:', postData.images)
         const imageData = postData.images.map((url, index) => ({
           post_id: insertedPost.id,
           url,
           display_order: index
         }))
-        
-        console.log('postsApi.createPost: Image data to insert:', imageData)
 
         const { error: imageError } = await supabase
           .from('post_images')
           .insert(imageData)
 
         if (imageError) {
-          console.error('postsApi.createPost: Image insert error:', imageError)
-          console.error('postsApi.createPost: Error details:', imageError.details)
-          console.error('postsApi.createPost: Error hint:', imageError.hint)
+          console.error('Failed to insert images:', imageError.message)
           // 画像の保存に失敗してもポスト自体は成功とする
-        } else {
-          console.log('postsApi.createPost: Images inserted successfully')
         }
-      } else {
-        console.log('postsApi.createPost: No images to insert')
       }
 
       // レスポンスデータをフロントエンド形式に変換
@@ -289,18 +259,10 @@ export const postsApi = {
         eventWeekOfMonth: postData.eventWeekOfMonth,
         images: []
       }
-      
-      console.log('postsApi.createPost: Transformed post:', transformedPost)
-      console.log('=== POST CREATION DEBUG END ===')
 
       return { data: transformedPost }
     } catch (error) {
-      console.error('=== UNEXPECTED ERROR ===')
       console.error('Unexpected post creation error:', error)
-      console.error('Error type:', typeof error)
-      console.error('Error constructor:', error?.constructor?.name)
-      console.error('Error stack:', error?.stack)
-      console.error('=== ERROR END ===')
       return { data: null, error: `予期しないエラー: ${error?.message || 'Unknown error'}` }
     }
   },
@@ -309,9 +271,6 @@ export const postsApi = {
   async testCreatePost(): Promise<PostResponse> {
     try {
       const authStore = useAuthStore()
-      
-      console.log('=== TEST POST CREATION ===')
-      console.log('Auth user ID:', authStore.user?.id)
       
       if (!authStore.user?.id) {
         return { data: null, error: 'ログインが必要です' }
@@ -326,16 +285,12 @@ export const postsApi = {
         recruitment_count: 1,
         deadline: null
       }
-      
-      console.log('Test data:', testData)
 
       const { data, error } = await supabase
         .from('posts')
         .insert([testData])
         .select()
         .single()
-
-      console.log('Test result:', { data, error })
       
       if (error) {
         return { data: null, error: error.message }
