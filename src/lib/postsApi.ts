@@ -57,7 +57,7 @@ export const postsApi = {
           sortOrder = 'desc'
       }
 
-      const result = await postsService.getPosts({
+      const queryParams = {
         category_slug: filters.category,
         search: filters.search,
         status: filters.status === 'active' ? 'published' : (filters.status as any),
@@ -66,7 +66,10 @@ export const postsApi = {
         sort_order: sortOrder,
         limit: filters.limit || 10,
         page
-      })
+      }
+      
+      console.log('postsApi.getPosts: Query parameters:', queryParams)
+      const result = await postsService.getPosts(queryParams)
 
       if (result.error) {
         return { data: [], total: 0, error: result.error.message }

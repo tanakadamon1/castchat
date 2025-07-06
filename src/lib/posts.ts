@@ -531,7 +531,22 @@ export class PostsService {
       
       // カテゴリslugによるフィルタリング
       if (filters.category_slug) {
-        supabaseQuery = supabaseQuery.eq('post_categories.slug', filters.category_slug)
+        console.log('Applying category_slug filter:', filters.category_slug)
+        // カテゴリIDを取得してからフィルタリング
+        const { data: category } = await supabase
+          .from('post_categories')
+          .select('id')
+          .eq('slug', filters.category_slug)
+          .single()
+        
+        if (category) {
+          console.log('Found category ID for slug:', filters.category_slug, '->', category.id)
+          supabaseQuery = supabaseQuery.eq('category_id', category.id)
+        } else {
+          console.log('No category found for slug:', filters.category_slug)
+          // カテゴリが見つからない場合は空の結果を返す
+          return { data: [], error: null, count: 0 }
+        }
       }
 
       if (filters.status) {
