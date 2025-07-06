@@ -21,6 +21,7 @@
             to="/posts" 
             class="text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white px-3 py-2 rounded-md text-sm font-medium transition-colors duration-200"
             active-class="text-indigo-600 bg-indigo-50 dark:bg-indigo-900 dark:text-indigo-300"
+            @click="handleNavClick('/posts')"
           >
             募集一覧
           </router-link>
@@ -29,6 +30,7 @@
             to="/my-posts" 
             class="text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white px-3 py-2 rounded-md text-sm font-medium transition-colors duration-200"
             active-class="text-indigo-600 bg-indigo-50 dark:bg-indigo-900 dark:text-indigo-300"
+            @click="handleNavClick('/my-posts')"
           >
             マイ投稿
           </router-link>
@@ -37,6 +39,7 @@
             to="/posts/create" 
             class="text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white px-3 py-2 rounded-md text-sm font-medium transition-colors duration-200"
             active-class="text-indigo-600 bg-indigo-50 dark:bg-indigo-900 dark:text-indigo-300"
+            @click="handleNavClick('/posts/create')"
           >
             募集投稿
           </router-link>
@@ -44,6 +47,7 @@
             to="/demo" 
             class="text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white px-3 py-2 rounded-md text-sm font-medium transition-colors duration-200"
             active-class="text-indigo-600 bg-indigo-50 dark:bg-indigo-900 dark:text-indigo-300"
+            @click="handleNavClick('/demo')"
           >
             Demo
           </router-link>
@@ -80,18 +84,21 @@
                   <router-link
                     to="/profile"
                     class="block px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors duration-200"
+                    @click="handleNavClick('/profile')"
                   >
                     プロフィール
                   </router-link>
                   <router-link
                     to="/my-posts"
                     class="block px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors duration-200"
+                    @click="handleNavClick('/my-posts')"
                   >
                     マイ投稿
                   </router-link>
                   <router-link
                     to="/applications"
                     class="block px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors duration-200"
+                    @click="handleNavClick('/applications')"
                   >
                     応募管理
                   </router-link>
@@ -135,7 +142,7 @@
           <router-link
             to="/posts"
             class="text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white block px-3 py-2 rounded-md text-base font-medium transition-colors duration-200"
-            @click="showMobileMenu = false"
+            @click="handleNavClick('/posts')"
           >
             募集一覧
           </router-link>
@@ -143,7 +150,7 @@
             v-if="authStore.isAuthenticated"
             to="/my-posts"
             class="text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white block px-3 py-2 rounded-md text-base font-medium transition-colors duration-200"
-            @click="showMobileMenu = false"
+            @click="handleNavClick('/my-posts')"
           >
             マイ投稿
           </router-link>
@@ -151,7 +158,7 @@
             v-if="authStore.isAuthenticated"
             to="/posts/create"
             class="text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white block px-3 py-2 rounded-md text-base font-medium transition-colors duration-200"
-            @click="showMobileMenu = false"
+            @click="handleNavClick('/posts/create')"
           >
             募集投稿
           </router-link>
@@ -187,6 +194,21 @@ const router = useRouter()
 
 const showUserMenu = ref(false)
 const showMobileMenu = ref(false)
+
+const handleNavClick = (path: string) => {
+  const clickId = Date.now() + Math.random()
+  console.log(`[CLICK-${clickId}] Navigation link clicked: ${path}`)
+  console.log(`[CLICK-${clickId}] Current route: ${router.currentRoute.value.path}`)
+  console.log(`[CLICK-${clickId}] Auth state:`, {
+    isAuthenticated: authStore.isAuthenticated,
+    isLoading: authStore.loading,
+    isInitializing: authStore.initializing
+  })
+  
+  // Close mobile menu if open
+  showMobileMenu.value = false
+  showUserMenu.value = false
+}
 
 const handleSignOut = async () => {
   try {
