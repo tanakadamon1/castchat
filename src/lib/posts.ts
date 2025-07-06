@@ -69,6 +69,7 @@ export interface PostsApiResult<T = any> {
 
 export interface PostFilters {
   category_id?: string
+  category_slug?: string
   tags?: string[]
   status?: Post['status']
   user_id?: string
@@ -526,6 +527,11 @@ export class PostsService {
       // フィルター適用
       if (filters.category_id) {
         supabaseQuery = supabaseQuery.eq('category_id', filters.category_id)
+      }
+      
+      // カテゴリslugによるフィルタリング
+      if (filters.category_slug) {
+        supabaseQuery = supabaseQuery.eq('post_categories.slug', filters.category_slug)
       }
 
       if (filters.status) {

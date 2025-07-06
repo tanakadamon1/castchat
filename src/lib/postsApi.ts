@@ -58,7 +58,7 @@ export const postsApi = {
       }
 
       const result = await postsService.getPosts({
-        category_id: filters.category,
+        category_slug: filters.category,
         search: filters.search,
         status: filters.status === 'active' ? 'published' : (filters.status as any),
         user_id: filters.user_id,
