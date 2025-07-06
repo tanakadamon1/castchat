@@ -290,9 +290,14 @@ const handleDeletePost = async (postId: string) => {
   }
   
   try {
-    // TODO: API実装後に削除処理を追加
-    toast.success('投稿を削除しました')
-    loadPosts()
+    const result = await postsApi.deletePost(postId)
+    
+    if (result.success) {
+      toast.success('投稿を削除しました')
+      loadPosts()
+    } else {
+      toast.error(result.error || '投稿の削除に失敗しました')
+    }
   } catch (error) {
     console.error('Delete post error:', error)
     toast.error('投稿の削除に失敗しました')

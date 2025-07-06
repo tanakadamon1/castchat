@@ -301,5 +301,48 @@ export const postsApi = {
       console.error('Test creation error:', error)
       return { data: null, error: error?.message || 'Test failed' }
     }
+  },
+
+  // 投稿削除
+  async deletePost(postId: string): Promise<{ success: boolean; error?: string }> {
+    try {
+      const authStore = useAuthStore()
+      
+      if (!authStore.user?.id) {
+        return { success: false, error: 'ログインが必要です' }
+      }
+
+      // 投稿の所有者確認のため、投稿情報を取得
+      const { data: post, error: fetchError } = await supabase
+        .from('posts')
+        .select('user_id')
+        .eq('id', postId)
+        .single()
+
+      if (fetchError || !post) {
+        return { success: false, error: '投稿が見つかりません' }
+      }
+
+      // 投稿者本人かチェック
+      if (post.user_id !== authStore.user.id) {
+        return { success: false, error: '削除権限がありません' }
+      }
+
+      // 投稿を削除（CASCADE設定により関連データも削除される）
+      const { error: deleteError } = await supabase
+        .from('posts')
+        .delete()
+        .eq('id', postId)
+
+      if (deleteError) {
+        console.error('Delete post error:', deleteError.message)
+        return { success: false, error: `削除に失敗しました: ${deleteError.message}` }
+      }
+
+      return { success: true }
+    } catch (error) {
+      console.error('Unexpected delete error:', error)
+      return { success: false, error: `予期しないエラー: ${error?.message || 'Unknown error'}` }
+    }
   }
 }
