@@ -10,9 +10,27 @@ import { useThemeStore } from './stores/theme'
 const authStore = useAuthStore()
 const themeStore = useThemeStore()
 
-onMounted(() => {
-  authStore.initialize()
-  themeStore.initialize()
+onMounted(async () => {
+  try {
+    console.log('App.vue: Starting initialization')
+    
+    // URLパラメータをチェックして強制リセット
+    const urlParams = new URLSearchParams(window.location.search)
+    if (urlParams.get('reset') === 'true') {
+      console.log('App.vue: Force reset requested')
+      await authStore.forceSignOut()
+      // URLからresetパラメータを削除
+      urlParams.delete('reset')
+      const newUrl = window.location.pathname + (urlParams.toString() ? '?' + urlParams.toString() : '')
+      window.history.replaceState({}, '', newUrl)
+    }
+    
+    await authStore.initialize()
+    themeStore.initialize()
+    console.log('App.vue: Initialization completed')
+  } catch (error) {
+    console.error('App.vue: Initialization error:', error)
+  }
 })
 </script>
 

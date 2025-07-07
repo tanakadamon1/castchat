@@ -238,14 +238,19 @@ export const useAuthStore = defineStore('auth', () => {
     loading.value = true
     error.value = null
     
+    // タイムアウトを設定
+    const timeoutPromise = new Promise((_, reject) => {
+      setTimeout(() => reject(new Error('Auth initialization timeout')), 10000) // 10秒
+    })
+    
     try {
       console.log('=== Initializing auth store ===')
 
-      // 現在のセッションを取得
-      const {
-        data: { session: currentSession },
-        error: sessionError,
-      } = await supabase.auth.getSession()
+      // 現在のセッションを取得（タイムアウト付き）
+      const sessionPromise = supabase.auth.getSession()
+      const result = await Promise.race([sessionPromise, timeoutPromise])
+      
+      const { data: { session: currentSession }, error: sessionError } = result as any
 
       if (sessionError) {
         console.error('Session error:', sessionError)
@@ -270,17 +275,20 @@ export const useAuthStore = defineStore('auth', () => {
       if (!window.__authListenerSet) {
         supabase.auth.onAuthStateChange(async (event: AuthChangeEvent, newSession) => {
           console.log('Auth state changed:', event)
+          
+          // 無限ループを防ぐため、変更があった場合のみ更新
+          if (newSession?.user?.id !== user.value?.id) {
+            session.value = newSession
+            user.value = newSession?.user ?? null
 
-          session.value = newSession
-          user.value = newSession?.user ?? null
-
-          if (newSession?.user) {
-            console.log('New user session, ensuring profile...')
-            const userProfile = await ensureUserProfile(newSession.user)
-            console.log('User profile ensured in listener:', !!userProfile)
-          } else {
-            console.log('User signed out, clearing profile...')
-            profile.value = null
+            if (newSession?.user) {
+              console.log('New user session, ensuring profile...')
+              const userProfile = await ensureUserProfile(newSession.user)
+              console.log('User profile ensured in listener:', !!userProfile)
+            } else {
+              console.log('User signed out, clearing profile...')
+              profile.value = null
+            }
           }
         })
         window.__authListenerSet = true
@@ -290,6 +298,14 @@ export const useAuthStore = defineStore('auth', () => {
     } catch (err) {
       console.error('Error initializing auth:', err)
       error.value = err instanceof Error ? err.message : 'Authentication initialization failed'
+      
+      // タイムアウトエラーの場合は、状態をリセット
+      if (err instanceof Error && err.message === 'Auth initialization timeout') {
+        console.warn('Auth initialization timed out, resetting state')
+        user.value = null
+        session.value = null
+        profile.value = null
+      }
     } finally {
       loading.value = false
       initializing.value = false

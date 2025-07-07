@@ -17,6 +17,9 @@ export default defineConfig(({ mode }) => {
         registerType: 'autoUpdate',
         workbox: {
           globPatterns: ['**/*.{js,css,html,ico,png,svg}'],
+          cleanupOutdatedCaches: true,
+          skipWaiting: true,
+          clientsClaim: true,
           runtimeCaching: [
             {
               urlPattern: /^https:\/\/fonts\.googleapis\.com\/.*/i,
@@ -31,6 +34,11 @@ export default defineConfig(({ mode }) => {
                   statuses: [0, 200],
                 },
               },
+            },
+            {
+              // APIリクエストは常にネットワークから取得
+              urlPattern: /^https:\/\/.*\.supabase\.co\/.*/i,
+              handler: 'NetworkOnly',
             },
           ],
         },
