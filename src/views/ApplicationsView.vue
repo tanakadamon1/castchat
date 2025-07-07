@@ -407,6 +407,7 @@ const loadApplications = async () => {
         console.log('Processing application:', app)
         console.log('app.posts:', app.posts)
         console.log('app.users:', app.users)
+        console.log('app.twitter_id:', app.twitter_id)
         
         const mappedApp = {
           id: app.id,
@@ -428,6 +429,7 @@ const loadApplications = async () => {
         }
         
         console.log('Mapped application:', mappedApp)
+        console.log('Twitter ID in mapped data:', mappedApp.twitterId)
         return mappedApp
       })
       console.log('Final received applications data:', receivedApplications.value)

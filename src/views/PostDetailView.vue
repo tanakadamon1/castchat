@@ -495,7 +495,7 @@ const handleApplicationSubmit = async (applicationData: any) => {
     const submitData = {
       postId: applicationData.postId,
       message: applicationData.message,
-      portfolio_url: applicationData.experience || null, // experienceをportfolio_urlとして使用
+      experience: applicationData.experience || null, // experienceはAPIでportfolio_urlにマッピングされる
       availability: applicationData.availability || null,
       twitterId: applicationData.twitterId || null
     }

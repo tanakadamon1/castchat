@@ -84,7 +84,7 @@ class ApplicationApi {
         {
           post_id: data.postId,
           message: data.message,
-          portfolio_url: data.portfolio_url || null,
+          portfolio_url: data.experience || null, // experienceをportfolio_urlとして保存
           availability: data.availability || null,
           twitter_id: data.twitterId || null
         },
