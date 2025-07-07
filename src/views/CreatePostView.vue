@@ -1,6 +1,10 @@
 <template>
   <div class="min-h-screen bg-gray-50 py-8">
     <div class="container mx-auto px-4 max-w-4xl">
+      <!-- エラー表示 -->
+      <div v-if="loadError" class="mb-6 p-4 bg-red-100 text-red-700 rounded">
+        {{ loadError }}
+      </div>
       <!-- ヘッダー -->
       <div class="mb-8">
         <h1 class="text-3xl font-bold text-gray-900 mb-2">
@@ -16,7 +20,7 @@
         <!-- 基本情報 -->
         <div class="bg-white rounded-lg shadow-sm border p-6">
           <h2 class="text-xl font-semibold text-gray-900 mb-4">基本情報</h2>
-          
+
           <div class="space-y-4">
             <!-- タイトル -->
             <div>
@@ -47,7 +51,7 @@
         <!-- 詳細情報 -->
         <div class="bg-white rounded-lg shadow-sm border p-6">
           <h2 class="text-xl font-semibold text-gray-900 mb-4">詳細情報</h2>
-          
+
           <div class="space-y-4">
             <!-- 説明文 -->
             <div>
@@ -74,7 +78,6 @@
               />
             </div>
 
-
             <!-- 開催頻度 -->
             <div>
               <BaseSelect
@@ -95,14 +98,19 @@
                 label="イベント開催日時"
                 required
                 :error="getFieldError('eventSpecificDate')"
-                @blur="validateField('eventSpecificDate', formData.eventSpecificDate, requiredRules)"
+                @blur="
+                  validateField('eventSpecificDate', formData.eventSpecificDate, requiredRules)
+                "
               />
             </div>
 
             <!-- 定期イベントの場合 -->
             <div v-else-if="formData.eventFrequency" class="space-y-4">
               <!-- 月1回の場合 -->
-              <div v-if="formData.eventFrequency === 'monthly'" class="grid grid-cols-1 md:grid-cols-3 gap-4">
+              <div
+                v-if="formData.eventFrequency === 'monthly'"
+                class="grid grid-cols-1 md:grid-cols-3 gap-4"
+              >
                 <div>
                   <BaseSelect
                     v-model="formData.eventWeekOfMonth"
@@ -133,7 +141,10 @@
               </div>
 
               <!-- 隔週の場合 -->
-              <div v-else-if="formData.eventFrequency === 'biweekly'" class="grid grid-cols-1 md:grid-cols-3 gap-4">
+              <div
+                v-else-if="formData.eventFrequency === 'biweekly'"
+                class="grid grid-cols-1 md:grid-cols-3 gap-4"
+              >
                 <div>
                   <BaseSelect
                     v-model="formData.eventWeekOfMonth"
@@ -164,7 +175,10 @@
               </div>
 
               <!-- 週1回の場合 -->
-              <div v-else-if="formData.eventFrequency === 'weekly'" class="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div
+                v-else-if="formData.eventFrequency === 'weekly'"
+                class="grid grid-cols-1 md:grid-cols-2 gap-4"
+              >
                 <div>
                   <BaseSelect
                     v-model="formData.eventWeekday"
@@ -196,7 +210,9 @@
                 min="1"
                 max="100"
                 :error="getFieldError('maxParticipants')"
-                @blur="validateField('maxParticipants', formData.maxParticipants, participantsRules)"
+                @blur="
+                  validateField('maxParticipants', formData.maxParticipants, participantsRules)
+                "
               />
             </div>
           </div>
@@ -205,7 +221,7 @@
         <!-- 連絡先情報 -->
         <div class="bg-white rounded-lg shadow-sm border p-6">
           <h2 class="text-xl font-semibold text-gray-900 mb-4">連絡先情報</h2>
-          
+
           <div class="space-y-4">
             <!-- Twitter ID -->
             <div>
@@ -218,20 +234,17 @@
                 @blur="validateContactInfo"
               />
             </div>
-
           </div>
         </div>
 
         <!-- 画像アップロード -->
         <div class="bg-white rounded-lg shadow-sm border p-6 mb-8">
           <h2 class="text-xl font-semibold text-gray-900 mb-4">画像</h2>
-          
+
           <div class="space-y-4">
             <div>
-              <label class="block text-sm font-medium text-gray-700 mb-2">
-                募集画像（任意）
-              </label>
-              <div 
+              <label class="block text-sm font-medium text-gray-700 mb-2"> 募集画像（任意） </label>
+              <div
                 @drop="handleDrop"
                 @dragover.prevent
                 @dragenter.prevent="dragOver = true"
@@ -247,14 +260,26 @@
                   @change="handleFileSelect"
                   class="hidden"
                 />
-                
-                <svg class="w-12 h-12 text-gray-400 mx-auto mb-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+
+                <svg
+                  class="w-12 h-12 text-gray-400 mx-auto mb-4"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                >
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="2"
+                    d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"
+                  />
                 </svg>
-                
-                <p class="text-gray-600 mb-2">画像をドラッグ&ドロップまたはクリックしてアップロード</p>
+
+                <p class="text-gray-600 mb-2">
+                  画像をドラッグ&ドロップまたはクリックしてアップロード
+                </p>
                 <p class="text-sm text-gray-500">PNG, JPG, GIF形式をサポート（最大3枚、各5MB）</p>
-                
+
                 <BaseButton
                   type="button"
                   variant="outline"
@@ -265,14 +290,13 @@
                   {{ uploadingImages ? 'アップロード中...' : 'ファイルを選択' }}
                 </BaseButton>
               </div>
-              
+
               <!-- 選択された画像のプレビュー -->
-              <div v-if="selectedImages.length > 0" class="mt-4 grid grid-cols-2 md:grid-cols-4 gap-4">
-                <div
-                  v-for="(image, index) in selectedImages"
-                  :key="index"
-                  class="relative group"
-                >
+              <div
+                v-if="selectedImages.length > 0"
+                class="mt-4 grid grid-cols-2 md:grid-cols-4 gap-4"
+              >
+                <div v-for="(image, index) in selectedImages" :key="index" class="relative group">
                   <img
                     :src="image.preview"
                     :alt="`プレビュー ${index + 1}`"
@@ -293,13 +317,9 @@
         <!-- プレビューセクション -->
         <div class="bg-white rounded-lg shadow-sm border p-6 mb-8">
           <h2 class="text-xl font-semibold text-gray-900 mb-4">プレビュー</h2>
-          
+
           <div class="border rounded-lg p-4 bg-gray-50">
-            <PostCard
-              v-if="previewPost"
-              :post="previewPost"
-              :preview="true"
-            />
+            <PostCard v-if="previewPost" :post="previewPost" :preview="true" />
             <div v-else class="text-center text-gray-500 py-8">
               フォームに入力すると投稿のプレビューが表示されます
             </div>
@@ -316,7 +336,7 @@
           >
             キャンセル
           </BaseButton>
-          
+
           <!-- デバッグ用テストボタン -->
           <BaseButton
             type="button"
@@ -336,7 +356,7 @@
           >
             下書き保存
           </BaseButton>
-          
+
           <BaseButton
             type="submit"
             :loading="submitting"
@@ -390,11 +410,13 @@ const formData = ref({
   maxParticipants: undefined as number | undefined,
   contactMethod: 'twitter' as ContactMethod,
   contactInfo: '',
-  deadline: ''
+  deadline: '',
 })
 
 // 画像アップロード関連
-const selectedImages = ref<Array<{ file: File; preview: string; uploaded?: { url: string; path: string } }>>([])
+const selectedImages = ref<
+  Array<{ file: File; preview: string; uploaded?: { url: string; path: string } }>
+>([])
 const dragOver = ref(false)
 const fileInput = ref<HTMLInputElement>()
 const uploadingImages = ref(false)
@@ -403,12 +425,15 @@ const uploadingImages = ref(false)
 const submitting = ref(false)
 const saving = ref(false)
 
+// エラー表示
+const loadError = ref<string | null>(null)
+
 // プレビュー用の投稿データ
 const previewPost = computed(() => {
   if (!formData.value.title || !formData.value.description) {
     return null
   }
-  
+
   return {
     id: 'preview',
     title: formData.value.title,
@@ -429,7 +454,7 @@ const previewPost = computed(() => {
     eventSpecificDate: formData.value.eventSpecificDate,
     eventWeekday: formData.value.eventWeekday,
     eventTime: formData.value.eventTime,
-    eventWeekOfMonth: formData.value.eventWeekOfMonth
+    eventWeekOfMonth: formData.value.eventWeekOfMonth,
   } as Post
 })
 
@@ -442,14 +467,14 @@ const categoryOptions = [
   { value: 'beginners', label: '初心者' },
   { value: 'roleplay', label: 'ロールプレイ' },
   { value: 'games', label: 'ゲーム' },
-  { value: 'other', label: 'その他' }
+  { value: 'other', label: 'その他' },
 ]
 
 const frequencyOptions = [
   { value: 'once', label: '単発' },
   { value: 'weekly', label: '週1' },
   { value: 'biweekly', label: '隔週' },
-  { value: 'monthly', label: '月1' }
+  { value: 'monthly', label: '月1' },
 ]
 
 const weekdayOptions = [
@@ -459,108 +484,86 @@ const weekdayOptions = [
   { value: 3, label: '水曜日' },
   { value: 4, label: '木曜日' },
   { value: 5, label: '金曜日' },
-  { value: 6, label: '土曜日' }
+  { value: 6, label: '土曜日' },
 ]
 
 const weekOfMonthOptions = [
   { value: 1, label: '第1週' },
   { value: 2, label: '第2週' },
   { value: 3, label: '第3週' },
-  { value: 4, label: '第4週' }
+  { value: 4, label: '第4週' },
 ]
 
 const biweeklyOptions = [
   { value: 1, label: '第1・第3週' },
-  { value: 2, label: '第2・第4週' }
+  { value: 2, label: '第2・第4週' },
 ]
 
 // 連絡方法は Twitter ID 固定
-const contactMethod = 'twitter'
 
 // バリデーションルール
 const titleRules = {
   required: true,
   minLength: 5,
   maxLength: 100,
-  message: 'タイトルは5文字以上100文字以内で入力してください'
+  message: 'タイトルは5文字以上100文字以内で入力してください',
 }
 
 const descriptionRules = {
   required: true,
   minLength: 20,
   maxLength: 2000,
-  message: '募集内容は20文字以上2000文字以内で入力してください'
+  message: '募集内容は20文字以上2000文字以内で入力してください',
 }
 
 const requiredRules = {
   required: true,
-  message: 'この項目は必須です'
+  message: 'この項目は必須です',
 }
 
 const participantsRules = {
   required: true,
   custom: (value: any) => value >= 1 && value <= 100,
-  message: '募集人数は1人以上100人以下で入力してください'
+  message: '募集人数は1人以上100人以下で入力してください',
 }
 
 // フォームバリデーション
 const isFormValid = computed(() => {
-  const basicRequiredFields = formData.value.title && 
-         formData.value.category && 
-         formData.value.description && 
-         formData.value.eventFrequency && 
-         formData.value.contactInfo
-  
+  const basicRequiredFields =
+    formData.value.title &&
+    formData.value.category &&
+    formData.value.description &&
+    formData.value.eventFrequency &&
+    formData.value.contactInfo
+
   let eventRequiredFields = false
-  
+
   if (formData.value.eventFrequency === 'once') {
     eventRequiredFields = !!formData.value.eventSpecificDate
   } else if (formData.value.eventFrequency) {
     eventRequiredFields = !!(formData.value.eventWeekday !== undefined && formData.value.eventTime)
-    if (formData.value.eventFrequency === 'monthly' || formData.value.eventFrequency === 'biweekly') {
-      eventRequiredFields = eventRequiredFields && (formData.value.eventWeekOfMonth !== undefined)
+    if (
+      formData.value.eventFrequency === 'monthly' ||
+      formData.value.eventFrequency === 'biweekly'
+    ) {
+      eventRequiredFields = eventRequiredFields && formData.value.eventWeekOfMonth !== undefined
     }
   }
-         
+
   console.log('Post form validation:', {
     hasErrors: hasErrors.value,
     basicRequiredFields,
     eventRequiredFields,
-    formData: formData.value
+    formData: formData.value,
   })
-  
+
   return basicRequiredFields && eventRequiredFields
 })
-
-// 連絡先のラベルとプレースホルダーを取得
-const getContactLabel = (method: ContactMethod) => {
-  const labels = {
-    discord: 'Discord ID',
-    twitter: 'Twitter ID',
-    vrchat: 'VRChat ID',
-    email: 'メールアドレス'
-  }
-  return labels[method] || '連絡先'
-}
-
-const getContactPlaceholder = (method: ContactMethod) => {
-  const placeholders = {
-    discord: 'username#1234',
-    twitter: '@username',
-    vrchat: 'VRChatユーザー名',
-    email: 'example@gmail.com'
-  }
-  return placeholders[method] || ''
-}
-
-
 
 // 連絡先情報のバリデーション
 const validateContactInfo = () => {
   const info = formData.value.contactInfo
-  
-  let rules = { required: true, ...commonRules.twitter }
-  
+  const rules: Record<string, unknown> = { required: true, ...commonRules.twitter }
   validateField('contactInfo', info, rules)
 }
 
@@ -575,7 +578,7 @@ const handleFileSelect = (event: Event) => {
 const handleDrop = (event: DragEvent) => {
   event.preventDefault()
   dragOver.value = false
-  
+
   if (event.dataTransfer?.files) {
     addFiles(Array.from(event.dataTransfer.files))
   }
@@ -588,35 +591,35 @@ const addFiles = (files: File[]) => {
     toast.error('画像は最大3枚まで追加できます')
     return
   }
-  
+
   const filesToAdd = files.slice(0, remainingSlots)
-  
-  filesToAdd.forEach(file => {
+
+  filesToAdd.forEach((file) => {
     // ファイルサイズチェック (5MB)
     if (file.size > 5 * 1024 * 1024) {
       toast.error(`${file.name} のファイルサイズが5MBを超えています`)
       return
     }
-    
+
     // ファイル形式チェック
     if (!file.type.startsWith('image/')) {
       toast.error(`${file.name} は画像ファイルではありません`)
       return
     }
-    
+
     // プレビュー用のDataURL生成
     const reader = new FileReader()
     reader.onload = (e) => {
       if (e.target?.result) {
         selectedImages.value.push({
           file,
-          preview: e.target.result as string
+          preview: e.target.result as string,
         })
       }
     }
     reader.readAsDataURL(file)
   })
-  
+
   if (files.length > remainingSlots) {
     toast.info(`${remainingSlots}枚のみ追加されました（最大3枚まで）`)
   }
@@ -631,7 +634,7 @@ const handleSubmit = async () => {
   console.log('Submit button clicked!')
   console.log('Form valid?', isFormValid.value)
   console.log('Form data:', formData.value)
-  
+
   if (!authStore.isAuthenticated) {
     toast.error('ログインが必要です')
     router.push('/login')
@@ -644,7 +647,7 @@ const handleSubmit = async () => {
     category: requiredRules,
     description: descriptionRules,
     eventFrequency: requiredRules,
-    contactInfo: requiredRules
+    contactInfo: requiredRules,
   }
 
   if (!validateAll(formData.value, validationRules)) {
@@ -657,16 +660,14 @@ const handleSubmit = async () => {
   console.log('Form data at submission:', formData.value)
   console.log('Auth store user:', authStore.user)
   console.log('Selected images:', selectedImages.value)
-  
+
   try {
     console.log('Calling submitPost()...')
     const result = await submitPost()
     console.log('submitPost() completed successfully:', result)
-    
-    toast.success(
-      isEditing.value ? '募集を更新しました' : '募集を投稿しました'
-    )
-    
+
+    toast.success(isEditing.value ? '募集を更新しました' : '募集を投稿しました')
+
     console.log('Navigating to /posts...')
     router.push('/posts')
   } catch (error) {
@@ -689,7 +690,7 @@ const handleSaveDraft = async () => {
   }
 
   saving.value = true
-  
+
   try {
     await saveDraft()
     toast.success('下書きを保存しました')
@@ -732,37 +733,37 @@ const uploadImages = async (postId?: string) => {
     console.log('uploadImages: No images to upload')
     return []
   }
-  
+
   if (!authStore.user?.id) {
     console.error('uploadImages: No user ID found')
     throw new Error('ユーザー情報が見つかりません')
   }
-  
+
   console.log('uploadImages: User ID:', authStore.user.id)
   uploadingImages.value = true
   const uploadedUrls = []
-  
+
   try {
     for (let i = 0; i < selectedImages.value.length; i++) {
       const imageData = selectedImages.value[i]
       console.log(`uploadImages: Processing image ${i + 1}/${selectedImages.value.length}`)
-      
+
       if (imageData.uploaded) {
         console.log(`uploadImages: Image ${i + 1} already uploaded:`, imageData.uploaded.url)
         // 既にアップロード済み
         uploadedUrls.push(imageData.uploaded.url)
         continue
       }
-      
+
       console.log(`uploadImages: Uploading image ${i + 1}:`, imageData.file.name)
       const result = await uploadPostImage(imageData.file, authStore.user.id, postId)
       console.log(`uploadImages: Upload result for image ${i + 1}:`, result)
-      
+
       if (result.error) {
         console.error(`uploadImages: Error uploading image ${i + 1}:`, result.error)
         throw new Error(result.error)
       }
-      
+
       if (result.data) {
         console.log(`uploadImages: Image ${i + 1} uploaded successfully:`, result.data.url)
         uploadedUrls.push(result.data.url)
@@ -770,7 +771,7 @@ const uploadImages = async (postId?: string) => {
         imageData.uploaded = result.data
       }
     }
-    
+
     console.log('uploadImages: All images processed, URLs:', uploadedUrls)
     return uploadedUrls
   } finally {
@@ -786,7 +787,7 @@ const submitPost = async () => {
   console.log('submitPost: Uploading images...')
   const imageUrls = await uploadImages()
   console.log('submitPost: Images uploaded:', imageUrls)
-  
+
   const postData: Partial<Post> = {
     title: formData.value.title,
     category: formData.value.category as PostCategory,
@@ -802,20 +803,20 @@ const submitPost = async () => {
     eventTime: formData.value.eventTime || undefined,
     eventWeekOfMonth: formData.value.eventWeekOfMonth,
     tags: [],
-    images: imageUrls
+    images: imageUrls,
   }
   console.log('submitPost: Post data prepared:', postData)
   console.log('submitPost: Event details:', {
     eventFrequency: postData.eventFrequency,
     eventWeekday: postData.eventWeekday,
     eventTime: postData.eventTime,
-    eventWeekOfMonth: postData.eventWeekOfMonth
+    eventWeekOfMonth: postData.eventWeekOfMonth,
   })
 
   if (isEditing.value) {
     console.log('submitPost: Editing mode - using mock update')
     // 更新処理（実装予定）
-    return new Promise(resolve => setTimeout(resolve, 1000))
+    return new Promise((resolve) => setTimeout(resolve, 1000))
   } else {
     console.log('submitPost: Creating new post via API...')
     // 新規作成処理
@@ -832,17 +833,17 @@ const submitPost = async () => {
 
 const saveDraft = () => {
   // 下書き保存処理（実装予定）
-  return new Promise(resolve => setTimeout(resolve, 500))
+  return new Promise((resolve) => setTimeout(resolve, 500))
 }
 
 const loadPost = async () => {
   if (!isEditing.value) return null
-  
+
   const result = await postsApi.getPost(postId.value)
   if (result.error) {
     throw new Error(result.error)
   }
-  
+
   return result.data
 }
 
@@ -851,6 +852,7 @@ onMounted(async () => {
   if (isEditing.value) {
     try {
       const postData = await loadPost()
+      console.log('編集モード: 取得した投稿データ', postData)
       if (postData) {
         formData.value = {
           title: postData.title,
@@ -865,12 +867,22 @@ onMounted(async () => {
           maxParticipants: postData.maxParticipants || undefined,
           contactMethod: postData.contactMethod,
           contactInfo: postData.contactValue || '',
-          deadline: postData.deadline || ''
+          deadline: postData.deadline || '',
         }
+        loadError.value = null
+      } else {
+        loadError.value = '投稿データが見つかりませんでした。URLや権限をご確認ください。'
       }
-    } catch (error) {
-      console.error('投稿データ取得エラー:', error)
-      toast.error('投稿データの取得に失敗しました')
+    } catch (error: unknown) {
+      if (typeof error === 'object' && error !== null) {
+        const errObj = error as Record<string, unknown>
+        const errMsg = typeof errObj.message === 'string' ? errObj.message : ''
+        const errStack = typeof errObj.stack === 'string' ? errObj.stack : ''
+        console.error('投稿データ取得エラー:', errMsg, errStack)
+      } else {
+        console.error('投稿データ取得エラー:', error)
+      }
+      loadError.value = '投稿データの取得に失敗しました。しばらくしてから再度お試しください。'
       router.push('/posts')
     }
   }
