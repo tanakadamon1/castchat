@@ -453,18 +453,17 @@ const formatEventTime = (post: any) => {
   }
   
   if (post.eventFrequency && post.eventWeekday !== undefined && post.eventTime) {
-    const frequency = eventFrequencyLabels[post.eventFrequency]
     const weekday = weekdayLabels[post.eventWeekday]
     const time = post.eventTime
     
     if (post.eventFrequency === 'monthly' && post.eventWeekOfMonth) {
       const weekOfMonth = weekOfMonthLabels[post.eventWeekOfMonth]
-      return `${frequency} ${weekOfMonth}${weekday} ${time}`
+      return `毎月${weekOfMonth}${weekday} ${time}`
     } else if (post.eventFrequency === 'biweekly' && post.eventWeekOfMonth) {
       const pattern = post.eventWeekOfMonth === 1 ? '第1・第3' : '第2・第4'
       return `${pattern}${weekday} ${time}`
-    } else {
-      return `${frequency} ${weekday} ${time}`
+    } else if (post.eventFrequency === 'weekly') {
+      return `毎週${weekday} ${time}`
     }
   }
   

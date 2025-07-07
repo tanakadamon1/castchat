@@ -281,7 +281,7 @@ const goToCreatePost = () => {
 }
 
 const handleEditPost = (postId: string) => {
-  router.push(`/posts/edit/${postId}`)
+  router.push(`/posts/${postId}/edit`)
 }
 
 const handleDeletePost = async (postId: string) => {
