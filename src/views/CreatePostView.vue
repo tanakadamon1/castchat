@@ -59,6 +59,7 @@
                 required
                 :error="getFieldError('description')"
                 @blur="validateField('description', formData.description, descriptionRules)"
+                class="px-4"
               />
             </div>
 
@@ -71,6 +72,7 @@
                 :rows="3"
                 :error="getFieldError('requirements')"
                 @blur="validateField('requirements', formData.requirements, {})"
+                class="px-4"
               />
             </div>
 
@@ -207,27 +209,16 @@
           <h2 class="text-xl font-semibold text-gray-900 mb-4">連絡先情報</h2>
           
           <div class="space-y-4">
-            <!-- 連絡方法 -->
+            <!-- Twitter ID -->
             <div>
-              <BaseSelect
-                v-model="formData.contactMethod"
-                label="希望連絡方法"
-                :options="contactMethodOptions"
-                required
-                :error="getFieldError('contactMethod')"
-                @change="validateField('contactMethod', formData.contactMethod, requiredRules)"
-              />
-            </div>
-
-            <!-- 連絡先詳細 -->
-            <div v-if="formData.contactMethod">
               <BaseInput
                 v-model="formData.contactInfo"
-                :label="getContactLabel(formData.contactMethod)"
-                :placeholder="getContactPlaceholder(formData.contactMethod)"
+                label="Twitter ID"
+                placeholder="@username または username"
                 required
                 :error="getFieldError('contactInfo')"
                 @blur="validateContactInfo"
+                class="px-4"
               />
             </div>
 
@@ -239,6 +230,7 @@
                 placeholder="追加で伝えたい情報があれば記載してください"
                 :rows="3"
                 :error="getFieldError('additionalNotes')"
+                class="px-4"
               />
             </div>
           </div>
@@ -410,7 +402,7 @@ const formData = ref({
   eventTime: '', // 時間
   eventWeekOfMonth: undefined as number | undefined, // 第何週
   maxParticipants: undefined as number | undefined,
-  contactMethod: '' as ContactMethod | '',
+  contactMethod: 'twitter' as ContactMethod,
   contactInfo: '',
   deadline: '',
   additionalNotes: ''
@@ -497,12 +489,8 @@ const biweeklyOptions = [
   { value: 2, label: '第2・第4週' }
 ]
 
-const contactMethodOptions = [
-  { value: 'discord', label: 'Discord' },
-  { value: 'twitter', label: 'Twitter/X' },
-  { value: 'vrchat', label: 'VRChat' },
-  { value: 'email', label: 'メール' }
-]
+// 連絡方法は Twitter ID 固定
+const contactMethod = 'twitter'
 
 // バリデーションルール
 const titleRules = {
@@ -536,7 +524,6 @@ const isFormValid = computed(() => {
          formData.value.category && 
          formData.value.description && 
          formData.value.eventFrequency && 
-         formData.value.contactMethod && 
          formData.value.contactInfo
   
   let eventRequiredFields = false
@@ -585,25 +572,9 @@ const getContactPlaceholder = (method: ContactMethod) => {
 
 // 連絡先情報のバリデーション
 const validateContactInfo = () => {
-  const method = formData.value.contactMethod
   const info = formData.value.contactInfo
   
-  let rules = { required: true }
-  
-  switch (method) {
-    case 'discord':
-      rules = { ...rules, ...commonRules.discord }
-      break
-    case 'twitter':
-      rules = { ...rules, ...commonRules.twitter }
-      break
-    case 'email':
-      rules = { ...rules, ...commonRules.email }
-      break
-    case 'vrchat':
-      rules = { ...rules, ...commonRules.vrchat }
-      break
-  }
+  let rules = { required: true, ...commonRules.twitter }
   
   validateField('contactInfo', info, rules)
 }
@@ -688,7 +659,6 @@ const handleSubmit = async () => {
     category: requiredRules,
     description: descriptionRules,
     eventFrequency: requiredRules,
-    contactMethod: requiredRules,
     contactInfo: requiredRules
   }
 
@@ -839,7 +809,7 @@ const submitPost = async () => {
     requirements: formData.value.requirements ? [formData.value.requirements] : [],
     deadline: formData.value.deadline || undefined,
     maxParticipants: formData.value.maxParticipants || 1,
-    contactMethod: formData.value.contactMethod as ContactMethod,
+    contactMethod: 'twitter' as ContactMethod,
     contactValue: formData.value.contactInfo,
     eventFrequency: formData.value.eventFrequency as EventFrequency,
     eventSpecificDate: formData.value.eventSpecificDate || undefined,

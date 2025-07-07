@@ -26,7 +26,7 @@
         {{ post.title }}
       </h3>
       
-      <p class="text-gray-600 dark:text-gray-300 text-sm mb-3 line-clamp-3">
+      <p class="text-gray-600 dark:text-gray-300 text-sm mb-3 line-clamp-3 whitespace-pre-wrap">
         {{ post.description }}
       </p>
       
