@@ -3,7 +3,7 @@
     <label
       v-if="label"
       :for="textareaId"
-      class="block text-sm font-medium text-gray-700"
+      class="block text-sm font-medium text-gray-700 dark:text-gray-300"
       :class="{ 'text-red-600': error }"
     >
       {{ label }}
@@ -30,14 +30,14 @@
       <div>
         <p
           v-if="error"
-          class="text-sm text-red-600"
+          class="text-sm text-red-600 dark:text-red-400"
         >
           {{ error }}
         </p>
         
         <p
           v-else-if="hint"
-          class="text-sm text-gray-500"
+          class="text-sm text-gray-500 dark:text-gray-400"
         >
           {{ hint }}
         </p>
@@ -45,7 +45,7 @@
       
       <div
         v-if="maxlength && showCount"
-        class="text-xs text-gray-500"
+        class="text-xs text-gray-500 dark:text-gray-400"
       >
         {{ (computedValue?.toString().length || 0) }}/{{ maxlength }}
       </div>
@@ -94,8 +94,8 @@ const computedValue = computed({
 
 const textareaClasses = computed(() => {
   const baseClasses = [
-    'block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset',
-    'placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600',
+    'block w-full rounded-md border-0 px-4 py-1.5 text-gray-900 dark:text-gray-100 bg-white dark:bg-gray-800 shadow-sm ring-1 ring-inset',
+    'placeholder:text-gray-400 dark:placeholder:text-gray-500 focus:ring-2 focus:ring-inset focus:ring-indigo-600 dark:focus:ring-indigo-500',
     'sm:text-sm sm:leading-6 transition-colors duration-200'
   ]
   
@@ -107,9 +107,9 @@ const textareaClasses = computed(() => {
   }
   
   const stateClasses = {
-    default: 'ring-gray-300 hover:ring-gray-400',
-    error: 'ring-red-300 hover:ring-red-400 focus:ring-red-600',
-    disabled: 'bg-gray-50 text-gray-500 ring-gray-200 cursor-not-allowed'
+    default: 'ring-gray-300 dark:ring-gray-600 hover:ring-gray-400 dark:hover:ring-gray-500',
+    error: 'ring-red-300 dark:ring-red-600 hover:ring-red-400 dark:hover:ring-red-500 focus:ring-red-600 dark:focus:ring-red-500',
+    disabled: 'bg-gray-50 dark:bg-gray-700 text-gray-500 dark:text-gray-400 ring-gray-200 dark:ring-gray-600 cursor-not-allowed'
   }
   
   let state: keyof typeof stateClasses = 'default'

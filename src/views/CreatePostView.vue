@@ -59,7 +59,6 @@
                 required
                 :error="getFieldError('description')"
                 @blur="validateField('description', formData.description, descriptionRules)"
-                class="px-4"
               />
             </div>
 
@@ -72,7 +71,6 @@
                 :rows="3"
                 :error="getFieldError('requirements')"
                 @blur="validateField('requirements', formData.requirements, {})"
-                class="px-4"
               />
             </div>
 
@@ -218,7 +216,6 @@
                 required
                 :error="getFieldError('contactInfo')"
                 @blur="validateContactInfo"
-                class="px-4"
               />
             </div>
 
@@ -230,7 +227,6 @@
                 placeholder="追加で伝えたい情報があれば記載してください"
                 :rows="3"
                 :error="getFieldError('additionalNotes')"
-                class="px-4"
               />
             </div>
           </div>
