@@ -141,7 +141,7 @@
             <BaseButton
               size="sm"
               variant="ghost"
-              @click="$emit('edit-post', post.id)"
+              @click="handleEditClick"
               :aria-label="`${post.title}を編集`"
             >
               <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -200,7 +200,14 @@ const authStore = useAuthStore()
 
 // 投稿者かどうかの判定
 const isAuthor = computed(() => {
-  return authStore.user?.id === props.post.authorId
+  const result = authStore.user?.id === props.post.authorId
+  console.log('PostCard isAuthor check:', {
+    result,
+    userId: authStore.user?.id,
+    postAuthorId: props.post.authorId,
+    postTitle: props.post.title
+  })
+  return result
 })
 
 // キーボードイベント処理
@@ -209,6 +216,16 @@ const handleKeyDown = (event: KeyboardEvent) => {
     event.preventDefault()
     emit('view-details', props.post.id)
   }
+}
+
+// 編集ボタンクリック処理
+const handleEditClick = () => {
+  console.log('=== PostCard: Edit button clicked ===')
+  console.log('PostCard: post.id:', props.post.id)
+  console.log('PostCard: isAuthor:', isAuthor.value)
+  console.log('PostCard: authStore.user?.id:', authStore.user?.id)
+  console.log('PostCard: post.authorId:', props.post.authorId)
+  emit('edit-post', props.post.id)
 }
 
 // 画像グリッドのレイアウト
