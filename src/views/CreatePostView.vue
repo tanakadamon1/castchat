@@ -817,6 +817,11 @@ const uploadImages = async (postId?: string) => {
         continue
       }
 
+      if (!imageData.file) {
+        console.error(`uploadImages: Image ${i + 1} has no file object`)
+        continue
+      }
+      
       console.log(`uploadImages: Uploading image ${i + 1}:`, imageData.file.name)
       const result = await uploadPostImage(imageData.file, authStore.user.id, postId)
       console.log(`uploadImages: Upload result for image ${i + 1}:`, result)
@@ -953,6 +958,18 @@ onMounted(async () => {
           contactInfo: postData.contactValue || '',
           deadline: postData.deadline || '',
         }
+        
+        // 画像データの読み込み
+        if (postData.images && postData.images.length > 0) {
+          console.log('編集モード: 画像データを読み込み中...', postData.images)
+          selectedImages.value = postData.images.map((url, index) => ({
+            file: null as any, // 既存画像の場合はファイルオブジェクトは無い
+            preview: url, // 既存画像のURLをプレビューとして使用
+            uploaded: { url, path: '' } // 既にアップロード済みとしてマーク
+          }))
+          console.log('編集モード: selectedImages設定完了', selectedImages.value)
+        }
+        
         loadError.value = null
       } else {
         loadError.value = '投稿データが見つかりませんでした。URLや権限をご確認ください。'
