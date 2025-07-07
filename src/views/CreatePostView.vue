@@ -631,14 +631,63 @@ const removeImage = (index: number) => {
 
 // フォーム送信
 const handleSubmit = async () => {
-  console.log('Submit button clicked!')
+  console.log('=== Submit button clicked ===')
   console.log('Form valid?', isFormValid.value)
   console.log('Form data:', formData.value)
+  console.log('Event fields check:', {
+    eventFrequency: formData.value.eventFrequency,
+    eventWeekday: formData.value.eventWeekday,
+    eventTime: formData.value.eventTime,
+    eventWeekOfMonth: formData.value.eventWeekOfMonth
+  })
 
   if (!authStore.isAuthenticated) {
     toast.error('ログインが必要です')
     router.push('/login')
     return
+  }
+
+  // イベント詳細のバリデーション
+  if (formData.value.eventFrequency === 'weekly') {
+    if (formData.value.eventWeekday === undefined) {
+      toast.error('週1回の場合は曜日を選択してください')
+      return
+    }
+    if (!formData.value.eventTime) {
+      toast.error('週1回の場合は時間を入力してください')
+      return
+    }
+  } else if (formData.value.eventFrequency === 'monthly') {
+    if (formData.value.eventWeekOfMonth === undefined) {
+      toast.error('月1回の場合は第何週かを選択してください')
+      return
+    }
+    if (formData.value.eventWeekday === undefined) {
+      toast.error('月1回の場合は曜日を選択してください')
+      return
+    }
+    if (!formData.value.eventTime) {
+      toast.error('月1回の場合は時間を入力してください')
+      return
+    }
+  } else if (formData.value.eventFrequency === 'biweekly') {
+    if (formData.value.eventWeekOfMonth === undefined) {
+      toast.error('隔週の場合は第何週かを選択してください')
+      return
+    }
+    if (formData.value.eventWeekday === undefined) {
+      toast.error('隔週の場合は曜日を選択してください')
+      return
+    }
+    if (!formData.value.eventTime) {
+      toast.error('隔週の場合は時間を入力してください')
+      return
+    }
+  } else if (formData.value.eventFrequency === 'once') {
+    if (!formData.value.eventSpecificDate) {
+      toast.error('単発の場合は開催日時を入力してください')
+      return
+    }
   }
 
   // 全フィールドのバリデーション
@@ -812,6 +861,15 @@ const submitPost = async () => {
     eventTime: postData.eventTime,
     eventWeekOfMonth: postData.eventWeekOfMonth,
   })
+  
+  // 送信前の最終チェックログ
+  if (postData.eventFrequency === 'weekly' && (postData.eventWeekday === undefined || !postData.eventTime)) {
+    console.error('VALIDATION ERROR: Weekly event missing required fields:', {
+      eventWeekday: postData.eventWeekday,
+      eventTime: postData.eventTime
+    })
+    throw new Error('週1回イベントに必要な情報が不足しています')
+  }
 
   if (isEditing.value) {
     console.log('submitPost: Editing mode - using mock update')
@@ -849,6 +907,12 @@ const loadPost = async () => {
 
 // 編集時のデータ読み込み
 onMounted(async () => {
+  console.log('=== CreatePostView onMounted called ===')
+  console.log('isEditing.value:', isEditing.value)
+  console.log('postId.value:', postId.value)
+  console.log('route.params:', route.params)
+  console.log('Current URL:', window.location.href)
+  
   if (isEditing.value) {
     try {
       const postData = await loadPost()
