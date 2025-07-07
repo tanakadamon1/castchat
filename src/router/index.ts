@@ -102,6 +102,14 @@ router.beforeEach(async (to, from, next) => {
   const authStore = useAuthStore()
   const navigationId = Date.now() + Math.random()
   console.log(`[NAV-${navigationId}] Starting navigation from ${from.path} to ${to.path}`)
+  
+  // 編集ページの特別なデバッグ
+  if (to.path.includes('/edit')) {
+    console.log(`[NAV-${navigationId}] EDIT PAGE NAVIGATION DETECTED`)
+    console.log(`[NAV-${navigationId}] Route params:`, to.params)
+    console.log(`[NAV-${navigationId}] Route matched:`, to.matched)
+    console.log(`[NAV-${navigationId}] Route name:`, to.name)
+  }
 
   try {
     // 認証が必要なルートかチェック

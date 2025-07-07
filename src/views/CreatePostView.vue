@@ -1,6 +1,10 @@
 <template>
   <div class="min-h-screen bg-gray-50 py-8">
     <div class="container mx-auto px-4 max-w-4xl">
+      <!-- デバッグ表示 -->
+      <div class="mb-4 p-2 bg-yellow-100 text-yellow-800 text-xs rounded">
+        DEBUG: CreatePostView rendered. isEditing: {{ isEditing }}, postId: {{ postId }}, route: {{ $route.path }}
+      </div>
       <!-- エラー表示 -->
       <div v-if="loadError" class="mb-6 p-4 bg-red-100 text-red-700 rounded">
         {{ loadError }}
@@ -372,6 +376,7 @@
 </template>
 
 <script setup lang="ts">
+console.log('=== CreatePostView SCRIPT LOADED ===')
 import { ref, computed, onMounted } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
 import { useAuthStore } from '@/stores/auth'
@@ -393,8 +398,16 @@ const toast = useToast()
 const { validate: validateField, validateAll, getFieldError, hasErrors } = useValidation()
 
 // 編集モードの判定
-const isEditing = computed(() => !!route.params.id)
-const postId = computed(() => route.params.id as string)
+const isEditing = computed(() => {
+  const editing = !!route.params.id
+  console.log('isEditing computed:', { editing, routeParams: route.params, routePath: route.path })
+  return editing
+})
+const postId = computed(() => {
+  const id = route.params.id as string
+  console.log('postId computed:', { id, routeParams: route.params })
+  return id
+})
 
 // フォームデータ
 const formData = ref({
