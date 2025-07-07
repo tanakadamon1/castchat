@@ -298,11 +298,12 @@ const closeImageViewer = () => {
   selectedImageIndex.value = 0
 }
 
-// Watch for filter changes
+// Watch for filter changes - immediate: false を追加してマウント時の実行を防ぐ
 watch(filters, () => {
+  console.log('Filters changed, reloading posts')
   currentPage.value = 1
   loadPosts()
-}, { deep: true })
+}, { deep: true, immediate: false })
 
 // Lifecycle
 onMounted(() => {

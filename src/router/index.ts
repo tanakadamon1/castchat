@@ -114,16 +114,10 @@ router.beforeEach(async (to, from, next) => {
         isInitializing: authStore.initializing
       })
 
-      // 認証ストアが初期化中の場合は待機
+      // 認証ストアが初期化中の場合は短時間だけ待機
       if (authStore.initializing) {
-        console.log(`[NAV-${navigationId}] Auth store is initializing, waiting...`)
-        let waitTime = 0
-        const maxWaitTime = 10000 // 10秒
-        while (authStore.initializing && waitTime < maxWaitTime) {
-          await new Promise(resolve => setTimeout(resolve, 100))
-          waitTime += 100
-        }
-        console.log(`[NAV-${navigationId}] Wait completed after ${waitTime}ms`)
+        console.log(`[NAV-${navigationId}] Auth store is initializing, waiting briefly...`)
+        await new Promise(resolve => setTimeout(resolve, 500)) // 500msだけ待機
       }
 
       // 認証ストアが初期化されていない場合は初期化

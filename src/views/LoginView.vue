@@ -11,7 +11,7 @@
       <div class="mt-8 space-y-6">
         <button
           @click="handleGoogleSignIn"
-          :disabled="authStore.loading"
+          :disabled="authStore.loading || authStore.initializing"
           class="group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 disabled:opacity-50 disabled:cursor-not-allowed"
         >
           <span class="absolute left-0 inset-y-0 flex items-center pl-3">
@@ -34,7 +34,7 @@
               />
             </svg>
           </span>
-          {{ authStore.loading ? 'サインイン中...' : 'Googleでサインイン' }}
+          {{ (authStore.loading || authStore.initializing) ? 'サインイン中...' : 'Googleでサインイン' }}
         </button>
 
         <!-- セッションクリアボタン -->
@@ -66,6 +66,7 @@
           <p><strong>ユーザーID:</strong> {{ authStore.user?.id || 'なし' }}</p>
           <p><strong>プロフィールID:</strong> {{ authStore.profile?.id || 'なし' }}</p>
           <p><strong>ローディング:</strong> {{ authStore.loading ? 'はい' : 'いいえ' }}</p>
+          <p><strong>初期化中:</strong> {{ authStore.initializing ? 'はい' : 'いいえ' }}</p>
           <p><strong>エラー:</strong> {{ authStore.error || 'なし' }}</p>
           <p><strong>現在のURL:</strong> {{ debugInfo.currentUrl }}</p>
           <p><strong>URLパラメータ:</strong> {{ debugInfo.urlParams }}</p>

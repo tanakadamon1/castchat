@@ -71,11 +71,15 @@ export const useAuthStore = defineStore('auth', () => {
 
   async function ensureUserProfile(authUser: User) {
     try {
+      // 既にプロフィールが設定されている場合はスキップ
+      if (profile.value && profile.value.id === authUser.id) {
+        console.log('Profile already exists for user:', authUser.id)
+        return profile.value
+      }
+
       console.log('Ensuring user profile for:', authUser.id)
-      console.log('User metadata:', authUser.user_metadata)
 
       let userProfile = await getUserProfile(authUser.id)
-      console.log('Existing profile:', userProfile)
 
       if (!userProfile) {
         console.log('Creating new user profile...')
@@ -93,13 +97,11 @@ export const useAuthStore = defineStore('auth', () => {
           is_verified: false,
         }
 
-        console.log('Profile data to create:', profileData)
         userProfile = await createUserProfile(profileData)
-        console.log('Created profile:', userProfile)
+        console.log('Created profile for user:', authUser.id)
       }
 
       profile.value = userProfile
-      console.log('Profile set in store:', userProfile)
       return userProfile
     } catch (error) {
       console.error('Ensure user profile error:', error)
@@ -226,22 +228,9 @@ export const useAuthStore = defineStore('auth', () => {
   }
 
   const initialize = async () => {
-    // 既に初期化中の場合は待機
-    if (initializing.value) {
-      console.log('Auth store already initializing, waiting...')
-      let retries = 0
-      const maxRetries = 50 // 5秒間待機
-      while (initializing.value && retries < maxRetries) {
-        await new Promise(resolve => setTimeout(resolve, 100))
-        retries++
-      }
-      console.log('Auth initialization wait completed')
-      return
-    }
-
-    // 既に初期化済みで認証されている場合はスキップ
-    if (isAuthenticated.value && !loading.value) {
-      console.log('Auth store already authenticated, skipping initialization')
+    // 既に初期化中または初期化済みの場合はスキップ
+    if (initializing.value || (user.value !== null && session.value !== null)) {
+      console.log('Auth store already initialized or initializing, skipping')
       return
     }
 
@@ -263,8 +252,7 @@ export const useAuthStore = defineStore('auth', () => {
         throw sessionError
       }
 
-      console.log('Current session:', currentSession)
-      console.log('Session user:', currentSession?.user)
+      console.log('Current session:', !!currentSession)
 
       session.value = currentSession
       user.value = currentSession?.user ?? null
@@ -272,17 +260,16 @@ export const useAuthStore = defineStore('auth', () => {
       if (currentSession?.user) {
         console.log('User found, ensuring profile...')
         const userProfile = await ensureUserProfile(currentSession.user)
-        console.log('User profile ensured:', userProfile)
+        console.log('User profile ensured:', !!userProfile)
       } else {
         console.log('No user found in session')
+        profile.value = null
       }
 
       // 認証状態変更のリスナーを設定（初回のみ）
       if (!window.__authListenerSet) {
         supabase.auth.onAuthStateChange(async (event: AuthChangeEvent, newSession) => {
-          console.log('=== Auth state changed ===')
-          console.log('Event:', event)
-          console.log('New session:', newSession)
+          console.log('Auth state changed:', event)
 
           session.value = newSession
           user.value = newSession?.user ?? null
@@ -290,7 +277,7 @@ export const useAuthStore = defineStore('auth', () => {
           if (newSession?.user) {
             console.log('New user session, ensuring profile...')
             const userProfile = await ensureUserProfile(newSession.user)
-            console.log('User profile ensured:', userProfile)
+            console.log('User profile ensured in listener:', !!userProfile)
           } else {
             console.log('User signed out, clearing profile...')
             profile.value = null
@@ -300,11 +287,6 @@ export const useAuthStore = defineStore('auth', () => {
       }
 
       console.log('Auth store initialized successfully')
-      console.log('Final auth state:', {
-        isAuthenticated: isAuthenticated.value,
-        user: user.value?.id,
-        profile: profile.value?.id,
-      })
     } catch (err) {
       console.error('Error initializing auth:', err)
       error.value = err instanceof Error ? err.message : 'Authentication initialization failed'
