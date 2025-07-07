@@ -219,16 +219,6 @@
               />
             </div>
 
-            <!-- 追加情報 -->
-            <div>
-              <BaseTextarea
-                v-model="formData.additionalNotes"
-                label="備考・その他"
-                placeholder="追加で伝えたい情報があれば記載してください"
-                :rows="3"
-                :error="getFieldError('additionalNotes')"
-              />
-            </div>
           </div>
         </div>
 
@@ -400,8 +390,7 @@ const formData = ref({
   maxParticipants: undefined as number | undefined,
   contactMethod: 'twitter' as ContactMethod,
   contactInfo: '',
-  deadline: '',
-  additionalNotes: ''
+  deadline: ''
 })
 
 // 画像アップロード関連
@@ -816,6 +805,12 @@ const submitPost = async () => {
     images: imageUrls
   }
   console.log('submitPost: Post data prepared:', postData)
+  console.log('submitPost: Event details:', {
+    eventFrequency: postData.eventFrequency,
+    eventWeekday: postData.eventWeekday,
+    eventTime: postData.eventTime,
+    eventWeekOfMonth: postData.eventWeekOfMonth
+  })
 
   if (isEditing.value) {
     console.log('submitPost: Editing mode - using mock update')
@@ -870,8 +865,7 @@ onMounted(async () => {
           maxParticipants: postData.maxParticipants || undefined,
           contactMethod: postData.contactMethod,
           contactInfo: postData.contactValue || '',
-          deadline: postData.deadline || '',
-          additionalNotes: ''
+          deadline: postData.deadline || ''
         }
       }
     } catch (error) {

@@ -247,6 +247,13 @@ const formatDate = (dateString: string) => {
 }
 
 const formatEventTime = (post: Post) => {
+  console.log('PostCard formatEventTime debug:', {
+    eventFrequency: post.eventFrequency,
+    eventWeekday: post.eventWeekday,
+    eventTime: post.eventTime,
+    eventWeekOfMonth: post.eventWeekOfMonth
+  })
+  
   if (post.eventFrequency === 'once' && post.eventSpecificDate) {
     const date = new Date(post.eventSpecificDate)
     return date.toLocaleString('ja-JP', {
@@ -273,6 +280,7 @@ const formatEventTime = (post: Post) => {
     }
   }
   
+  console.log('PostCard formatEventTime fallback to:', eventFrequencyLabels[post.eventFrequency])
   return eventFrequencyLabels[post.eventFrequency] || ''
 }
 </script>

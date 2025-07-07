@@ -45,6 +45,12 @@ const router = createRouter({
       component: () => import('../views/PostDetailView.vue'),
     },
     {
+      path: '/posts/:id/edit',
+      name: 'post-edit',
+      component: () => import('../views/CreatePostView.vue'),
+      meta: { requiresAuth: true },
+    },
+    {
       path: '/posts/create',
       name: 'post-create',
       component: () => import('../views/CreatePostView.vue'),
@@ -54,12 +60,6 @@ const router = createRouter({
       path: '/my-posts',
       name: 'my-posts',
       component: () => import('../views/MyPostsView.vue'),
-      meta: { requiresAuth: true },
-    },
-    {
-      path: '/posts/:id/edit',
-      name: 'post-edit',
-      component: () => import('../views/CreatePostView.vue'),
       meta: { requiresAuth: true },
     },
     {
