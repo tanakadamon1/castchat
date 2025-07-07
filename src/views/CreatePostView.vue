@@ -885,9 +885,16 @@ const submitPost = async () => {
   }
 
   if (isEditing.value) {
-    console.log('submitPost: Editing mode - using mock update')
-    // 更新処理（実装予定）
-    return new Promise((resolve) => setTimeout(resolve, 1000))
+    console.log('submitPost: Editing mode - calling updatePost API...')
+    // 更新処理
+    const result = await postsApi.updatePost(postId.value, postData)
+    console.log('submitPost: Update API result:', result)
+    if (result.error) {
+      console.error('submitPost: Update API error:', result.error)
+      throw new Error(result.error)
+    }
+    console.log('submitPost: Update success, returning data:', result.data)
+    return result.data
   } else {
     console.log('submitPost: Creating new post via API...')
     // 新規作成処理

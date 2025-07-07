@@ -267,6 +267,142 @@ export const postsApi = {
     }
   },
 
+  // 投稿更新
+  async updatePost(postId: string, postData: any): Promise<PostResponse> {
+    try {
+      const authStore = useAuthStore()
+      
+      if (!authStore.user?.id) {
+        console.error('No user ID found in auth store')
+        return { data: null, error: 'ログインが必要です' }
+      }
+
+      // カテゴリslugをIDに変換
+      const categoryMap: Record<string, string> = {
+        'customer-service': '86701fea-6a75-4abe-bdf6-d04534043093',
+        'meetings': 'b6928c39-9e2b-48f6-b4a1-8291543f4374',
+        'music-dance': '7de2f5db-0a00-4b55-adf0-10f9ecf755a1',
+        'social': '7c104ccc-ae25-44c8-b8b6-d8392d8b44e0',
+        'beginners': 'd93d482c-402a-469f-ba9a-92da08ff05e8',
+        'roleplay': '50a97664-cd88-45a3-baf7-8e2c2776df03',
+        'games': '23e2cbf3-3a80-4249-afaa-491b696bf94b',
+        'other': '8878469d-a3b7-40f5-ad32-7be0846f2498'
+      }
+
+      const categoryId = categoryMap[postData.category] || categoryMap['other']
+
+      // 更新データを準備
+      const updateData = {
+        category_id: categoryId,
+        title: postData.title,
+        description: postData.description,
+        requirements: postData.requirements?.join ? postData.requirements.join(', ') : (typeof postData.requirements === 'string' ? postData.requirements : ''),
+        recruitment_count: postData.maxParticipants || 1,
+        deadline: postData.deadline ? new Date(postData.deadline).toISOString().split('T')[0] : null,
+        contact_method: postData.contactMethod || null,
+        contact_value: postData.contactValue || null,
+        event_frequency: postData.eventFrequency || null,
+        event_specific_date: postData.eventSpecificDate ? new Date(postData.eventSpecificDate).toISOString() : null,
+        event_weekday: postData.eventWeekday !== undefined ? postData.eventWeekday : null,
+        event_time: postData.eventTime || null,
+        event_week_of_month: postData.eventWeekOfMonth !== undefined ? postData.eventWeekOfMonth : null,
+        updated_at: new Date().toISOString()
+      }
+
+      // 権限チェック：自分の投稿のみ更新可能
+      const { data: existingPost, error: fetchError } = await supabase
+        .from('posts')
+        .select('user_id')
+        .eq('id', postId)
+        .single()
+
+      if (fetchError) {
+        console.error('Failed to fetch existing post:', fetchError.message)
+        return { data: null, error: '投稿の取得に失敗しました' }
+      }
+
+      if (existingPost.user_id !== authStore.user.id) {
+        return { data: null, error: '他のユーザーの投稿は編集できません' }
+      }
+
+      // Supabaseで更新
+      const { data: updatedPost, error: updateError } = await supabase
+        .from('posts')
+        .update(updateData)
+        .eq('id', postId)
+        .select()
+        .single()
+      
+      if (updateError) {
+        console.error('postsApi.updatePost: Update error:', updateError.message)
+        return { data: null, error: `データベースエラー: ${updateError.message}` }
+      }
+
+      if (!updatedPost) {
+        return { data: null, error: '投稿の更新に失敗しました' }
+      }
+
+      // 既存の画像を削除
+      const { error: deleteImageError } = await supabase
+        .from('post_images')
+        .delete()
+        .eq('post_id', postId)
+
+      if (deleteImageError) {
+        console.error('Failed to delete existing images:', deleteImageError.message)
+      }
+
+      // 新しい画像を追加
+      if (postData.images && postData.images.length > 0) {
+        const imageData = postData.images.map((url, index) => ({
+          post_id: postId,
+          url,
+          display_order: index
+        }))
+
+        const { error: imageError } = await supabase
+          .from('post_images')
+          .insert(imageData)
+
+        if (imageError) {
+          console.error('Failed to insert images:', imageError.message)
+        }
+      }
+
+      // レスポンスデータをフロントエンド形式に変換
+      const transformedPost: Post = {
+        id: updatedPost.id,
+        title: updatedPost.title,
+        description: updatedPost.description,
+        category: postData.category,
+        status: 'active' as any,
+        deadline: updatedPost.deadline || undefined,
+        maxParticipants: updatedPost.recruitment_count || 1,
+        contactMethod: postData.contactMethod,
+        contactValue: postData.contactValue,
+        requirements: postData.requirements || [],
+        tags: [],
+        worldName: undefined,
+        authorId: updatedPost.user_id,
+        authorName: authStore.user.user_metadata?.display_name || '匿名',
+        createdAt: updatedPost.created_at,
+        updatedAt: updatedPost.updated_at || updatedPost.created_at,
+        applicationsCount: 0,
+        eventFrequency: postData.eventFrequency,
+        eventSpecificDate: postData.eventSpecificDate,
+        eventWeekday: postData.eventWeekday,
+        eventTime: postData.eventTime,
+        eventWeekOfMonth: postData.eventWeekOfMonth,
+        images: postData.images || []
+      }
+
+      return { data: transformedPost }
+    } catch (error) {
+      console.error('Unexpected post update error:', error)
+      return { data: null, error: `予期しないエラー: ${error?.message || 'Unknown error'}` }
+    }
+  },
+
   // デバッグ用: 最小限のテスト投稿
   async testCreatePost(): Promise<PostResponse> {
     try {
