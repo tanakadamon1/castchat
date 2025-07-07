@@ -64,32 +64,21 @@
           />
         </div>
 
-        <!-- 連絡可能な方法 -->
+        <!-- Twitter ID -->
         <div>
-          <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-            連絡可能な方法 <span class="text-red-500">*</span>
-          </label>
-          <div class="space-y-2">
-            <BaseCheckbox
-              v-model="formData.contactMethods.discord"
-              label="Discord"
-            />
-            <BaseCheckbox
-              v-model="formData.contactMethods.twitter"
-              label="Twitter/X"
-            />
-            <BaseCheckbox
-              v-model="formData.contactMethods.vrchat"
-              label="VRChat"
-            />
-            <BaseCheckbox
-              v-model="formData.contactMethods.email"
-              label="メール"
-            />
-          </div>
-          <p v-if="!hasSelectedContactMethod" class="text-sm text-red-600 mt-1">
-            少なくとも1つの連絡方法を選択してください
-          </p>
+          <BaseInput
+            v-model="formData.twitterId"
+            label="Twitter ID"
+            placeholder="@username または username"
+            :error="getFieldError('twitterId')"
+            @blur="validateField('twitterId', formData.twitterId, twitterIdRules)"
+          >
+            <template #helper>
+              <p class="text-xs text-gray-500 mt-1">
+                連絡用のTwitter IDを入力してください（@は省略可能）
+              </p>
+            </template>
+          </BaseInput>
         </div>
 
         <!-- 注意事項 -->
@@ -138,7 +127,7 @@ import { X, User, Calendar, Info } from 'lucide-vue-next'
 import { useValidation } from '@/utils/validation'
 import BaseModal from '@/components/ui/BaseModal.vue'
 import BaseTextarea from '@/components/ui/BaseTextarea.vue'
-import BaseCheckbox from '@/components/ui/BaseCheckbox.vue'
+import BaseInput from '@/components/ui/BaseInput.vue'
 import BaseButton from '@/components/ui/BaseButton.vue'
 import type { Post } from '@/types/post'
 
@@ -160,12 +149,7 @@ const formData = ref({
   message: '',
   experience: '',
   availability: '',
-  contactMethods: {
-    discord: false,
-    twitter: false,
-    vrchat: false,
-    email: false
-  }
+  twitterId: ''
 })
 
 // ローディング状態
@@ -179,26 +163,26 @@ const messageRules = {
   message: 'メッセージは10文字以上500文字以内で入力してください'
 }
 
-// 連絡方法が選択されているかチェック
-const hasSelectedContactMethod = computed(() => {
-  const hasContact = Object.values(formData.value.contactMethods).some(selected => selected)
-  console.log('Contact methods:', formData.value.contactMethods, 'hasContact:', hasContact)
-  return hasContact
-})
+const twitterIdRules = {
+  required: false,
+  pattern: /^@?[A-Za-z0-9_]{1,15}$/,
+  message: '有効なTwitter IDを入力してください（@は省略可能）'
+}
 
 // フォームの有効性チェック
 const isFormValid = computed(() => {
   // メッセージが10文字以上かチェック
   const messageValid = formData.value.message.trim().length >= 10
   
-  // 連絡方法が選択されているかチェック
-  const contactValid = hasSelectedContactMethod.value
+  // Twitter IDが入力されている場合は有効かチェック
+  const twitterIdValid = !formData.value.twitterId || 
+    /^@?[A-Za-z0-9_]{1,15}$/.test(formData.value.twitterId)
   
   // 実際のエラーがあるかチェック（空のエラー配列は無視）
   const actualErrors = Object.values(errors.value).filter(errorArray => errorArray && errorArray.length > 0)
   const hasActualErrors = actualErrors.length > 0
   
-  const isValid = !hasActualErrors && messageValid && contactValid
+  const isValid = !hasActualErrors && messageValid && twitterIdValid
   
   console.log('Form validation:', {
     hasErrors: hasErrors.value,
@@ -207,9 +191,7 @@ const isFormValid = computed(() => {
     errorsObject: errors.value,
     messageLength: formData.value.message.trim().length,
     messageValid,
-    hasContactMethod: hasSelectedContactMethod.value,
-    contactValid,
-    contactMethods: formData.value.contactMethods,
+    twitterIdValid,
     isValid
   })
   
@@ -235,7 +217,7 @@ const handleSubmit = async () => {
     return
   }
   
-  if (!hasSelectedContactMethod.value) {
+  if (formData.value.twitterId && !validateField('twitterId', formData.value.twitterId, twitterIdRules)) {
     return
   }
 
@@ -247,9 +229,7 @@ const handleSubmit = async () => {
       message: formData.value.message.trim(),
       experience: formData.value.experience.trim(),
       availability: formData.value.availability.trim(),
-      contactMethods: Object.entries(formData.value.contactMethods)
-        .filter(([_, selected]) => selected)
-        .map(([method, _]) => method)
+      twitterId: formData.value.twitterId.trim().replace(/^@/, '') // @を除去して保存
     }
     
     emit('submit', applicationData)

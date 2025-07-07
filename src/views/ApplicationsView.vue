@@ -422,7 +422,9 @@ const loadApplications = async () => {
           respondedAt: app.responded_at,
           portfolio_url: app.portfolio_url,
           // portfolio_urlを経験として表示
-          experience: app.portfolio_url
+          experience: app.portfolio_url,
+          availability: app.availability,
+          twitterId: app.twitter_id
         }
         
         console.log('Mapped application:', mappedApp)
@@ -455,7 +457,9 @@ const loadApplications = async () => {
         respondedAt: app.responded_at,
         portfolio_url: app.portfolio_url,
         // portfolio_urlを経験として表示
-        experience: app.portfolio_url
+        experience: app.portfolio_url,
+        availability: app.availability,
+        twitterId: app.twitter_id
       }))
       console.log('Sent applications data:', sentApplications.value)
     }

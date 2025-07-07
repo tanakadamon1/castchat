@@ -28,6 +28,8 @@ export interface ApplicationCreateData {
   post_id: string
   message: string
   portfolio_url?: string | null
+  availability?: string | null
+  twitter_id?: string | null
 }
 
 export interface ApplicationUpdateData {
@@ -120,6 +122,8 @@ export class ApplicationsService {
         post_id: applicationData.post_id,
         message: applicationData.message,
         portfolio_url: applicationData.portfolio_url,
+        availability: applicationData.availability,
+        twitter_id: applicationData.twitter_id,
         status: 'pending'
       }
 

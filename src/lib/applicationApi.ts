@@ -12,6 +12,7 @@ export interface ApplicationData {
   experience?: string
   availability?: string
   portfolio_url?: string
+  twitterId?: string
 }
 
 export interface ApplicationResponse {
@@ -83,7 +84,9 @@ class ApplicationApi {
         {
           post_id: data.postId,
           message: data.message,
-          portfolio_url: data.portfolio_url || null
+          portfolio_url: data.portfolio_url || null,
+          availability: data.availability || null,
+          twitter_id: data.twitterId || null
         },
         profile || undefined
       )

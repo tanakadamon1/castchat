@@ -10,7 +10,7 @@ export interface Application {
   portfolioUrl?: string
   experienceYears?: number
   availability?: string
-  contactPreference?: 'discord' | 'twitter' | 'email' | 'vrchat'
+  twitterId?: string
   createdAt: string
   updatedAt: string
 }
@@ -39,7 +39,7 @@ export interface ApplicationData {
   portfolioUrl?: string
   experienceYears?: number
   availability?: string
-  contactPreference?: 'discord' | 'twitter' | 'email' | 'vrchat'
+  twitterId?: string
 }
 
 export interface ApplicationFilter {

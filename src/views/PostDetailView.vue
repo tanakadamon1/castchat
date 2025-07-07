@@ -497,7 +497,7 @@ const handleApplicationSubmit = async (applicationData: any) => {
       message: applicationData.message,
       portfolio_url: applicationData.experience || null, // experienceをportfolio_urlとして使用
       availability: applicationData.availability || null,
-      contactMethods: applicationData.contactMethods || []
+      twitterId: applicationData.twitterId || null
     }
     
     console.log('Submitting application:', submitData)

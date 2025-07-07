@@ -90,10 +90,19 @@
           <p class="text-sm text-gray-800 dark:text-gray-100">{{ application.availability }}</p>
         </div>
       </div>
-      <div v-if="application.contactPreference">
-        <p class="text-sm font-bold text-gray-700 mb-2 dark:text-gray-200">連絡可能な方法</p>
+      <div v-if="application.twitterId">
+        <p class="text-sm font-bold text-gray-700 mb-2 dark:text-gray-200">Twitter ID</p>
         <div class="bg-gray-50 dark:bg-gray-800 rounded-lg p-3">
-          <p class="text-sm text-gray-800 dark:text-gray-100">{{ application.contactPreference }}</p>
+          <p class="text-sm text-gray-800 dark:text-gray-100">
+            <a 
+              :href="`https://twitter.com/${application.twitterId}`" 
+              target="_blank" 
+              rel="noopener noreferrer"
+              class="text-blue-600 hover:text-blue-700 dark:text-blue-400 dark:hover:text-blue-300"
+            >
+              @{{ application.twitterId }}
+            </a>
+          </p>
         </div>
       </div>
     </div>
@@ -131,7 +140,7 @@ interface Application {
   experience?: string
   availability?: string
   portfolio_url?: string
-  contactPreference?: string
+  twitterId?: string
 }
 
 interface Props {
