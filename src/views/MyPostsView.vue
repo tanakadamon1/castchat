@@ -281,6 +281,9 @@ const goToCreatePost = () => {
 }
 
 const handleEditPost = (postId: string) => {
+  console.log('=== handleEditPost called ===')
+  console.log('postId:', postId)
+  console.log('Navigating to:', `/posts/${postId}/edit`)
   router.push(`/posts/${postId}/edit`)
 }
 

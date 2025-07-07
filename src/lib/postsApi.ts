@@ -96,9 +96,9 @@ export const postsApi = {
         applicationsCount: post.application_count || 0,
         eventFrequency: post.event_frequency || undefined,
         eventSpecificDate: post.event_specific_date || undefined,
-        eventWeekday: post.event_weekday || undefined,
+        eventWeekday: post.event_weekday !== null ? post.event_weekday : undefined,
         eventTime: post.event_time || undefined,
-        eventWeekOfMonth: post.event_week_of_month || undefined,
+        eventWeekOfMonth: post.event_week_of_month !== null ? post.event_week_of_month : undefined,
         images: post.post_images?.map(img => img.url) || []
       }))
 
@@ -145,9 +145,9 @@ export const postsApi = {
         applicationsCount: post.application_count || 0,
         eventFrequency: post.event_frequency || undefined,
         eventSpecificDate: post.event_specific_date || undefined,
-        eventWeekday: post.event_weekday || undefined,
+        eventWeekday: post.event_weekday !== null ? post.event_weekday : undefined,
         eventTime: post.event_time || undefined,
-        eventWeekOfMonth: post.event_week_of_month || undefined,
+        eventWeekOfMonth: post.event_week_of_month !== null ? post.event_week_of_month : undefined,
         images: post.post_images?.map(img => img.url) || []
       }
 
@@ -195,9 +195,9 @@ export const postsApi = {
         contact_value: postData.contactValue || null,
         event_frequency: postData.eventFrequency || null,
         event_specific_date: postData.eventSpecificDate ? new Date(postData.eventSpecificDate).toISOString() : null,
-        event_weekday: postData.eventWeekday || null,
+        event_weekday: postData.eventWeekday !== undefined ? postData.eventWeekday : null,
         event_time: postData.eventTime || null,
-        event_week_of_month: postData.eventWeekOfMonth || null
+        event_week_of_month: postData.eventWeekOfMonth !== undefined ? postData.eventWeekOfMonth : null
       }
 
       // Supabaseに直接挿入
