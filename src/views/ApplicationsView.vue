@@ -344,7 +344,48 @@ const clearSentFilters = () => {
 
 // イベントハンドラー
 const handleUpdateStatus = async (applicationId: string, status: string) => {
-  console.log('ApplicationsView: handleUpdateStatus called', { applicationId, status })
+  console.log('=== ApplicationsView: handleUpdateStatus START ===')
+  console.log('Raw parameters:', { applicationId, status, statusType: typeof status })
+  console.log('Status character codes:', [...status].map(c => c.charCodeAt(0)))
+  console.log('Status length:', status.length)
+  
+  // 日本語→ENUM値変換マップ（文字列キーを明示）
+  const statusMap: Record<string, string> = {
+    '承認': 'accepted',
+    '却下': 'rejected',
+    '保留': 'pending',
+    '辞退': 'withdrawn',
+    '承認する': 'accepted',
+    '却下する': 'rejected',
+    'accepted': 'accepted',
+    'rejected': 'rejected',
+    'pending': 'pending',
+    'withdrawn': 'withdrawn',
+  }
+  
+  console.log('=== ステータス変換処理 ===')
+  console.log('変換前:', status)
+  console.log('statusMapキー一覧:', Object.keys(statusMap))
+  console.log('マップに存在するか:', status in statusMap)
+  console.log('マップから取得した値:', statusMap[status])
+  
+  // より強力な変換処理
+  let apiStatus = statusMap[status]
+  if (!apiStatus) {
+    console.warn('statusMapで見つからなかったため、フォールバック処理を実行')
+    if (status.includes('承認')) {
+      apiStatus = 'accepted'
+      console.log('「承認」を含むため accepted に変換')
+    } else if (status.includes('却下')) {
+      apiStatus = 'rejected'
+      console.log('「却下」を含むため rejected に変換')
+    } else {
+      apiStatus = status
+      console.log('変換できないため元の値を使用:', status)
+    }
+  }
+  
+  console.log('最終的なapiStatus:', apiStatus)
   
   // 認証状態の詳細チェック
   console.log('=== 認証状態チェック ===')
@@ -356,26 +397,6 @@ const handleUpdateStatus = async (applicationId: string, status: string) => {
   const application = receivedApplications.value.find(app => app.id === applicationId)
   console.log('=== 応募詳細 ===')
   console.log('application:', application)
-  
-  if (application) {
-    console.log('投稿ID:', application.postId)
-    console.log('応募者ID:', application.applicantId)
-    console.log('現在ログイン中のユーザーID:', authStore.user?.id)
-    console.log('投稿者かどうか:', authStore.user?.id)
-  }
-  
-  // 日本語→ENUM値変換マップ
-  const statusMap: Record<string, string> = {
-    承認: 'accepted',
-    却下: 'rejected',
-    保留: 'pending',
-    辞退: 'withdrawn',
-    accepted: 'accepted',
-    rejected: 'rejected',
-    pending: 'pending',
-    withdrawn: 'withdrawn',
-  }
-  const apiStatus = statusMap[status] || status
   try {
     // セッション状態の再確認
     if (!authStore.isAuthenticated) {
