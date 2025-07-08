@@ -986,6 +986,13 @@ const loadPost = async () => {
   return result.data
 }
 
+// プロフィールからTwitterIDを自動入力
+const loadUserProfile = () => {
+  if (authStore.profile?.twitter_username) {
+    formData.value.contactInfo = authStore.profile.twitter_username
+  }
+}
+
 // 編集時のデータ読み込み
 onMounted(async () => {
   console.log('=== CreatePostView onMounted called ===')
@@ -993,6 +1000,11 @@ onMounted(async () => {
   console.log('postId.value:', postId.value)
   console.log('route.params:', route.params)
   console.log('Current URL:', window.location.href)
+  
+  // 新規投稿の場合、プロフィールからTwitterIDを自動入力
+  if (!isEditing.value) {
+    loadUserProfile()
+  }
   
   if (isEditing.value) {
     try {

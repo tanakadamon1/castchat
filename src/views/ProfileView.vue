@@ -79,79 +79,22 @@
       <div class="bg-white rounded-lg shadow-sm border p-6 mb-8">
         <h2 class="text-lg font-semibold text-gray-900 mb-4">連絡先情報</h2>
         
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-          <!-- Discord -->
-          <div>
-            <label class="block text-sm font-medium text-gray-700 mb-1">
-              Discord
-            </label>
-            <BaseInput
-              v-if="isEditing"
-              v-model="editData.discordUsername"
-              placeholder="username#1234"
-              :error="getFieldError('discordUsername')"
-              @blur="validateDiscord"
-            />
-            <p v-else class="text-gray-900">
-              {{ profileData?.discordUsername || 'なし' }}
-            </p>
-          </div>
-
+        <div class="max-w-md">
           <!-- Twitter -->
           <div>
             <label class="block text-sm font-medium text-gray-700 mb-1">
-              Twitter/X
+              Twitter/X ID
             </label>
             <BaseInput
               v-if="isEditing"
               v-model="editData.twitterUsername"
-              placeholder="@username"
+              placeholder="@username または username"
               :error="getFieldError('twitterUsername')"
               @blur="validateTwitter"
             />
             <p v-else class="text-gray-900">
               {{ profileData?.twitterUsername || 'なし' }}
             </p>
-          </div>
-
-          <!-- VRChat -->
-          <div>
-            <label class="block text-sm font-medium text-gray-700 mb-1">
-              VRChat
-            </label>
-            <BaseInput
-              v-if="isEditing"
-              v-model="editData.vrchatUsername"
-              placeholder="VRChatユーザー名"
-              :error="getFieldError('vrchatUsername')"
-            />
-            <p v-else class="text-gray-900">
-              {{ profileData?.vrchatUsername || 'なし' }}
-            </p>
-          </div>
-
-          <!-- ウェブサイト -->
-          <div>
-            <label class="block text-sm font-medium text-gray-700 mb-1">
-              ウェブサイト
-            </label>
-            <BaseInput
-              v-if="isEditing"
-              v-model="editData.websiteUrl"
-              placeholder="https://..."
-              :error="getFieldError('websiteUrl')"
-              @blur="validateWebsite"
-            />
-            <a
-              v-else-if="profileData?.websiteUrl"
-              :href="profileData.websiteUrl"
-              target="_blank"
-              rel="noopener noreferrer"
-              class="text-indigo-600 hover:text-indigo-700"
-            >
-              {{ profileData?.websiteUrl }}
-            </a>
-            <p v-else class="text-gray-900">なし</p>
           </div>
         </div>
       </div>
@@ -221,10 +164,7 @@ const profileData = computed(() => {
     id: profile.id,
     displayName: profile.display_name || '',
     avatarUrl: profile.avatar_url || '',
-    discordUsername: profile.discord_username || '',
     twitterUsername: profile.twitter_username || '',
-    vrchatUsername: profile.vrchat_username || '',
-    websiteUrl: profile.website_url || '',
     createdAt: profile.created_at
   }
 })
@@ -232,10 +172,7 @@ const profileData = computed(() => {
 // 編集用データ
 const editData = ref({
   displayName: '',
-  discordUsername: '',
-  twitterUsername: '',
-  vrchatUsername: '',
-  websiteUrl: ''
+  twitterUsername: ''
 })
 
 
@@ -262,21 +199,9 @@ const isFormValid = computed(() => {
 })
 
 // バリデーション関数
-const validateDiscord = () => {
-  if (editData.value.discordUsername) {
-    validateField('discordUsername', editData.value.discordUsername, commonRules.discord)
-  }
-}
-
 const validateTwitter = () => {
   if (editData.value.twitterUsername) {
     validateField('twitterUsername', editData.value.twitterUsername, commonRules.twitter)
-  }
-}
-
-const validateWebsite = () => {
-  if (editData.value.websiteUrl) {
-    validateField('websiteUrl', editData.value.websiteUrl, commonRules.url)
   }
 }
 
@@ -342,10 +267,7 @@ const handleSave = async () => {
     // 実際のAPIを使用してプロフィールを更新
     await authStore.updateProfile({
       display_name: editData.value.displayName,
-      discord_username: editData.value.discordUsername,
-      twitter_username: editData.value.twitterUsername,
-      vrchat_username: editData.value.vrchatUsername,
-      website_url: editData.value.websiteUrl
+      twitter_username: editData.value.twitterUsername
     })
     
     toast.success('プロフィールを更新しました')
@@ -364,10 +286,7 @@ const handleCancel = () => {
   // 編集データをリセット
   editData.value = {
     displayName: profileData.value.displayName,
-    discordUsername: profileData.value.discordUsername,
-    twitterUsername: profileData.value.twitterUsername,
-    vrchatUsername: profileData.value.vrchatUsername,
-    websiteUrl: profileData.value.websiteUrl
+    twitterUsername: profileData.value.twitterUsername
   }
   
   isEditing.value = false
@@ -378,10 +297,7 @@ const initializeEditData = () => {
   if (profileData.value) {
     editData.value = {
       displayName: profileData.value.displayName,
-      discordUsername: profileData.value.discordUsername,
-      twitterUsername: profileData.value.twitterUsername,
-      vrchatUsername: profileData.value.vrchatUsername,
-      websiteUrl: profileData.value.websiteUrl
+      twitterUsername: profileData.value.twitterUsername
     }
   }
 }

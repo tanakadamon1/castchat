@@ -122,9 +122,10 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed } from 'vue'
+import { ref, computed, onMounted } from 'vue'
 import { X, User, Calendar, Info } from 'lucide-vue-next'
 import { useValidation } from '@/utils/validation'
+import { useAuthStore } from '@/stores/auth'
 import BaseModal from '@/components/ui/BaseModal.vue'
 import BaseTextarea from '@/components/ui/BaseTextarea.vue'
 import BaseInput from '@/components/ui/BaseInput.vue'
@@ -142,6 +143,7 @@ const emit = defineEmits<{
   submit: [applicationData: any]
 }>()
 
+const authStore = useAuthStore()
 const { validate: validateField, getFieldError, hasErrors, errors } = useValidation()
 
 // フォームデータ
@@ -151,6 +153,18 @@ const formData = ref({
   availability: '',
   twitterId: ''
 })
+
+// プロフィールからTwitterIDを自動入力
+const loadUserProfile = async () => {
+  // authStore.profileがない場合は動的に取得
+  if (!authStore.profile && authStore.user?.id) {
+    await authStore.fetchProfile()
+  }
+  
+  if (authStore.profile?.twitter_username) {
+    formData.value.twitterId = authStore.profile.twitter_username
+  }
+}
 
 // ローディング状態
 const submitting = ref(false)
@@ -237,4 +251,9 @@ const handleSubmit = async () => {
     submitting.value = false
   }
 }
+
+// 初期化時にプロフィールからTwitterIDを読み込み
+onMounted(() => {
+  loadUserProfile()
+})
 </script>
