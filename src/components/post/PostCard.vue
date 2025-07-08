@@ -39,29 +39,22 @@
       <!-- Image Section with aspect ratio -->
       <div class="px-4 pb-3">
         <div v-if="post.images && post.images.length > 0">
-          <div class="grid gap-2" :class="imageGridClasses">
+          <div class="relative group cursor-pointer overflow-hidden rounded-lg bg-gray-100 dark:bg-gray-800" @click="$emit('view-image', post.images[0], 0)">
+            <LazyImage
+              :src="post.images[0]"
+              :alt="`投稿画像 1`"
+              container-class="w-full aspect-video"
+              image-class="w-full h-full object-contain"
+              :eager="true"
+              :threshold="0.2"
+            />
+            
+            <!-- 複数画像がある場合の表示 -->
             <div
-              v-for="(image, index) in displayImages"
-              :key="index"
-              class="relative group cursor-pointer overflow-hidden rounded-lg bg-gray-100 dark:bg-gray-800"
-              @click="$emit('view-image', image, index)"
+              v-if="post.images.length > 1"
+              class="absolute top-2 right-2 bg-black bg-opacity-70 text-white text-xs px-2 py-1 rounded-full"
             >
-              <LazyImage
-                :src="image"
-                :alt="`投稿画像 ${index + 1}`"
-                container-class="w-full aspect-video"
-                image-class="w-full h-full object-contain"
-                :eager="index === 0"
-                :threshold="0.2"
-              />
-              
-              <!-- 残り画像数表示 -->
-              <div
-                v-if="index === 2 && post.images!.length > 3"
-                class="absolute inset-0 bg-black bg-opacity-50 flex items-center justify-center text-white font-semibold"
-              >
-                +{{ post.images!.length - 3 }}
-              </div>
+              {{ post.images.length }}枚
             </div>
           </div>
         </div>
@@ -241,18 +234,6 @@ const handleEditClick = () => {
   emit('edit-post', props.post.id)
 }
 
-// 画像グリッドのレイアウト
-const imageGridClasses = computed(() => {
-  const imageCount = props.post.images?.length || 0
-  if (imageCount === 1) return 'grid-cols-1'
-  if (imageCount === 2) return 'grid-cols-2'
-  return 'grid-cols-3'
-})
-
-// 表示する画像（最大3枚）
-const displayImages = computed(() => {
-  return props.post.images?.slice(0, 3) || []
-})
 
 const statusBadgeClasses = computed(() => {
   const baseClasses = 'inline-flex items-center px-2 py-1 rounded-full text-xs font-medium'
