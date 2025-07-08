@@ -1,10 +1,5 @@
 import { createClient } from '@supabase/supabase-js'
-import { config, debugLog } from '@/config/env'
-
-debugLog('Initializing Supabase client', {
-  url: config.supabaseUrl,
-  hasAnonKey: !!config.supabaseAnonKey,
-})
+import { config } from '@/config/env'
 
 export const supabase = createClient(config.supabaseUrl, config.supabaseAnonKey, {
   auth: {
@@ -12,6 +7,6 @@ export const supabase = createClient(config.supabaseUrl, config.supabaseAnonKey,
     persistSession: true,
     detectSessionInUrl: true,
     flowType: 'pkce',
-    debug: true, // デバッグモードを有効化
+    debug: false, // デバッグモードを無効化
   },
 })

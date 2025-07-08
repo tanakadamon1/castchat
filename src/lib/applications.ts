@@ -249,6 +249,15 @@ export class ApplicationsService {
         .single()
 
       if (error) {
+        console.error('Application update error:', {
+          error,
+          message: error.message,
+          details: error.details,
+          hint: error.hint,
+          code: error.code,
+          updatePayload,
+          applicationId
+        })
         return {
           data: null,
           error: errorHandler.handleError(error, {
