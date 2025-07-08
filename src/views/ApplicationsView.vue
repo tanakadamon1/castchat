@@ -87,7 +87,7 @@
           <ApplicationCard
             v-for="application in filteredReceivedApplications"
             :key="application.id"
-            :application="application"
+            :application="application as ApplicationViewModel"
             type="received"
             @update-status="handleUpdateStatus"
             @view-profile="handleViewProfile"
@@ -144,7 +144,7 @@
           <ApplicationCard
             v-for="application in filteredSentApplications"
             :key="application.id"
-            :application="application"
+            :application="application as ApplicationViewModel"
             type="sent"
             @view-post="handleViewPost"
             @withdraw="handleWithdraw"
@@ -156,7 +156,7 @@
     <!-- 応募詳細モーダル -->
     <ApplicationDetailModal
       v-if="selectedApplication"
-      :application="selectedApplication"
+      :application="selectedApplication as ApplicationViewModel"
       :type="activeTab === 'received' ? 'received' : 'sent'"
       @close="selectedApplication = null"
       @update-status="handleUpdateStatus"
@@ -188,7 +188,53 @@ import EmptyState from '@/components/ui/EmptyState.vue'
 import ApplicationCard from '@/components/application/ApplicationCard.vue'
 import ApplicationDetailModal from '@/components/application/ApplicationDetailModal.vue'
 // import MessageModal from '@/components/message/MessageModal.vue'
-import type { Application } from '@/types/application'
+import type { Application as DBApplication } from '@/types/application'
+import type { ApplicationStatus } from '@/types/application'
+
+// UI用の拡張型
+interface ApplicationViewModel extends DBApplication {
+  postTitle: string
+  postAuthor: string
+  applicantName: string
+  applicantAvatar?: string
+  respondedAt: string | null
+  experience?: string
+  portfolio_url?: string
+  appliedAt: string
+}
+
+// 型安全なプロパティ取得ヘルパー
+function getStringProp(obj: unknown, key: string): string | undefined {
+  if (
+    typeof obj === 'object' &&
+    obj !== null &&
+    key in obj &&
+    typeof (obj as Record<string, unknown>)[key] === 'string'
+  ) {
+    return (obj as Record<string, unknown>)[key] as string
+  }
+  return undefined
+}
+function getObjectProp(obj: unknown, key: string): object | undefined {
+  if (
+    typeof obj === 'object' &&
+    obj !== null &&
+    key in obj &&
+    typeof (obj as Record<string, unknown>)[key] === 'object' &&
+    (obj as Record<string, unknown>)[key] !== null
+  ) {
+    return (obj as Record<string, unknown>)[key] as object
+  }
+  return undefined
+}
+
+// ApplicationStatus型の値かどうかを判定するガード
+const validStatuses: ApplicationStatus[] = ['pending', 'accepted', 'rejected', 'withdrawn']
+function toApplicationStatus(val: unknown): ApplicationStatus {
+  return typeof val === 'string' && validStatuses.includes(val as ApplicationStatus)
+    ? (val as ApplicationStatus)
+    : 'pending'
+}
 
 const router = useRouter()
 const authStore = useAuthStore()
@@ -205,11 +251,14 @@ const selectedApplication = ref(null)
 
 // メッセージモーダル関連
 const showMessageModal = ref(false)
-const selectedRecipient = ref<any>(null)
+// You can define a more specific type for selectedRecipient if you know its structure
+const selectedRecipient = ref<{ id: string; display_name: string; avatar_url?: string } | null>(
+  null,
+)
 
 // 応募データ
-const receivedApplications = ref<any[]>([])
-const sentApplications = ref<any[]>([])
+const receivedApplications = ref<ApplicationViewModel[]>([])
+const sentApplications = ref<ApplicationViewModel[]>([])
 const errorMessage = ref<string | null>(null)
 
 // フィルター状態
@@ -295,46 +344,21 @@ const clearSentFilters = () => {
 
 // イベントハンドラー
 const handleUpdateStatus = async (applicationId: string, status: string) => {
-  console.log('ApplicationsView: handleUpdateStatus called', { applicationId, status, statusType: typeof status })
-  
-  // 日本語→ENUM値変換マップ（すべてのパターンを網羅）
+  console.log('ApplicationsView: handleUpdateStatus called', { applicationId, status })
+  // 日本語→ENUM値変換マップ
   const statusMap: Record<string, string> = {
-    '承認': 'accepted',
-    '却下': 'rejected',
-    '保留': 'pending',
-    '辞退': 'withdrawn',
-    '承認する': 'accepted',
-    '却下する': 'rejected',
-    'accepted': 'accepted',
-    'rejected': 'rejected',
-    'pending': 'pending',
-    'withdrawn': 'withdrawn',
+    承認: 'accepted',
+    却下: 'rejected',
+    保留: 'pending',
+    辞退: 'withdrawn',
+    accepted: 'accepted',
+    rejected: 'rejected',
+    pending: 'pending',
+    withdrawn: 'withdrawn',
   }
-  
-  // より安全な変換：日本語が含まれている場合は確実に変換
-  let apiStatus = statusMap[status]
-  if (!apiStatus) {
-    // fallback: もし変換マップにない場合は、文字列解析を試行
-    if (status.includes('承認')) {
-      apiStatus = 'accepted'
-    } else if (status.includes('却下')) {
-      apiStatus = 'rejected'
-    } else if (status.includes('保留')) {
-      apiStatus = 'pending'
-    } else if (status.includes('辞退')) {
-      apiStatus = 'withdrawn'
-    } else {
-      apiStatus = status // 最後の手段：そのまま使用
-    }
-  }
-  
-  console.log('ApplicationsView: Status mapping', { 
-    originalStatus: status, 
-    mappedStatus: apiStatus, 
-    hasMapping: status in statusMap,
-    includesJapanese: /[ひらがなカタカナ漢字]/.test(status)
-  })
+  const apiStatus = statusMap[status] || status
   try {
+    // 型キャストを追加してENUM型に合わせる
     const result = await applicationApi.updateApplicationStatus(
       applicationId,
       apiStatus as 'pending' | 'accepted' | 'rejected' | 'withdrawn',
@@ -369,17 +393,15 @@ const handleViewProfile = (userId: string) => {
 const handleSendMessage = (userId: string) => {
   console.log('ApplicationsView: handleSendMessage called', { userId })
   // メッセージモーダルを開く
-  const user = receivedApplications.value.find(
-    (app) => app.applicantId === userId || app.user_id === userId,
-  )
+  const user = receivedApplications.value.find((app) => app.applicantId === userId)
 
   console.log('ApplicationsView: Found user for message:', user)
 
   if (user) {
     selectedRecipient.value = {
       id: userId,
-      display_name: user.applicantName || user.user?.display_name || '匿名ユーザー',
-      avatar_url: user.applicantAvatar || user.user?.avatar_url,
+      display_name: user.applicantName || '匿名ユーザー',
+      avatar_url: user.applicantAvatar,
     }
     showMessageModal.value = true
   } else {
@@ -435,39 +457,75 @@ const loadApplications = async () => {
       console.log('Raw received applications data:', receivedResult.data)
       // データを ApplicationCard で使用する形式に変換
       receivedApplications.value = (receivedResult.data || []).map((app: unknown) => {
-        if (typeof app !== 'object' || app === null) return {} as Application
+        if (typeof app !== 'object' || app === null)
+          return {
+            id: '',
+            postId: '',
+            postTitle: '募集タイトル',
+            postAuthor: '投稿者',
+            applicantId: '',
+            applicantName: '匿名ユーザー',
+            status: 'pending',
+            message: '',
+            appliedAt: '',
+            respondedAt: null,
+            createdAt: '',
+            updatedAt: '',
+          }
         const a = app as Record<string, unknown>
+        // posts.title
+        let postTitle = '募集タイトル'
+        if (typeof a.posts === 'object' && a.posts !== null) {
+          const t = getStringProp(a.posts, 'title')
+          if (t) postTitle = t
+        }
+        let postAuthor = '投稿者'
+        if (typeof a.posts === 'object' && a.posts !== null) {
+          const usersObj = getObjectProp(a.posts, 'users')
+          if (usersObj) {
+            const d = getStringProp(usersObj, 'display_name')
+            if (d) postAuthor = d
+          }
+        }
+        let applicantName = '匿名ユーザー'
+        if (typeof a.users === 'object' && a.users !== null) {
+          const d = getStringProp(a.users, 'display_name')
+          if (d) applicantName = d
+        }
+        let applicantAvatar: string | undefined = undefined
+        if (typeof a.users === 'object' && a.users !== null) {
+          const av = getStringProp(a.users, 'avatar_url')
+          if (av) applicantAvatar = av
+        }
+        // respondedAt
+        let respondedAt: string | null = null
+        if (typeof a.responded_at === 'string') {
+          respondedAt = a.responded_at
+        }
         return {
-          id: a.id as string,
-          postId: a.post_id as string,
-          postTitle:
-            a.posts && typeof a.posts === 'object'
-              ? ((a.posts as Record<string, unknown>).title as string) || '募集タイトル'
-              : '募集タイトル',
-          postAuthor:
-            a.posts && typeof a.posts === 'object' && (a.posts as Record<string, unknown>).users
-              ? ((a.posts as Record<string, unknown>).users &&
-                  (a.posts as Record<string, any>).users.display_name) ||
-                '投稿者'
-              : '投稿者',
-          applicantId: a.user_id as string,
-          applicantName:
-            a.users && typeof a.users === 'object'
-              ? ((a.users as Record<string, unknown>).display_name as string) || '匿名ユーザー'
-              : '匿名ユーザー',
-          applicantAvatar:
-            a.users && typeof a.users === 'object'
-              ? ((a.users as Record<string, unknown>).avatar_url as string)
-              : undefined,
-          status: a.status as string,
-          message: a.message as string,
-          appliedAt: a.created_at as string,
-          respondedAt: a.responded_at as string,
-          portfolio_url: a.portfolio_url as string,
-          experience: a.portfolio_url as string,
-          availability: a.availability as string,
-          twitterId: a.twitter_id as string,
-        } as Application
+          id: typeof a.id === 'string' ? a.id : '',
+          postId: typeof a.post_id === 'string' ? a.post_id : '',
+          postTitle,
+          postAuthor,
+          applicantId: typeof a.user_id === 'string' ? a.user_id : '',
+          applicantName,
+          applicantAvatar,
+          status: toApplicationStatus(a.status),
+          message: typeof a.message === 'string' ? a.message : '',
+          appliedAt: typeof a.created_at === 'string' ? a.created_at : '',
+          respondedAt,
+          portfolio_url: typeof a.portfolio_url === 'string' ? a.portfolio_url : undefined,
+          experience:
+            typeof a.experience === 'string'
+              ? a.experience
+              : typeof a.portfolio_url === 'string'
+                ? a.portfolio_url
+                : undefined,
+          availability: typeof a.availability === 'string' ? a.availability : undefined,
+          twitterId: typeof a.twitter_id === 'string' ? a.twitter_id : undefined,
+          createdAt: typeof a.created_at === 'string' ? a.created_at : '',
+          updatedAt: typeof a.updated_at === 'string' ? a.updated_at : '',
+        }
       })
       console.log('Final received applications data:', receivedApplications.value)
     }
@@ -483,37 +541,75 @@ const loadApplications = async () => {
     } else {
       // データを ApplicationCard で使用する形式に変換
       sentApplications.value = (sentResult.data || []).map((app: unknown) => {
-        if (typeof app !== 'object' || app === null) return {} as Application
+        if (typeof app !== 'object' || app === null)
+          return {
+            id: '',
+            postId: '',
+            postTitle: '募集タイトル',
+            postAuthor: '投稿者',
+            applicantId: '',
+            applicantName: '匿名ユーザー',
+            status: 'pending',
+            message: '',
+            appliedAt: '',
+            respondedAt: null,
+            createdAt: '',
+            updatedAt: '',
+          }
         const a = app as Record<string, unknown>
+        // posts.title
+        let postTitle = '募集タイトル'
+        if (typeof a.posts === 'object' && a.posts !== null) {
+          const t = getStringProp(a.posts, 'title')
+          if (t) postTitle = t
+        }
+        let postAuthor = '投稿者'
+        if (typeof a.posts === 'object' && a.posts !== null) {
+          const usersObj = getObjectProp(a.posts, 'users')
+          if (usersObj) {
+            const d = getStringProp(usersObj, 'display_name')
+            if (d) postAuthor = d
+          }
+        }
+        let applicantName = '匿名ユーザー'
+        if (typeof a.users === 'object' && a.users !== null) {
+          const d = getStringProp(a.users, 'display_name')
+          if (d) applicantName = d
+        }
+        let applicantAvatar: string | undefined = undefined
+        if (typeof a.users === 'object' && a.users !== null) {
+          const av = getStringProp(a.users, 'avatar_url')
+          if (av) applicantAvatar = av
+        }
+        // respondedAt
+        let respondedAt: string | null = null
+        if (typeof a.responded_at === 'string') {
+          respondedAt = a.responded_at
+        }
         return {
-          id: a.id as string,
-          postId: a.post_id as string,
-          postTitle:
-            a.posts && typeof a.posts === 'object'
-              ? ((a.posts as Record<string, unknown>).title as string) || '募集タイトル'
-              : '募集タイトル',
-          postAuthor:
-            a.posts && typeof a.posts === 'object' && (a.posts as Record<string, unknown>).users
-              ? (a.posts as Record<string, any>).users.display_name || '投稿者'
-              : '投稿者',
-          applicantId: a.user_id as string,
-          applicantName:
-            a.users && typeof a.users === 'object'
-              ? ((a.users as Record<string, unknown>).display_name as string) || '匿名ユーザー'
-              : '匿名ユーザー',
-          applicantAvatar:
-            a.users && typeof a.users === 'object'
-              ? ((a.users as Record<string, unknown>).avatar_url as string)
-              : undefined,
-          status: a.status as string,
-          message: a.message as string,
-          appliedAt: a.created_at as string,
-          respondedAt: a.responded_at as string,
-          portfolio_url: a.portfolio_url as string,
-          experience: a.portfolio_url as string,
-          availability: a.availability as string,
-          twitterId: a.twitter_id as string,
-        } as Application
+          id: typeof a.id === 'string' ? a.id : '',
+          postId: typeof a.post_id === 'string' ? a.post_id : '',
+          postTitle,
+          postAuthor,
+          applicantId: typeof a.user_id === 'string' ? a.user_id : '',
+          applicantName,
+          applicantAvatar,
+          status: toApplicationStatus(a.status),
+          message: typeof a.message === 'string' ? a.message : '',
+          appliedAt: typeof a.created_at === 'string' ? a.created_at : '',
+          respondedAt,
+          portfolio_url: typeof a.portfolio_url === 'string' ? a.portfolio_url : undefined,
+          experience:
+            typeof a.experience === 'string'
+              ? a.experience
+              : typeof a.portfolio_url === 'string'
+                ? a.portfolio_url
+                : undefined,
+          availability: typeof a.availability === 'string' ? a.availability : undefined,
+          twitterId: typeof a.twitter_id === 'string' ? a.twitter_id : undefined,
+          createdAt: typeof a.created_at === 'string' ? a.created_at : '',
+          updatedAt: typeof a.updated_at === 'string' ? a.updated_at : '',
+        }
       })
       console.log('Sent applications data:', sentApplications.value)
     }

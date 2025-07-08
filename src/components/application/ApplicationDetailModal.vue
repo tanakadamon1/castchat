@@ -6,10 +6,7 @@
         <h2 class="text-xl font-bold text-gray-900">
           {{ type === 'received' ? '応募詳細' : '応募履歴詳細' }}
         </h2>
-        <button
-          @click="emit('close')"
-          class="text-gray-400 hover:text-gray-600"
-        >
+        <button @click="emit('close')" class="text-gray-400 hover:text-gray-600">
           <X class="w-6 h-6" />
         </button>
       </div>
@@ -29,7 +26,7 @@
               <User class="w-8 h-8" />
             </div>
           </div>
-          
+
           <div>
             <h3 class="font-semibold text-gray-900">{{ userName }}</h3>
             <p class="text-sm text-gray-600">{{ userRole }}</p>
@@ -58,7 +55,7 @@
             <h4 class="font-medium text-gray-900 mb-1">応募日時</h4>
             <p class="text-sm text-gray-600">{{ formatDateTime(application.appliedAt) }}</p>
           </div>
-          
+
           <div v-if="application.respondedAt" class="p-4 border rounded-lg">
             <h4 class="font-medium text-gray-900 mb-1">回答日時</h4>
             <p class="text-sm text-gray-600">{{ formatDateTime(application.respondedAt) }}</p>
@@ -66,21 +63,16 @@
         </div>
 
         <!-- アクション（受信した応募の場合） -->
-        <div v-if="type === 'received' && application.status === 'pending'" 
-             class="flex flex-col sm:flex-row gap-3 pt-4 border-t">
-          <BaseButton
-            @click="handleUpdateStatus('accepted')"
-            class="flex-1"
-          >
+        <div
+          v-if="type === 'received' && application.status === 'pending'"
+          class="flex flex-col sm:flex-row gap-3 pt-4 border-t"
+        >
+          <BaseButton @click="handleUpdateStatus('accepted')" class="flex-1">
             <CheckCircle class="w-4 h-4 mr-2" />
             承認する
           </BaseButton>
-          
-          <BaseButton
-            variant="outline"
-            @click="handleUpdateStatus('rejected')"
-            class="flex-1"
-          >
+
+          <BaseButton variant="outline" @click="handleUpdateStatus('rejected')" class="flex-1">
             <XCircle class="w-4 h-4 mr-2" />
             却下する
           </BaseButton>
@@ -91,12 +83,8 @@
           <div class="flex items-center gap-2">
             <Info class="w-5 h-5 text-blue-600" />
             <p class="text-sm text-blue-800">
-              <span v-if="application.status === 'accepted'">
-                この応募は承認済みです。
-              </span>
-              <span v-else>
-                この応募は却下されました。
-              </span>
+              <span v-if="application.status === 'accepted'"> この応募は承認済みです。 </span>
+              <span v-else> この応募は却下されました。 </span>
             </p>
           </div>
         </div>
@@ -120,7 +108,7 @@ interface Application {
   applicantId?: string
   applicantName?: string
   applicantAvatar?: string
-  status: 'pending' | 'accepted' | 'rejected'
+  status: 'pending' | 'accepted' | 'rejected' | 'withdrawn'
   message?: string
   appliedAt: string
   respondedAt?: string | null
@@ -140,7 +128,7 @@ const emit = defineEmits<{
 
 // 表示用データ
 const userName = computed(() => {
-  return props.type === 'received' 
+  return props.type === 'received'
     ? props.application.applicantName || '匿名ユーザー'
     : props.application.postAuthor || '投稿者'
 })
@@ -150,9 +138,7 @@ const userRole = computed(() => {
 })
 
 const userAvatar = computed(() => {
-  return props.type === 'received' 
-    ? props.application.applicantAvatar
-    : null
+  return props.type === 'received' ? props.application.applicantAvatar : null
 })
 
 const postTitle = computed(() => {
@@ -171,7 +157,7 @@ const formatDateTime = (dateString: string) => {
     month: 'numeric',
     day: 'numeric',
     hour: '2-digit',
-    minute: '2-digit'
+    minute: '2-digit',
   })
 }
 
@@ -182,11 +168,14 @@ const handleUpdateStatus = (status: string) => {
     status,
     statusType: typeof status,
     statusLength: status.length,
-    statusCodeUnits: [...status].map(c => c.charCodeAt(0)),
+    statusCodeUnits: [...status].map((c) => c.charCodeAt(0)),
   })
-  
+
   if (confirm(`この応募を${status === 'accepted' ? '承認' : '却下'}しますか？`)) {
-    console.log('ApplicationDetailModal: emitting updateStatus', { applicationId: props.application.id, status })
+    console.log('ApplicationDetailModal: emitting updateStatus', {
+      applicationId: props.application.id,
+      status,
+    })
     emit('updateStatus', props.application.id, status)
     emit('close')
   }
