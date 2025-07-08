@@ -62,7 +62,7 @@ class ApplicationApi {
     const authStore = this.getAuthStore()
     return {
       id: authStore.user?.id,
-      profile: authStore.profile
+      profile: authStore.profile,
     }
   }
 
@@ -71,12 +71,12 @@ class ApplicationApi {
    */
   async submitApplication(data: ApplicationData): Promise<ApplicationResponse> {
     try {
-      const { id: userId, profile } = this.getCurrentUser()
-      
+      const { id: userId } = this.getCurrentUser()
+
       if (!userId) {
         return {
           data: null,
-          error: 'ログインが必要です'
+          error: 'ログインが必要です',
         }
       }
 
@@ -89,7 +89,7 @@ class ApplicationApi {
           .select('column_name, data_type, is_nullable')
           .eq('table_schema', 'public')
           .eq('table_name', 'applications')
-        
+
         console.log('Applications table columns:', tableStructure)
 
         // 既存の応募があるかチェック
@@ -98,25 +98,27 @@ class ApplicationApi {
           .from('applications')
           .select('id, post_id, user_id')
           .limit(5)
-        
+
         console.log('Existing applications:', existingApps, 'Error:', selectError)
 
         console.log('Attempting to create application:', {
           post_id: data.postId,
           user_id: userId,
-          message: data.message
+          message: data.message,
         })
 
         const insertPayload = {
           post_id: data.postId,
           user_id: userId,
           message: data.message,
-          status: 'pending'
+          status: 'pending',
+          availability: data.availability || null,
+          twitter_id: data.twitterId || null,
         }
 
         console.log('Full insert payload:', insertPayload)
-        console.log('User auth state:', authStore.user)
-        console.log('User profile:', authStore.profile)
+        // console.log('User auth state:', authStore.user)
+        // console.log('User profile:', authStore.profile)
 
         const { data: applicationData, error: insertError } = await supabase
           .from('applications')
@@ -130,32 +132,31 @@ class ApplicationApi {
             code: insertError.code,
             message: insertError.message,
             details: insertError.details,
-            hint: insertError.hint
+            hint: insertError.hint,
           })
           return {
             data: null,
-            error: `${insertError.message} (${insertError.code})`
+            error: `${insertError.message} (${insertError.code})`,
           }
         }
 
         console.log('Direct insert success:', applicationData)
         return {
           data: applicationData,
-          error: undefined
+          error: undefined,
         }
       } catch (directError) {
         console.error('Direct insert exception:', directError)
         return {
           data: null,
-          error: '応募の送信に失敗しました'
+          error: '応募の送信に失敗しました',
         }
       }
-
     } catch (error) {
       console.error('Submit application error:', error)
       return {
         data: null,
-        error: '応募の送信に失敗しました'
+        error: '応募の送信に失敗しました',
       }
     }
   }
@@ -165,37 +166,36 @@ class ApplicationApi {
    */
   async getMyApplications(): Promise<ApplicationsResponse> {
     try {
-      const { id: userId, profile } = this.getCurrentUser()
-      
+      const { id: userId } = this.getCurrentUser()
+
       if (!userId) {
         return {
           data: [],
           total: 0,
-          error: 'ログインが必要です'
+          error: 'ログインが必要です',
         }
       }
 
-      const result = await applicationsService.getUserApplications(userId, profile || undefined)
+      const result = await applicationsService.getUserApplications(userId, undefined)
 
       if (result.error) {
         return {
           data: [],
           total: 0,
-          error: result.error.message
+          error: result.error.message,
         }
       }
 
       return {
         data: result.data || [],
-        total: result.count || 0
+        total: result.count || 0,
       }
-
     } catch (error) {
       console.error('Get my applications error:', error)
       return {
         data: [],
         total: 0,
-        error: '応募履歴の取得に失敗しました'
+        error: '応募履歴の取得に失敗しました',
       }
     }
   }
@@ -205,51 +205,43 @@ class ApplicationApi {
    */
   async getReceivedApplications(postId?: string): Promise<ApplicationsResponse> {
     try {
-      const { id: userId, profile } = this.getCurrentUser()
-      
+      const { id: userId } = this.getCurrentUser()
+
       if (!userId) {
         return {
           data: [],
           total: 0,
-          error: 'ログインが必要です'
+          error: 'ログインが必要です',
         }
       }
 
       let result
       if (postId) {
         // 特定の投稿の応募を取得
-        result = await applicationsService.getPostApplications(
-          postId,
-          userId,
-          profile || undefined
-        )
+        result = await applicationsService.getPostApplications(postId, userId, undefined)
       } else {
         // 全ての受信応募を取得
-        result = await applicationsService.getAllReceivedApplications(
-          userId,
-          profile || undefined
-        )
+        result = await applicationsService.getAllReceivedApplications(userId, undefined)
       }
 
       if (result.error) {
         return {
           data: [],
           total: 0,
-          error: result.error.message
+          error: result.error.message,
         }
       }
 
       return {
         data: result.data || [],
-        total: result.count || 0
+        total: result.count || 0,
       }
-
     } catch (error) {
       console.error('Get received applications error:', error)
       return {
         data: [],
         total: 0,
-        error: '応募管理の取得に失敗しました'
+        error: '応募管理の取得に失敗しました',
       }
     }
   }
@@ -258,17 +250,17 @@ class ApplicationApi {
    * 応募ステータスを更新（承認/拒否）
    */
   async updateApplicationStatus(
-    applicationId: string, 
+    applicationId: string,
     status: 'pending' | 'accepted' | 'rejected' | 'withdrawn',
-    responseMessage?: string
+    responseMessage?: string,
   ): Promise<ApplicationResponse> {
     try {
-      const { id: userId, profile } = this.getCurrentUser()
-      
+      const { id: userId } = this.getCurrentUser()
+
       if (!userId) {
         return {
           data: null,
-          error: 'ログインが必要です'
+          error: 'ログインが必要です',
         }
       }
 
@@ -278,28 +270,27 @@ class ApplicationApi {
         {
           status,
           response_message: responseMessage || null,
-          responded_at: new Date().toISOString()
+          responded_at: new Date().toISOString(),
         },
-        profile || undefined
+        undefined,
       )
 
       if (result.error) {
         return {
           data: null,
-          error: result.error.message
+          error: result.error.message,
         }
       }
 
       return {
         data: result.data,
-        error: undefined
+        error: undefined,
       }
-
     } catch (error) {
       console.error('Update application status error:', error)
       return {
         data: null,
-        error: 'ステータスの更新に失敗しました'
+        error: 'ステータスの更新に失敗しました',
       }
     }
   }
@@ -309,38 +300,33 @@ class ApplicationApi {
    */
   async withdrawApplication(applicationId: string): Promise<ApplicationResponse> {
     try {
-      const { id: userId, profile } = this.getCurrentUser()
-      
+      const { id: userId } = this.getCurrentUser()
+
       if (!userId) {
         return {
           data: null,
-          error: 'ログインが必要です'
+          error: 'ログインが必要です',
         }
       }
 
-      const result = await applicationsService.deleteApplication(
-        applicationId,
-        userId,
-        profile || undefined
-      )
+      const result = await applicationsService.deleteApplication(applicationId, userId, undefined)
 
       if (result.error) {
         return {
           data: null,
-          error: result.error.message
+          error: result.error.message,
         }
       }
 
       return {
         data: null,
-        error: undefined
+        error: undefined,
       }
-
     } catch (error) {
       console.error('Withdraw application error:', error)
       return {
         data: null,
-        error: '応募の取り下げに失敗しました'
+        error: '応募の取り下げに失敗しました',
       }
     }
   }
@@ -348,42 +334,39 @@ class ApplicationApi {
   /**
    * 応募統計を取得
    */
-  async getApplicationStats(postId?: string): Promise<{ data: ApplicationStats | null; error: string | null }> {
+  async getApplicationStats(
+    postId?: string,
+  ): Promise<{ data: ApplicationStats | null; error: string | null }> {
     try {
-      const { id: userId, profile } = this.getCurrentUser()
-      
+      const { id: userId } = this.getCurrentUser()
+
       if (!userId) {
         return {
           data: null,
-          error: 'ログインが必要です'
+          error: 'ログインが必要です',
         }
       }
 
       // 投稿IDが指定されている場合は、その投稿の応募統計
       // 指定されていない場合は、ユーザーの全投稿の統計
-      const result = await applicationsService.getApplicationStatistics(
-        postId,
-        userId,
-        profile || undefined
-      )
+      const result = await applicationsService.getApplicationStatistics(postId, userId, undefined)
 
       if (result.error) {
         return {
           data: null,
-          error: result.error.message
+          error: result.error.message,
         }
       }
 
       return {
         data: result.data,
-        error: null
+        error: null,
       }
-
     } catch (error) {
       console.error('Get application stats error:', error)
       return {
         data: null,
-        error: '統計データの取得に失敗しました'
+        error: '統計データの取得に失敗しました',
       }
     }
   }
@@ -394,36 +377,32 @@ class ApplicationApi {
   async canApply(postId: string): Promise<{ canApply: boolean; reason?: string }> {
     try {
       const { id: userId } = this.getCurrentUser()
-      
+
       if (!userId) {
         return {
           canApply: false,
-          reason: 'ログインが必要です'
+          reason: 'ログインが必要です',
         }
       }
 
-      const result = await applicationsService.checkApplicationEligibility(
-        postId,
-        userId
-      )
+      const result = await applicationsService.checkApplicationEligibility(postId, userId)
 
       if (result.error) {
         return {
           canApply: false,
-          reason: result.error.message
+          reason: result.error.message,
         }
       }
 
       return {
         canApply: result.data?.canApply || false,
-        reason: result.data?.reason
+        reason: result.data?.reason,
       }
-
     } catch (error) {
       console.error('Check can apply error:', error)
       return {
         canApply: false,
-        reason: '応募可能性の確認に失敗しました'
+        reason: '応募可能性の確認に失敗しました',
       }
     }
   }
