@@ -255,6 +255,7 @@ class ApplicationApi {
     responseMessage?: string,
   ): Promise<ApplicationResponse> {
     try {
+      console.log('ApplicationApi: updateApplicationStatus called', { applicationId, status, statusType: typeof status })
       const { id: userId } = this.getCurrentUser()
 
       if (!userId) {
@@ -264,14 +265,17 @@ class ApplicationApi {
         }
       }
 
+      const updateData = {
+        status,
+        response_message: responseMessage || null,
+        responded_at: new Date().toISOString(),
+      }
+      console.log('ApplicationApi: Update data', updateData)
+
       const result = await applicationsService.updateApplication(
         applicationId,
         userId,
-        {
-          status,
-          response_message: responseMessage || null,
-          responded_at: new Date().toISOString(),
-        },
+        updateData,
         this.getCurrentUser().profile,
       )
 

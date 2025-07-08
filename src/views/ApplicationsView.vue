@@ -295,19 +295,20 @@ const clearSentFilters = () => {
 
 // イベントハンドラー
 const handleUpdateStatus = async (applicationId: string, status: string) => {
-  console.log('ApplicationsView: handleUpdateStatus called', { applicationId, status })
+  console.log('ApplicationsView: handleUpdateStatus called', { applicationId, status, statusType: typeof status })
   // 日本語→ENUM値変換マップ
   const statusMap: Record<string, string> = {
-    承認: 'accepted',
-    却下: 'rejected',
-    保留: 'pending',
-    辞退: 'withdrawn',
-    accepted: 'accepted',
-    rejected: 'rejected',
-    pending: 'pending',
-    withdrawn: 'withdrawn',
+    '承認': 'accepted',
+    '却下': 'rejected',
+    '保留': 'pending',
+    '辞退': 'withdrawn',
+    'accepted': 'accepted',
+    'rejected': 'rejected',
+    'pending': 'pending',
+    'withdrawn': 'withdrawn',
   }
   const apiStatus = statusMap[status] || status
+  console.log('ApplicationsView: Status mapping', { originalStatus: status, mappedStatus: apiStatus, hasMapping: status in statusMap })
   try {
     const result = await applicationApi.updateApplicationStatus(
       applicationId,
