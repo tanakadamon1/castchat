@@ -163,10 +163,10 @@ interface Props {
 const props = defineProps<Props>()
 
 const emit = defineEmits<{
-  updateStatus: [applicationId: string, status: string]
-  viewProfile: [userId: string]
-  sendMessage: [userId: string]
-  viewPost: [postId: string]
+  'update-status': [applicationId: string, status: string]
+  'view-profile': [userId: string]
+  'send-message': [userId: string]
+  'view-post': [postId: string]
   withdraw: [applicationId: string]
 }>()
 
@@ -210,12 +210,12 @@ const handleUpdateStatus = (status: string) => {
   
   alert(`🔵 ApplicationCard emitting: ${props.application.id}, ${finalStatus}`)
   console.log('🔵 ApplicationCard emitting:', props.application.id, finalStatus)
-  emit('updateStatus', props.application.id, finalStatus)
+  emit('update-status', props.application.id, finalStatus)
 }
 
 const handleViewPost = () => {
   if (props.application.postId) {
-    emit('viewPost', props.application.postId)
+    emit('view-post', props.application.postId)
   }
 }
 
