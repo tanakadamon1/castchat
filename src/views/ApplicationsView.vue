@@ -345,6 +345,25 @@ const clearSentFilters = () => {
 // イベントハンドラー
 const handleUpdateStatus = async (applicationId: string, status: string) => {
   console.log('ApplicationsView: handleUpdateStatus called', { applicationId, status })
+  
+  // 認証状態の詳細チェック
+  console.log('=== 認証状態チェック ===')
+  console.log('authStore.user:', authStore.user)
+  console.log('authStore.profile:', authStore.profile)
+  console.log('authStore.isAuthenticated:', authStore.isAuthenticated)
+  
+  // 該当する応募の詳細情報
+  const application = receivedApplications.value.find(app => app.id === applicationId)
+  console.log('=== 応募詳細 ===')
+  console.log('application:', application)
+  
+  if (application) {
+    console.log('投稿ID:', application.postId)
+    console.log('応募者ID:', application.applicantId)
+    console.log('現在ログイン中のユーザーID:', authStore.user?.id)
+    console.log('投稿者かどうか:', authStore.user?.id)
+  }
+  
   // 日本語→ENUM値変換マップ
   const statusMap: Record<string, string> = {
     承認: 'accepted',
@@ -358,6 +377,14 @@ const handleUpdateStatus = async (applicationId: string, status: string) => {
   }
   const apiStatus = statusMap[status] || status
   try {
+    // セッション状態の再確認
+    if (!authStore.isAuthenticated) {
+      console.error('認証されていません。再ログインが必要です。')
+      toast.error('認証が無効です。再ログインしてください。')
+      router.push('/login')
+      return
+    }
+
     // 型キャストを追加してENUM型に合わせる
     const result = await applicationApi.updateApplicationStatus(
       applicationId,
@@ -366,7 +393,14 @@ const handleUpdateStatus = async (applicationId: string, status: string) => {
     console.log('ApplicationsView: updateApplicationStatus result', result)
 
     if (result.error) {
-      toast.error(result.error)
+      console.error('ステータス更新エラー詳細:', result.error)
+      
+      // 権限エラーの場合はより具体的なメッセージ
+      if (result.error.includes('permission') || result.error.includes('denied') || result.error.includes('policy')) {
+        toast.error('この操作を実行する権限がありません。投稿者としてログインしているか確認してください。')
+      } else {
+        toast.error(result.error)
+      }
       return
     }
 
