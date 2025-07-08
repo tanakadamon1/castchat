@@ -305,6 +305,7 @@ class ApplicationApi {
       )
 
       if (result.error) {
+        console.error('ApplicationApi: updateApplicationStatus error details:', result.error)
         return {
           data: null,
           error: result.error.message,

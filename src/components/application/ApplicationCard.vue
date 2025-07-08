@@ -29,7 +29,7 @@
           <BaseButton
             v-if="application.status === 'pending'"
             size="sm"
-            @click="() => handleUpdateStatus('accepted')"
+            @click="() => { console.log('承認ボタンがクリックされました!'); handleUpdateStatus('accepted'); }"
           >
             承認
           </BaseButton>
@@ -37,7 +37,7 @@
             v-if="application.status === 'pending'"
             size="sm"
             variant="outline"
-            @click="() => handleUpdateStatus('rejected')"
+            @click="() => { console.log('却下ボタンがクリックされました!'); handleUpdateStatus('rejected'); }"
           >
             却下
           </BaseButton>
