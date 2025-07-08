@@ -296,19 +296,44 @@ const clearSentFilters = () => {
 // イベントハンドラー
 const handleUpdateStatus = async (applicationId: string, status: string) => {
   console.log('ApplicationsView: handleUpdateStatus called', { applicationId, status, statusType: typeof status })
-  // 日本語→ENUM値変換マップ
+  
+  // 日本語→ENUM値変換マップ（すべてのパターンを網羅）
   const statusMap: Record<string, string> = {
     '承認': 'accepted',
     '却下': 'rejected',
     '保留': 'pending',
     '辞退': 'withdrawn',
+    '承認する': 'accepted',
+    '却下する': 'rejected',
     'accepted': 'accepted',
     'rejected': 'rejected',
     'pending': 'pending',
     'withdrawn': 'withdrawn',
   }
-  const apiStatus = statusMap[status] || status
-  console.log('ApplicationsView: Status mapping', { originalStatus: status, mappedStatus: apiStatus, hasMapping: status in statusMap })
+  
+  // より安全な変換：日本語が含まれている場合は確実に変換
+  let apiStatus = statusMap[status]
+  if (!apiStatus) {
+    // fallback: もし変換マップにない場合は、文字列解析を試行
+    if (status.includes('承認')) {
+      apiStatus = 'accepted'
+    } else if (status.includes('却下')) {
+      apiStatus = 'rejected'
+    } else if (status.includes('保留')) {
+      apiStatus = 'pending'
+    } else if (status.includes('辞退')) {
+      apiStatus = 'withdrawn'
+    } else {
+      apiStatus = status // 最後の手段：そのまま使用
+    }
+  }
+  
+  console.log('ApplicationsView: Status mapping', { 
+    originalStatus: status, 
+    mappedStatus: apiStatus, 
+    hasMapping: status in statusMap,
+    includesJapanese: /[ひらがなカタカナ漢字]/.test(status)
+  })
   try {
     const result = await applicationApi.updateApplicationStatus(
       applicationId,

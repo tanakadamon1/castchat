@@ -256,6 +256,31 @@ class ApplicationApi {
   ): Promise<ApplicationResponse> {
     try {
       console.log('ApplicationApi: updateApplicationStatus called', { applicationId, status, statusType: typeof status })
+      
+      // ステータス値のバリデーションと正規化
+      const validStatuses = ['pending', 'accepted', 'rejected', 'withdrawn']
+      const statusMap: Record<string, string> = {
+        '承認': 'accepted',
+        '却下': 'rejected',
+        '保留': 'pending',
+        '辞退': 'withdrawn',
+        '承認する': 'accepted',
+        '却下する': 'rejected'
+      }
+      
+      let normalizedStatus = status
+      if (!validStatuses.includes(status)) {
+        normalizedStatus = statusMap[status] || status
+        console.log('ApplicationApi: Status normalized', { original: status, normalized: normalizedStatus })
+      }
+      
+      if (!validStatuses.includes(normalizedStatus)) {
+        return {
+          data: null,
+          error: `無効なステータス値: ${status} -> ${normalizedStatus}`,
+        }
+      }
+      
       const { id: userId } = this.getCurrentUser()
 
       if (!userId) {
@@ -266,7 +291,7 @@ class ApplicationApi {
       }
 
       const updateData = {
-        status,
+        status: normalizedStatus,
         response_message: responseMessage || null,
         responded_at: new Date().toISOString(),
       }
