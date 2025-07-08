@@ -28,7 +28,7 @@ export interface ApplicationCreateData {
   post_id: string
   message: string
   portfolio_url?: string | null
-  availability?: string | null
+  // availability?: string | null // TODO: マイグレーション00019適用後に有効化
   twitter_id?: string | null
 }
 
@@ -122,7 +122,7 @@ export class ApplicationsService {
         post_id: applicationData.post_id,
         message: applicationData.message,
         portfolio_url: applicationData.portfolio_url,
-        availability: applicationData.availability,
+        // availability: applicationData.availability, // TODO: マイグレーション00019適用後に有効化
         twitter_id: applicationData.twitter_id,
         status: 'pending'
       }

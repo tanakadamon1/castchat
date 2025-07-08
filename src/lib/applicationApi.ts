@@ -79,13 +79,14 @@ class ApplicationApi {
         }
       }
 
+      // 一時的にavailabilityを削除（データベースに存在しないため）
       const result = await applicationsService.createApplication(
         userId,
         {
           post_id: data.postId,
           message: data.message,
           portfolio_url: data.experience || null, // experienceをportfolio_urlとして保存
-          availability: data.availability || null,
+          // availability: data.availability || null, // TODO: マイグレーション00019適用後に有効化
           twitter_id: data.twitterId || null
         },
         profile || undefined
