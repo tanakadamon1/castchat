@@ -81,21 +81,48 @@
         </div>
       </div>
       
-      <!-- Filters -->
-      <div class="mb-6 flex items-center space-x-4">
-        <BaseSelect
-          v-model="statusFilter"
-          :options="statusOptions"
-          @change="loadPosts"
-          class="w-48"
-        />
+      <!-- Tabs -->
+      <div class="mb-6">
+        <!-- Tab Navigation -->
+        <div class="border-b border-gray-200 dark:border-gray-700">
+          <nav class="-mb-px flex space-x-8" aria-label="Tabs">
+            <button
+              v-for="tab in statusTabs"
+              :key="tab.value"
+              @click="statusFilter = tab.value; loadPosts()"
+              :class="[
+                statusFilter === tab.value
+                  ? 'border-indigo-500 text-indigo-600 dark:text-indigo-400'
+                  : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 dark:text-gray-400 dark:hover:text-gray-300',
+                'whitespace-nowrap py-2 px-1 border-b-2 font-medium text-sm'
+              ]"
+              :aria-current="statusFilter === tab.value ? 'page' : undefined"
+            >
+              {{ tab.label }}
+              <span
+                v-if="tab.count !== undefined"
+                :class="[
+                  statusFilter === tab.value
+                    ? 'bg-indigo-100 text-indigo-600 dark:bg-indigo-900 dark:text-indigo-300'
+                    : 'bg-gray-100 text-gray-900 dark:bg-gray-800 dark:text-gray-300',
+                  'hidden ml-2 py-0.5 px-2.5 rounded-full text-xs font-medium md:inline-block'
+                ]"
+              >
+                {{ tab.count }}
+              </span>
+            </button>
+          </nav>
+        </div>
         
-        <BaseSelect
-          v-model="sortBy"
-          :options="sortOptions"
-          @change="loadPosts"
-          class="w-48"
-        />
+        <!-- Sort Filter -->
+        <div class="mt-4 flex justify-end">
+          <BaseSelect
+            v-model="sortBy"
+            :options="sortOptions"
+            @change="loadPosts"
+            class="w-48"
+          />
+        </div>
       </div>
       
       <!-- Loading State -->
@@ -203,13 +230,6 @@ const selectedImages = ref<string[]>([])
 const selectedImageIndex = ref(0)
 
 // Select options
-const statusOptions = [
-  { label: 'すべて', value: 'all' },
-  { label: '募集中', value: 'active' },
-  { label: '募集終了', value: 'closed' },
-  { label: '下書き', value: 'draft' }
-]
-
 const sortOptions = [
   { label: '新しい順', value: 'newest' },
   { label: '古い順', value: 'oldest' },
@@ -217,8 +237,37 @@ const sortOptions = [
   { label: '閲覧数順', value: 'views' }
 ]
 
+// 全投稿を保持（タブ用の集計に使用）
+const allPosts = ref<Post[]>([])
+
 // Computed
 const totalPages = computed(() => Math.ceil(total.value / perPage.value))
+
+// 各ステータスの件数を計算
+const statusCounts = computed(() => {
+  const counts = {
+    all: allPosts.value.length,
+    active: 0,
+    draft: 0,
+    closed: 0
+  }
+  
+  allPosts.value.forEach(post => {
+    if (post.status === 'active') counts.active++
+    else if (post.status === 'draft') counts.draft++
+    else if (post.status === 'closed') counts.closed++
+  })
+  
+  return counts
+})
+
+// タブ設定
+const statusTabs = computed(() => [
+  { label: 'すべて', value: 'all', count: statusCounts.value.all },
+  { label: '公開中', value: 'active', count: statusCounts.value.active },
+  { label: '下書き', value: 'draft', count: statusCounts.value.draft },
+  { label: '募集終了', value: 'closed', count: statusCounts.value.closed }
+])
 
 const totalPosts = computed(() => total.value)
 const activePosts = computed(() => posts.value.filter(p => p.status === 'active').length)
@@ -238,24 +287,40 @@ const loadPosts = async (showLoading = true) => {
   error.value = null
   
   try {
-    const result = await postsApi.getPosts({
-      status: statusFilter.value === 'all' ? undefined : statusFilter.value,
-      sortBy: sortBy.value,
-      limit: perPage.value,
-      offset: (currentPage.value - 1) * perPage.value,
-      user_id: authStore.user.id
+    // 全投稿を取得（タブの件数計算用）
+    const allResult = await postsApi.getPosts({
+      user_id: authStore.user.id,
+      limit: 1000 // 大きめの値で全件取得
     })
     
-    if (result.error) {
-      error.value = result.error
+    if (allResult.error) {
+      error.value = allResult.error
       posts.value = []
+      allPosts.value = []
       total.value = 0
       return
     }
     
-    // 一時的に自分の投稿のみフィルタリング（API実装後は削除）
-    const filteredPosts = (result.data || []).filter(post => post.authorId === authStore.user?.id)
-    posts.value = filteredPosts
+    // 自分の投稿のみフィルタリング
+    allPosts.value = (allResult.data || []).filter(post => post.authorId === authStore.user?.id)
+    
+    // 現在のタブに応じてフィルタリング
+    let filteredPosts = allPosts.value
+    if (statusFilter.value !== 'all') {
+      filteredPosts = allPosts.value.filter(post => post.status === statusFilter.value)
+    }
+    
+    // ソート適用
+    if (sortBy.value === 'newest') {
+      filteredPosts.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())
+    } else if (sortBy.value === 'oldest') {
+      filteredPosts.sort((a, b) => new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime())
+    }
+    
+    // ページネーション適用
+    const startIndex = (currentPage.value - 1) * perPage.value
+    const endIndex = startIndex + perPage.value
+    posts.value = filteredPosts.slice(startIndex, endIndex)
     total.value = filteredPosts.length
     
   } catch (err) {

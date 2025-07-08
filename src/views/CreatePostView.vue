@@ -358,7 +358,7 @@
             :loading="saving"
             class="order-3 sm:order-3"
           >
-            下書き保存
+            {{ isDraftMode ? '下書き更新' : '下書き保存' }}
           </BaseButton>
 
           <BaseButton
@@ -397,7 +397,7 @@ const authStore = useAuthStore()
 const toast = useToast()
 const { validate: validateField, validateAll, getFieldError, hasErrors } = useValidation()
 
-// 編集モードの判定
+// 編集モードと下書きモードの判定
 const isEditing = computed(() => {
   const editing = !!route.params.id
   console.log('isEditing computed:', { editing, routeParams: route.params, routePath: route.path })
@@ -408,6 +408,10 @@ const postId = computed(() => {
   console.log('postId computed:', { id, routeParams: route.params })
   return id
 })
+
+// 下書きID管理
+const draftId = ref<string | null>(null)
+const isDraftMode = computed(() => !!draftId.value)
 
 // フォームデータ
 const formData = ref({
@@ -751,13 +755,58 @@ const handleSaveDraft = async () => {
     return
   }
 
+  // 最小限のバリデーション（タイトルのみ）
+  if (!formData.value.title?.trim()) {
+    toast.error('タイトルを入力してください')
+    return
+  }
+
   saving.value = true
 
   try {
-    await saveDraft()
-    toast.success('下書きを保存しました')
+    console.log('=== Draft Save Process Started ===')
+    
+    // 画像をアップロード
+    const imageUrls = await uploadImages(draftId.value)
+    console.log('Draft save: Images uploaded:', imageUrls)
+
+    // 投稿データを準備
+    const postData = {
+      title: formData.value.title,
+      category: formData.value.category || 'other',
+      description: formData.value.description,
+      requirements: formData.value.requirements ? [formData.value.requirements] : [],
+      deadline: formData.value.deadline || undefined,
+      maxParticipants: formData.value.maxParticipants || 1,
+      contactMethod: 'twitter' as ContactMethod,
+      contactValue: formData.value.contactInfo,
+      eventFrequency: formData.value.eventFrequency,
+      eventSpecificDate: formData.value.eventSpecificDate || undefined,
+      eventWeekday: formData.value.eventWeekday,
+      eventTime: formData.value.eventTime || undefined,
+      eventWeekOfMonth: formData.value.eventWeekOfMonth,
+      tags: [],
+      images: imageUrls,
+    }
+
+    console.log('Draft save: Post data prepared:', postData)
+
+    // 下書き保存API呼び出し
+    const result = await postsApi.saveDraft(postData, draftId.value)
+    console.log('Draft save: API result:', result)
+
+    if (result.error) {
+      throw new Error(result.error)
+    }
+
+    if (result.data) {
+      draftId.value = result.data.id
+      const message = isDraftMode.value ? '下書きを更新しました' : '下書きを保存しました'
+      toast.success(message)
+      console.log('Draft save: Success, draftId set to:', draftId.value)
+    }
   } catch (error) {
-    console.error('下書き保存エラー:', error)
+    console.error('Draft save error:', error)
     toast.error('下書き保存に失敗しました')
   } finally {
     saving.value = false
@@ -900,6 +949,17 @@ const submitPost = async () => {
     }
     console.log('submitPost: Update success, returning data:', result.data)
     return result.data
+  } else if (isDraftMode.value) {
+    console.log('submitPost: Draft publish mode - updating draft to active...')
+    // 下書きから公開処理
+    const result = await postsApi.updatePost(draftId.value!, { ...postData, status: 'active' })
+    console.log('submitPost: Draft publish API result:', result)
+    if (result.error) {
+      console.error('submitPost: Draft publish API error:', result.error)
+      throw new Error(result.error)
+    }
+    console.log('submitPost: Draft publish success, returning data:', result.data)
+    return result.data
   } else {
     console.log('submitPost: Creating new post via API...')
     // 新規作成処理
@@ -914,10 +974,6 @@ const submitPost = async () => {
   }
 }
 
-const saveDraft = () => {
-  // 下書き保存処理（実装予定）
-  return new Promise((resolve) => setTimeout(resolve, 500))
-}
 
 const loadPost = async () => {
   if (!isEditing.value) return null
@@ -968,6 +1024,12 @@ onMounted(async () => {
             uploaded: { url, path: '' } // 既にアップロード済みとしてマーク
           }))
           console.log('編集モード: selectedImages設定完了', selectedImages.value)
+        }
+        
+        // 下書きの場合はdraftIdを設定
+        if (postData.status === 'draft') {
+          draftId.value = postData.id
+          console.log('下書きモード: draftId設定完了', draftId.value)
         }
         
         loadError.value = null

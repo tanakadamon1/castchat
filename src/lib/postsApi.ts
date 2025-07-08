@@ -403,6 +403,145 @@ export const postsApi = {
     }
   },
 
+  // 下書き保存
+  async saveDraft(postData: any, draftId?: string): Promise<PostResponse> {
+    try {
+      const authStore = useAuthStore()
+      
+      if (!authStore.user?.id) {
+        console.error('No user ID found in auth store')
+        return { data: null, error: 'ログインが必要です' }
+      }
+
+      // カテゴリslugをIDに変換
+      const categoryMap: Record<string, string> = {
+        'customer-service': '86701fea-6a75-4abe-bdf6-d04534043093',
+        'meetings': 'b6928c39-9e2b-48f6-b4a1-8291543f4374',
+        'music-dance': '7de2f5db-0a00-4b55-adf0-10f9ecf755a1',
+        'social': '7c104ccc-ae25-44c8-b8b6-d8392d8b44e0',
+        'beginners': 'd93d482c-402a-469f-ba9a-92da08ff05e8',
+        'roleplay': '50a97664-cd88-45a3-baf7-8e2c2776df03',
+        'games': '23e2cbf3-3a80-4249-afaa-491b696bf94b',
+        'other': '8878469d-a3b7-40f5-ad32-7be0846f2498'
+      }
+
+      const categoryId = categoryMap[postData.category] || categoryMap['other']
+
+      // 下書きデータを準備（最小限のバリデーション）
+      const draftData = {
+        user_id: authStore.user.id,
+        category_id: categoryId,
+        title: postData.title || '無題の下書き',
+        description: postData.description || '',
+        requirements: postData.requirements?.join ? postData.requirements.join(', ') : (typeof postData.requirements === 'string' ? postData.requirements : ''),
+        recruitment_count: postData.maxParticipants || 1,
+        deadline: postData.deadline ? new Date(postData.deadline).toISOString().split('T')[0] : null,
+        contact_method: postData.contactMethod || null,
+        contact_value: postData.contactValue || null,
+        event_frequency: postData.eventFrequency || null,
+        event_specific_date: postData.eventSpecificDate ? new Date(postData.eventSpecificDate).toISOString() : null,
+        event_weekday: postData.eventWeekday !== undefined ? postData.eventWeekday : null,
+        event_time: postData.eventTime || null,
+        event_week_of_month: postData.eventWeekOfMonth !== undefined ? postData.eventWeekOfMonth : null,
+        status: 'draft', // 下書きステータス
+        updated_at: new Date().toISOString()
+      }
+
+      let result
+      if (draftId) {
+        // 既存の下書きを更新
+        const { data: updatedDraft, error: updateError } = await supabase
+          .from('posts')
+          .update(draftData)
+          .eq('id', draftId)
+          .eq('user_id', authStore.user.id) // セキュリティチェック
+          .select()
+          .single()
+        
+        if (updateError) {
+          console.error('postsApi.saveDraft: Update error:', updateError.message)
+          return { data: null, error: `下書きの更新に失敗しました: ${updateError.message}` }
+        }
+        result = { data: updatedDraft, error: null }
+      } else {
+        // 新規下書きを作成
+        const { data: newDraft, error: insertError } = await supabase
+          .from('posts')
+          .insert([draftData])
+          .select()
+          .single()
+        
+        if (insertError) {
+          console.error('postsApi.saveDraft: Insert error:', insertError.message)
+          return { data: null, error: `下書きの保存に失敗しました: ${insertError.message}` }
+        }
+        result = { data: newDraft, error: null }
+      }
+
+      if (!result.data) {
+        return { data: null, error: '下書きの保存に失敗しました' }
+      }
+
+      // 画像がある場合の処理
+      if (postData.images && postData.images.length > 0) {
+        // 既存の画像を削除（更新の場合）
+        if (draftId) {
+          await supabase
+            .from('post_images')
+            .delete()
+            .eq('post_id', draftId)
+        }
+
+        // 新しい画像を追加
+        const imageData = postData.images.map((url, index) => ({
+          post_id: result.data.id,
+          url,
+          display_order: index
+        }))
+
+        const { error: imageError } = await supabase
+          .from('post_images')
+          .insert(imageData)
+
+        if (imageError) {
+          console.error('Failed to save draft images:', imageError.message)
+        }
+      }
+
+      // レスポンスデータをフロントエンド形式に変換
+      const transformedPost: Post = {
+        id: result.data.id,
+        title: result.data.title,
+        description: result.data.description,
+        category: postData.category,
+        status: 'draft' as any,
+        deadline: result.data.deadline || undefined,
+        maxParticipants: result.data.recruitment_count || 1,
+        contactMethod: postData.contactMethod,
+        contactValue: postData.contactValue,
+        requirements: postData.requirements || [],
+        tags: [],
+        worldName: undefined,
+        authorId: result.data.user_id,
+        authorName: authStore.user.user_metadata?.display_name || '匿名',
+        createdAt: result.data.created_at,
+        updatedAt: result.data.updated_at || result.data.created_at,
+        applicationsCount: 0,
+        eventFrequency: postData.eventFrequency,
+        eventSpecificDate: postData.eventSpecificDate,
+        eventWeekday: postData.eventWeekday,
+        eventTime: postData.eventTime,
+        eventWeekOfMonth: postData.eventWeekOfMonth,
+        images: postData.images || []
+      }
+
+      return { data: transformedPost }
+    } catch (error) {
+      console.error('Unexpected draft save error:', error)
+      return { data: null, error: `予期しないエラー: ${error?.message || 'Unknown error'}` }
+    }
+  },
+
   // デバッグ用: 最小限のテスト投稿
   async testCreatePost(): Promise<PostResponse> {
     try {
