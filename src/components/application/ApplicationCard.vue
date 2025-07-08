@@ -30,16 +30,18 @@
             v-if="application.status === 'pending'"
             size="sm"
             @click="() => handleUpdateStatus('accepted')"
+            data-test="accept-button"
           >
-            承認
+承認
           </BaseButton>
           <BaseButton
             v-if="application.status === 'pending'"
             size="sm"
             variant="outline"
             @click="() => handleUpdateStatus('rejected')"
+            data-test="reject-button"
           >
-            却下
+却下
           </BaseButton>
         </template>
 
@@ -191,9 +193,6 @@ const displayAvatar = computed(() => {
 
 // イベントハンドラー
 const handleUpdateStatus = (status: string) => {
-  alert(`🔵 ApplicationCard handleUpdateStatus called: ${status}`)
-  console.log('🔵 ApplicationCard handleUpdateStatus called:', status)
-  
   // 必ず英語の enum 値を送信
   const validStatuses = ['accepted', 'rejected', 'pending', 'withdrawn']
   let finalStatus = status
@@ -208,8 +207,6 @@ const handleUpdateStatus = (status: string) => {
     }
   }
   
-  alert(`🔵 ApplicationCard emitting: ${props.application.id}, ${finalStatus}`)
-  console.log('🔵 ApplicationCard emitting:', props.application.id, finalStatus)
   emit('update-status', props.application.id, finalStatus)
 }
 

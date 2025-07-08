@@ -67,14 +67,14 @@
           v-if="type === 'received' && application.status === 'pending'"
           class="flex flex-col sm:flex-row gap-3 pt-4 border-t"
         >
-          <BaseButton @click="handleUpdateStatus('accepted')" class="flex-1">
+          <BaseButton @click="handleUpdateStatus('accepted')" class="flex-1" data-test="modal-accept">
             <CheckCircle class="w-4 h-4 mr-2" />
-            承認する
+承認する
           </BaseButton>
 
-          <BaseButton variant="outline" @click="handleUpdateStatus('rejected')" class="flex-1">
+          <BaseButton variant="outline" @click="handleUpdateStatus('rejected')" class="flex-1" data-test="modal-reject">
             <XCircle class="w-4 h-4 mr-2" />
-            却下する
+却下する
           </BaseButton>
         </div>
 
@@ -123,7 +123,7 @@ const props = defineProps<Props>()
 
 const emit = defineEmits<{
   close: []
-  updateStatus: [applicationId: string, status: string]
+  'update-status': [applicationId: string, status: string]
 }>()
 
 // 表示用データ
@@ -163,20 +163,8 @@ const formatDateTime = (dateString: string) => {
 
 // ステータス更新
 const handleUpdateStatus = (status: string) => {
-  console.log('ApplicationDetailModal: handleUpdateStatus called', {
-    applicationId: props.application.id,
-    status,
-    statusType: typeof status,
-    statusLength: status.length,
-    statusCodeUnits: [...status].map((c) => c.charCodeAt(0)),
-  })
-
   if (confirm(`この応募を${status === 'accepted' ? '承認' : '却下'}しますか？`)) {
-    console.log('ApplicationDetailModal: emitting updateStatus', {
-      applicationId: props.application.id,
-      status,
-    })
-    emit('updateStatus', props.application.id, status)
+    emit('update-status', props.application.id, status)
     emit('close')
   }
 }
