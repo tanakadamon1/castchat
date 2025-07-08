@@ -82,28 +82,59 @@ class ApplicationApi {
 
       // 直接Supabaseにアクセスして応募を作成（デバッグ用）
       try {
+        // まず、テーブル構造を確認
+        console.log('Checking applications table structure...')
+        const { data: tableStructure } = await supabase
+          .from('information_schema.columns')
+          .select('column_name, data_type, is_nullable')
+          .eq('table_schema', 'public')
+          .eq('table_name', 'applications')
+        
+        console.log('Applications table columns:', tableStructure)
+
+        // 既存の応募があるかチェック
+        console.log('Checking for existing applications...')
+        const { data: existingApps, error: selectError } = await supabase
+          .from('applications')
+          .select('id, post_id, user_id')
+          .limit(5)
+        
+        console.log('Existing applications:', existingApps, 'Error:', selectError)
+
         console.log('Attempting to create application:', {
           post_id: data.postId,
           user_id: userId,
           message: data.message
         })
 
+        const insertPayload = {
+          post_id: data.postId,
+          user_id: userId,
+          message: data.message,
+          status: 'pending'
+        }
+
+        console.log('Full insert payload:', insertPayload)
+        console.log('User auth state:', authStore.user)
+        console.log('User profile:', authStore.profile)
+
         const { data: applicationData, error: insertError } = await supabase
           .from('applications')
-          .insert({
-            post_id: data.postId,
-            user_id: userId,
-            message: data.message,
-            status: 'pending'
-          })
+          .insert(insertPayload)
           .select()
           .single()
 
         if (insertError) {
-          console.error('Direct insert error:', insertError)
+          console.error('Direct insert error details:', {
+            error: insertError,
+            code: insertError.code,
+            message: insertError.message,
+            details: insertError.details,
+            hint: insertError.hint
+          })
           return {
             data: null,
-            error: insertError.message
+            error: `${insertError.message} (${insertError.code})`
           }
         }
 
