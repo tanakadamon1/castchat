@@ -8,7 +8,7 @@
             <h1 class="text-2xl font-bold text-gray-900">応募管理</h1>
             <p class="text-gray-600 mt-1">あなたの投稿への応募と、応募した募集を管理できます</p>
           </div>
-          
+
           <!-- タブ切り替え -->
           <div class="flex bg-gray-100 rounded-lg p-1">
             <button
@@ -17,7 +17,7 @@
                 'px-4 py-2 rounded-md text-sm font-medium transition-colors',
                 activeTab === 'received'
                   ? 'bg-white text-indigo-600 shadow-sm'
-                  : 'text-gray-600 hover:text-gray-900'
+                  : 'text-gray-600 hover:text-gray-900',
               ]"
             >
               受信した応募 ({{ receivedApplications.length }})
@@ -28,7 +28,7 @@
                 'px-4 py-2 rounded-md text-sm font-medium transition-colors',
                 activeTab === 'sent'
                   ? 'bg-white text-indigo-600 shadow-sm'
-                  : 'text-gray-600 hover:text-gray-900'
+                  : 'text-gray-600 hover:text-gray-900',
               ]"
             >
               送信した応募 ({{ sentApplications.length }})
@@ -61,11 +61,7 @@
               />
             </div>
             <div class="flex items-end">
-              <BaseButton
-                type="button"
-                variant="outline"
-                @click="clearReceivedFilters"
-              >
+              <BaseButton type="button" variant="outline" @click="clearReceivedFilters">
                 クリア
               </BaseButton>
             </div>
@@ -83,9 +79,7 @@
             title="応募がありません"
             description="まだ応募が届いていません。募集を投稿して応募を待ちましょう。"
           >
-            <BaseButton @click="$router.push('/posts/create')">
-              募集を投稿する
-            </BaseButton>
+            <BaseButton @click="$router.push('/posts/create')"> 募集を投稿する </BaseButton>
           </EmptyState>
         </div>
 
@@ -124,11 +118,7 @@
               />
             </div>
             <div class="flex items-end">
-              <BaseButton
-                type="button"
-                variant="outline"
-                @click="clearSentFilters"
-              >
+              <BaseButton type="button" variant="outline" @click="clearSentFilters">
                 クリア
               </BaseButton>
             </div>
@@ -146,9 +136,7 @@
             title="応募履歴がありません"
             description="まだ応募していません。気になる募集に応募してみましょう。"
           >
-            <BaseButton @click="$router.push('/posts')">
-              募集を探す
-            </BaseButton>
+            <BaseButton @click="$router.push('/posts')"> 募集を探す </BaseButton>
           </EmptyState>
         </div>
 
@@ -200,6 +188,7 @@ import EmptyState from '@/components/ui/EmptyState.vue'
 import ApplicationCard from '@/components/application/ApplicationCard.vue'
 import ApplicationDetailModal from '@/components/application/ApplicationDetailModal.vue'
 // import MessageModal from '@/components/message/MessageModal.vue'
+import type { Application } from '@/types/application'
 
 const router = useRouter()
 const authStore = useAuthStore()
@@ -223,16 +212,15 @@ const receivedApplications = ref<any[]>([])
 const sentApplications = ref<any[]>([])
 const errorMessage = ref<string | null>(null)
 
-
 // フィルター状態
 const receivedFilters = ref({
   status: '',
-  postId: ''
+  postId: '',
 })
 
 const sentFilters = ref({
   status: '',
-  search: ''
+  search: '',
 })
 
 // フィルターオプション
@@ -240,24 +228,23 @@ const statusFilterOptions = [
   { value: '', label: 'すべて' },
   { value: 'pending', label: '審査中' },
   { value: 'accepted', label: '承認済み' },
-  { value: 'rejected', label: '却下' }
+  { value: 'rejected', label: '却下' },
 ]
 
 const postFilterOptions = computed(() => [
   { value: '', label: 'すべての投稿' },
-  ...Array.from(new Set(receivedApplications.value.map(app => app.postId)))
-    .map(postId => {
-      const app = receivedApplications.value.find(a => a.postId === postId)
-      return {
-        value: postId,
-        label: app?.postTitle || `投稿 ${postId}`
-      }
-    })
+  ...Array.from(new Set(receivedApplications.value.map((app) => app.postId))).map((postId) => {
+    const app = receivedApplications.value.find((a) => a.postId === postId)
+    return {
+      value: postId,
+      label: app?.postTitle || `投稿 ${postId}`,
+    }
+  }),
 ])
 
 // フィルター適用
 const filteredReceivedApplications = computed(() => {
-  return receivedApplications.value.filter(app => {
+  return receivedApplications.value.filter((app) => {
     if (receivedFilters.value.status && app.status !== receivedFilters.value.status) {
       return false
     }
@@ -269,12 +256,14 @@ const filteredReceivedApplications = computed(() => {
 })
 
 const filteredSentApplications = computed(() => {
-  return sentApplications.value.filter(app => {
+  return sentApplications.value.filter((app) => {
     if (sentFilters.value.status && app.status !== sentFilters.value.status) {
       return false
     }
-    if (sentFilters.value.search && 
-        !app.postTitle.toLowerCase().includes(sentFilters.value.search.toLowerCase())) {
+    if (
+      sentFilters.value.search &&
+      !app.postTitle.toLowerCase().includes(sentFilters.value.search.toLowerCase())
+    ) {
       return false
     }
     return true
@@ -293,37 +282,52 @@ const applySentFilters = () => {
 const clearReceivedFilters = () => {
   receivedFilters.value = {
     status: '',
-    postId: ''
+    postId: '',
   }
 }
 
 const clearSentFilters = () => {
   sentFilters.value = {
     status: '',
-    search: ''
+    search: '',
   }
 }
 
 // イベントハンドラー
 const handleUpdateStatus = async (applicationId: string, status: string) => {
   console.log('ApplicationsView: handleUpdateStatus called', { applicationId, status })
+  // 日本語→ENUM値変換マップ
+  const statusMap: Record<string, string> = {
+    承認: 'accepted',
+    却下: 'rejected',
+    保留: 'pending',
+    辞退: 'withdrawn',
+    accepted: 'accepted',
+    rejected: 'rejected',
+    pending: 'pending',
+    withdrawn: 'withdrawn',
+  }
+  const apiStatus = statusMap[status] || status
   try {
-    const result = await applicationApi.updateApplicationStatus(applicationId, status as 'pending' | 'accepted' | 'rejected' | 'withdrawn')
+    const result = await applicationApi.updateApplicationStatus(
+      applicationId,
+      apiStatus as 'pending' | 'accepted' | 'rejected' | 'withdrawn',
+    )
     console.log('ApplicationsView: updateApplicationStatus result', result)
-    
+
     if (result.error) {
       toast.error(result.error)
       return
     }
-    
+
     // ローカルデータを更新
-    const application = receivedApplications.value.find(app => app.id === applicationId)
+    const application = receivedApplications.value.find((app) => app.id === applicationId)
     if (application && result.data) {
       application.status = result.data.status
       application.respondedAt = result.data.responded_at
     }
-    
-    const statusText = status === 'accepted' ? '承認' : '却下'
+
+    const statusText = apiStatus === 'accepted' ? '承認' : '却下'
     toast.success(`応募を${statusText}しました`)
   } catch (err) {
     console.error('ステータス更新エラー:', err)
@@ -339,16 +343,17 @@ const handleViewProfile = (userId: string) => {
 const handleSendMessage = (userId: string) => {
   console.log('ApplicationsView: handleSendMessage called', { userId })
   // メッセージモーダルを開く
-  const user = receivedApplications.value
-    .find(app => app.applicantId === userId || app.user_id === userId)
-  
+  const user = receivedApplications.value.find(
+    (app) => app.applicantId === userId || app.user_id === userId,
+  )
+
   console.log('ApplicationsView: Found user for message:', user)
-  
+
   if (user) {
     selectedRecipient.value = {
       id: userId,
       display_name: user.applicantName || user.user?.display_name || '匿名ユーザー',
-      avatar_url: user.applicantAvatar || user.user?.avatar_url
+      avatar_url: user.applicantAvatar || user.user?.avatar_url,
     }
     showMessageModal.value = true
   } else {
@@ -365,21 +370,21 @@ const handleWithdraw = async (applicationId: string) => {
   if (!confirm('応募を取り下げますか？この操作は取り消せません。')) {
     return
   }
-  
+
   try {
     const result = await applicationApi.withdrawApplication(applicationId)
-    
+
     if (result.error) {
       toast.error(result.error)
       return
     }
-    
+
     // ローカルデータから削除
-    const index = sentApplications.value.findIndex(app => app.id === applicationId)
+    const index = sentApplications.value.findIndex((app) => app.id === applicationId)
     if (index !== -1) {
       sentApplications.value.splice(index, 1)
     }
-    
+
     toast.success('応募を取り下げました')
   } catch (err) {
     console.error('応募取り下げエラー:', err)
@@ -391,46 +396,52 @@ const handleWithdraw = async (applicationId: string) => {
 const loadApplications = async () => {
   try {
     console.log('Loading applications...')
-    
+
     // 受信した応募を取得
     console.log('Fetching received applications...')
     const receivedResult = await applicationApi.getReceivedApplications()
     console.log('Received applications result:', receivedResult)
-    
+
     if (receivedResult.error) {
       errorMessage.value = receivedResult.error
       console.error('Received applications error:', receivedResult.error)
     } else {
       console.log('Raw received applications data:', receivedResult.data)
       // データを ApplicationCard で使用する形式に変換
-      receivedApplications.value = (receivedResult.data || []).map((app: any) => {
-        console.log('Processing application:', app)
-        console.log('app.posts:', app.posts)
-        console.log('app.users:', app.users)
-        console.log('app.twitter_id:', app.twitter_id)
-        
-        const mappedApp = {
-          id: app.id,
-          postId: app.post_id,
-          postTitle: app.posts?.title || '募集タイトル',
-          postAuthor: app.posts?.users?.display_name || '投稿者',
-          applicantId: app.user_id,
-          applicantName: app.users?.display_name || '匿名ユーザー',
-          applicantAvatar: app.users?.avatar_url,
-          status: app.status,
-          message: app.message,
-          appliedAt: app.created_at,
-          respondedAt: app.responded_at,
-          portfolio_url: app.portfolio_url,
-          // portfolio_urlを経験として表示
-          experience: app.portfolio_url,
-          availability: app.availability,
-          twitterId: app.twitter_id
-        }
-        
-        console.log('Mapped application:', mappedApp)
-        console.log('Twitter ID in mapped data:', mappedApp.twitterId)
-        return mappedApp
+      receivedApplications.value = (receivedResult.data || []).map((app: unknown) => {
+        if (typeof app !== 'object' || app === null) return {} as Application
+        const a = app as Record<string, unknown>
+        return {
+          id: a.id as string,
+          postId: a.post_id as string,
+          postTitle:
+            a.posts && typeof a.posts === 'object'
+              ? ((a.posts as Record<string, unknown>).title as string) || '募集タイトル'
+              : '募集タイトル',
+          postAuthor:
+            a.posts && typeof a.posts === 'object' && (a.posts as Record<string, unknown>).users
+              ? ((a.posts as Record<string, unknown>).users &&
+                  (a.posts as Record<string, any>).users.display_name) ||
+                '投稿者'
+              : '投稿者',
+          applicantId: a.user_id as string,
+          applicantName:
+            a.users && typeof a.users === 'object'
+              ? ((a.users as Record<string, unknown>).display_name as string) || '匿名ユーザー'
+              : '匿名ユーザー',
+          applicantAvatar:
+            a.users && typeof a.users === 'object'
+              ? ((a.users as Record<string, unknown>).avatar_url as string)
+              : undefined,
+          status: a.status as string,
+          message: a.message as string,
+          appliedAt: a.created_at as string,
+          respondedAt: a.responded_at as string,
+          portfolio_url: a.portfolio_url as string,
+          experience: a.portfolio_url as string,
+          availability: a.availability as string,
+          twitterId: a.twitter_id as string,
+        } as Application
       })
       console.log('Final received applications data:', receivedApplications.value)
     }
@@ -439,30 +450,45 @@ const loadApplications = async () => {
     console.log('Fetching sent applications...')
     const sentResult = await applicationApi.getMyApplications()
     console.log('Sent applications result:', sentResult)
-    
+
     if (sentResult.error) {
       errorMessage.value = sentResult.error
       console.error('Sent applications error:', sentResult.error)
     } else {
       // データを ApplicationCard で使用する形式に変換
-      sentApplications.value = (sentResult.data || []).map((app: any) => ({
-        id: app.id,
-        postId: app.post_id,
-        postTitle: app.posts?.title || '募集タイトル',
-        postAuthor: app.posts?.users?.display_name || '投稿者',
-        applicantId: app.user_id,
-        applicantName: app.users?.display_name || '匿名ユーザー',
-        applicantAvatar: app.users?.avatar_url,
-        status: app.status,
-        message: app.message,
-        appliedAt: app.created_at,
-        respondedAt: app.responded_at,
-        portfolio_url: app.portfolio_url,
-        // portfolio_urlを経験として表示
-        experience: app.portfolio_url,
-        availability: app.availability,
-        twitterId: app.twitter_id
-      }))
+      sentApplications.value = (sentResult.data || []).map((app: unknown) => {
+        if (typeof app !== 'object' || app === null) return {} as Application
+        const a = app as Record<string, unknown>
+        return {
+          id: a.id as string,
+          postId: a.post_id as string,
+          postTitle:
+            a.posts && typeof a.posts === 'object'
+              ? ((a.posts as Record<string, unknown>).title as string) || '募集タイトル'
+              : '募集タイトル',
+          postAuthor:
+            a.posts && typeof a.posts === 'object' && (a.posts as Record<string, unknown>).users
+              ? (a.posts as Record<string, any>).users.display_name || '投稿者'
+              : '投稿者',
+          applicantId: a.user_id as string,
+          applicantName:
+            a.users && typeof a.users === 'object'
+              ? ((a.users as Record<string, unknown>).display_name as string) || '匿名ユーザー'
+              : '匿名ユーザー',
+          applicantAvatar:
+            a.users && typeof a.users === 'object'
+              ? ((a.users as Record<string, unknown>).avatar_url as string)
+              : undefined,
+          status: a.status as string,
+          message: a.message as string,
+          appliedAt: a.created_at as string,
+          respondedAt: a.responded_at as string,
+          portfolio_url: a.portfolio_url as string,
+          experience: a.portfolio_url as string,
+          availability: a.availability as string,
+          twitterId: a.twitter_id as string,
+        } as Application
+      })
       console.log('Sent applications data:', sentApplications.value)
     }
   } catch (err) {
@@ -477,7 +503,7 @@ onMounted(async () => {
     router.push('/login')
     return
   }
-  
+
   try {
     await loadApplications()
   } catch (err) {
