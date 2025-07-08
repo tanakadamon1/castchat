@@ -26,23 +26,13 @@
       <div class="flex flex-col sm:flex-row gap-2 lg:flex-shrink-0">
         <!-- 受信した応募の場合 -->
         <template v-if="type === 'received'">
-          <div>
-            <p>Debug: type={{ type }}, status={{ application.status }}</p>
-            <button 
-              v-if="application.status === 'pending'"
-              @click="handleUpdateStatus('accepted')"
-              style="background: blue; color: white; padding: 8px;"
-            >
-              テスト承認ボタン
-            </button>
-            <BaseButton
-              v-if="application.status === 'pending'"
-              size="sm"
-              @click="() => handleUpdateStatus('accepted')"
-            >
-              承認
-            </BaseButton>
-          </div>
+          <BaseButton
+            v-if="application.status === 'pending'"
+            size="sm"
+            @click="() => handleUpdateStatus('accepted')"
+          >
+            承認
+          </BaseButton>
           <BaseButton
             v-if="application.status === 'pending'"
             size="sm"
@@ -201,7 +191,6 @@ const displayAvatar = computed(() => {
 
 // イベントハンドラー
 const handleUpdateStatus = (status: string) => {
-  alert(`handleUpdateStatus が呼ばれました: ${status}`)
   console.log('ApplicationCard handleUpdateStatus called:', status)
   
   // 必ず英語の enum 値を送信
@@ -218,6 +207,7 @@ const handleUpdateStatus = (status: string) => {
     }
   }
   
+  console.log('ApplicationCard emitting:', props.application.id, finalStatus)
   emit('updateStatus', props.application.id, finalStatus)
 }
 

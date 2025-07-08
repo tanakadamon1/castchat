@@ -89,7 +89,7 @@
             :key="application.id"
             :application="application as ApplicationViewModel"
             type="received"
-            @update-status="handleUpdateStatus"
+            @update-status="(appId, status) => { console.log('emit received:', appId, status); handleUpdateStatus(appId, status); }"
             @view-profile="handleViewProfile"
             @send-message="handleSendMessage"
           />
