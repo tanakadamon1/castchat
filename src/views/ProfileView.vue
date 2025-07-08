@@ -71,32 +71,6 @@
                 {{ profileData.displayName || 'なし' }}
               </p>
             </div>
-
-
-            <!-- 自己紹介 -->
-            <div>
-              <label class="block text-sm font-medium text-gray-700 mb-1">
-                自己紹介
-              </label>
-              <BaseTextarea
-                v-if="isEditing"
-                v-model="editData.bio"
-                placeholder="自己紹介を入力..."
-                :rows="3"
-                :error="getFieldError('bio')"
-              />
-              <p v-else class="text-gray-900 whitespace-pre-wrap">
-                {{ profileData.bio || '自己紹介が設定されていません' }}
-              </p>
-            </div>
-
-            <!-- ステータス -->
-            <div class="flex items-center gap-2">
-              <UserStatusBadge :status="profileData.status" />
-              <span class="text-sm text-gray-500">
-                {{ formatDate(profileData.lastActiveAt) }}にアクティブ
-              </span>
-            </div>
           </div>
         </div>
       </div>
@@ -223,9 +197,7 @@ import { useValidation, commonRules } from '@/utils/validation'
 import { uploadProfileImage } from '@/lib/imageUpload'
 import { User } from 'lucide-vue-next'
 import BaseInput from '@/components/ui/BaseInput.vue'
-import BaseTextarea from '@/components/ui/BaseTextarea.vue'
 import BaseButton from '@/components/ui/BaseButton.vue'
-import UserStatusBadge from '@/components/user/UserStatusBadge.vue'
 
 const router = useRouter()
 const authStore = useAuthStore()
@@ -248,14 +220,11 @@ const profileData = computed(() => {
   return {
     id: profile.id,
     displayName: profile.display_name || '',
-    bio: profile.bio || '',
     avatarUrl: profile.avatar_url || '',
     discordUsername: profile.discord_username || '',
     twitterUsername: profile.twitter_username || '',
     vrchatUsername: profile.vrchat_username || '',
     websiteUrl: profile.website_url || '',
-    status: 'active' as const,
-    lastActiveAt: profile.updated_at || profile.created_at,
     createdAt: profile.created_at
   }
 })
@@ -263,7 +232,6 @@ const profileData = computed(() => {
 // 編集用データ
 const editData = ref({
   displayName: '',
-  bio: '',
   discordUsername: '',
   twitterUsername: '',
   vrchatUsername: '',
@@ -312,23 +280,6 @@ const validateWebsite = () => {
   }
 }
 
-// 日付フォーマット
-const formatDate = (dateString: string) => {
-  const date = new Date(dateString)
-  const now = new Date()
-  const diffMs = now.getTime() - date.getTime()
-  const diffDays = Math.floor(diffMs / (1000 * 60 * 60 * 24))
-  
-  if (diffDays === 0) {
-    return '今日'
-  } else if (diffDays === 1) {
-    return '昨日'
-  } else if (diffDays < 7) {
-    return `${diffDays}日前`
-  } else {
-    return date.toLocaleDateString('ja-JP')
-  }
-}
 
 // イベントハンドラー
 const triggerFileUpload = () => {
@@ -391,7 +342,6 @@ const handleSave = async () => {
     // 実際のAPIを使用してプロフィールを更新
     await authStore.updateProfile({
       display_name: editData.value.displayName,
-      bio: editData.value.bio,
       discord_username: editData.value.discordUsername,
       twitter_username: editData.value.twitterUsername,
       vrchat_username: editData.value.vrchatUsername,
@@ -414,7 +364,6 @@ const handleCancel = () => {
   // 編集データをリセット
   editData.value = {
     displayName: profileData.value.displayName,
-    bio: profileData.value.bio,
     discordUsername: profileData.value.discordUsername,
     twitterUsername: profileData.value.twitterUsername,
     vrchatUsername: profileData.value.vrchatUsername,
@@ -429,7 +378,6 @@ const initializeEditData = () => {
   if (profileData.value) {
     editData.value = {
       displayName: profileData.value.displayName,
-      bio: profileData.value.bio,
       discordUsername: profileData.value.discordUsername,
       twitterUsername: profileData.value.twitterUsername,
       vrchatUsername: profileData.value.vrchatUsername,
