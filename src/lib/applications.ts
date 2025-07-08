@@ -385,7 +385,19 @@ export class ApplicationsService {
   ): Promise<ApplicationsApiResult<ApplicationWithDetails[]>> {
     try {
       // 権限チェック（本人または管理者）
-      if (!userProfile || !permissionManager.canViewApplication(userProfile, userId, '')) {
+      if (!userProfile) {
+        return {
+          data: null,
+          error: errorHandler.createError(
+            ErrorCode.PERMISSION_DENIED,
+            'Insufficient permissions to view applications',
+            `User ${userId} cannot view applications`
+          )
+        }
+      }
+
+      // ユーザーは自分の応募を見ることができる
+      if (userProfile.id !== userId && !permissionManager.isAdmin(userProfile)) {
         return {
           data: null,
           error: errorHandler.createError(

@@ -176,7 +176,7 @@ class ApplicationApi {
         }
       }
 
-      const result = await applicationsService.getUserApplications(userId, undefined)
+      const result = await applicationsService.getUserApplications(userId, this.getCurrentUser().profile)
 
       if (result.error) {
         return {
@@ -218,10 +218,10 @@ class ApplicationApi {
       let result
       if (postId) {
         // 特定の投稿の応募を取得
-        result = await applicationsService.getPostApplications(postId, userId, undefined)
+        result = await applicationsService.getPostApplications(postId, userId, this.getCurrentUser().profile)
       } else {
         // 全ての受信応募を取得
-        result = await applicationsService.getAllReceivedApplications(userId, undefined)
+        result = await applicationsService.getAllReceivedApplications(userId, this.getCurrentUser().profile)
       }
 
       if (result.error) {
@@ -272,7 +272,7 @@ class ApplicationApi {
           response_message: responseMessage || null,
           responded_at: new Date().toISOString(),
         },
-        undefined,
+        this.getCurrentUser().profile,
       )
 
       if (result.error) {
@@ -309,7 +309,7 @@ class ApplicationApi {
         }
       }
 
-      const result = await applicationsService.deleteApplication(applicationId, userId, undefined)
+      const result = await applicationsService.deleteApplication(applicationId, userId, this.getCurrentUser().profile)
 
       if (result.error) {
         return {
@@ -349,7 +349,7 @@ class ApplicationApi {
 
       // 投稿IDが指定されている場合は、その投稿の応募統計
       // 指定されていない場合は、ユーザーの全投稿の統計
-      const result = await applicationsService.getApplicationStatistics(postId, userId, undefined)
+      const result = await applicationsService.getApplicationStatistics(postId, userId, this.getCurrentUser().profile)
 
       if (result.error) {
         return {
