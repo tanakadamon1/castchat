@@ -29,7 +29,7 @@
           <BaseButton
             v-if="application.status === 'pending'"
             size="sm"
-            @click="() => { console.log('承認ボタンがクリックされました!'); handleUpdateStatus('accepted'); }"
+            @click="() => handleUpdateStatus('accepted')"
           >
             承認
           </BaseButton>
@@ -37,7 +37,7 @@
             v-if="application.status === 'pending'"
             size="sm"
             variant="outline"
-            @click="() => { console.log('却下ボタンがクリックされました!'); handleUpdateStatus('rejected'); }"
+            @click="() => handleUpdateStatus('rejected')"
           >
             却下
           </BaseButton>
@@ -191,59 +191,30 @@ const displayAvatar = computed(() => {
 
 // イベントハンドラー
 const handleUpdateStatus = (status: string) => {
-  console.log('=== ApplicationCard: handleUpdateStatus START ===')
-  console.log('Raw status parameter:', status)
-  console.log('Status type:', typeof status)
-  console.log('Status length:', status.length)
-  console.log('Status character codes:', [...status].map((c) => c.charCodeAt(0)))
-  console.log('Expected codes for "accepted":', [...'accepted'].map((c) => c.charCodeAt(0)))
-  console.log('Expected codes for "rejected":', [...'rejected'].map((c) => c.charCodeAt(0)))
-  console.log('Is exactly "accepted"?', status === 'accepted')
-  console.log('Is exactly "rejected"?', status === 'rejected')
-  console.log('Application ID:', props.application.id)
-  console.log('Button type (received/sent):', props.type)
-  
   // 必ず英語の enum 値を送信
   const validStatuses = ['accepted', 'rejected', 'pending', 'withdrawn']
   let finalStatus = status
   
   if (!validStatuses.includes(status)) {
-    console.warn('ApplicationCard: Invalid status received, attempting conversion:', status)
     if (status.includes('承認') || status === '承認') {
       finalStatus = 'accepted'
     } else if (status.includes('却下') || status === '却下') {
       finalStatus = 'rejected'
     } else {
-      console.error('ApplicationCard: Cannot convert status:', status)
       finalStatus = 'pending' // fallback
     }
   }
-  
-  console.log('=== ApplicationCard: Final status to emit ===')
-  console.log('Original:', status)
-  console.log('Final:', finalStatus)
-  console.log('Is valid enum?', validStatuses.includes(finalStatus))
   
   emit('updateStatus', props.application.id, finalStatus)
 }
 
 const handleViewPost = () => {
-  console.log('ApplicationCard: handleViewPost called', {
-    postId: props.application.postId,
-    application: props.application,
-  })
   if (props.application.postId) {
     emit('viewPost', props.application.postId)
-  } else {
-    console.error('ApplicationCard: No postId found')
   }
 }
 
 const handleWithdraw = () => {
-  console.log('ApplicationCard: handleWithdraw called', {
-    applicationId: props.application.id,
-    application: props.application,
-  })
   emit('withdraw', props.application.id)
 }
 

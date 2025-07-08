@@ -255,8 +255,6 @@ class ApplicationApi {
     responseMessage?: string,
   ): Promise<ApplicationResponse> {
     try {
-      console.log('ApplicationApi: updateApplicationStatus called', { applicationId, status, statusType: typeof status })
-      
       // ステータス値のバリデーションと正規化
       const validStatuses = ['pending', 'accepted', 'rejected', 'withdrawn']
       const statusMap: Record<string, string> = {
@@ -271,7 +269,6 @@ class ApplicationApi {
       let normalizedStatus = status
       if (!validStatuses.includes(status)) {
         normalizedStatus = statusMap[status] || status
-        console.log('ApplicationApi: Status normalized', { original: status, normalized: normalizedStatus })
       }
       
       if (!validStatuses.includes(normalizedStatus)) {
@@ -295,7 +292,6 @@ class ApplicationApi {
         response_message: responseMessage || null,
         responded_at: new Date().toISOString(),
       }
-      console.log('ApplicationApi: Update data', updateData)
 
       const result = await applicationsService.updateApplication(
         applicationId,
@@ -305,7 +301,6 @@ class ApplicationApi {
       )
 
       if (result.error) {
-        console.error('ApplicationApi: updateApplicationStatus error details:', result.error)
         return {
           data: null,
           error: result.error.message,

@@ -344,12 +344,8 @@ const clearSentFilters = () => {
 
 // イベントハンドラー
 const handleUpdateStatus = async (applicationId: string, status: string) => {
-  console.log('=== ApplicationsView: handleUpdateStatus START ===')
-  console.log('Raw parameters:', { applicationId, status, statusType: typeof status })
-  console.log('Status character codes:', [...status].map(c => c.charCodeAt(0)))
-  console.log('Status length:', status.length)
-  
-  // 日本語→ENUM値変換マップ（文字列キーを明示）
+  console.log('handleUpdateStatus called with:', { applicationId, status })
+  // 日本語→ENUM値変換マップ
   const statusMap: Record<string, string> = {
     '承認': 'accepted',
     '却下': 'rejected',
@@ -363,40 +359,17 @@ const handleUpdateStatus = async (applicationId: string, status: string) => {
     'withdrawn': 'withdrawn',
   }
   
-  console.log('=== ステータス変換処理 ===')
-  console.log('変換前:', status)
-  console.log('statusMapキー一覧:', Object.keys(statusMap))
-  console.log('マップに存在するか:', status in statusMap)
-  console.log('マップから取得した値:', statusMap[status])
-  
-  // より強力な変換処理
+  // 変換処理
   let apiStatus = statusMap[status]
   if (!apiStatus) {
-    console.warn('statusMapで見つからなかったため、フォールバック処理を実行')
     if (status.includes('承認')) {
       apiStatus = 'accepted'
-      console.log('「承認」を含むため accepted に変換')
     } else if (status.includes('却下')) {
       apiStatus = 'rejected'
-      console.log('「却下」を含むため rejected に変換')
     } else {
       apiStatus = status
-      console.log('変換できないため元の値を使用:', status)
     }
   }
-  
-  console.log('最終的なapiStatus:', apiStatus)
-  
-  // 認証状態の詳細チェック
-  console.log('=== 認証状態チェック ===')
-  console.log('authStore.user:', authStore.user)
-  console.log('authStore.profile:', authStore.profile)
-  console.log('authStore.isAuthenticated:', authStore.isAuthenticated)
-  
-  // 該当する応募の詳細情報
-  const application = receivedApplications.value.find(app => app.id === applicationId)
-  console.log('=== 応募詳細 ===')
-  console.log('application:', application)
   try {
     // セッション状態の再確認
     if (!authStore.isAuthenticated) {
@@ -411,10 +384,8 @@ const handleUpdateStatus = async (applicationId: string, status: string) => {
       applicationId,
       apiStatus as 'pending' | 'accepted' | 'rejected' | 'withdrawn',
     )
-    console.log('ApplicationsView: updateApplicationStatus result', result)
 
     if (result.error) {
-      console.error('ステータス更新エラー詳細:', result.error)
       
       // 権限エラーの場合はより具体的なメッセージ
       if (result.error.includes('permission') || result.error.includes('denied') || result.error.includes('policy')) {
@@ -441,16 +412,12 @@ const handleUpdateStatus = async (applicationId: string, status: string) => {
 }
 
 const handleViewProfile = (userId: string) => {
-  console.log('ApplicationsView: handleViewProfile called', { userId })
   router.push(`/users/${userId}`)
 }
 
 const handleSendMessage = (userId: string) => {
-  console.log('ApplicationsView: handleSendMessage called', { userId })
   // メッセージモーダルを開く
   const user = receivedApplications.value.find((app) => app.applicantId === userId)
-
-  console.log('ApplicationsView: Found user for message:', user)
 
   if (user) {
     selectedRecipient.value = {
@@ -460,7 +427,6 @@ const handleSendMessage = (userId: string) => {
     }
     showMessageModal.value = true
   } else {
-    console.error('ApplicationsView: User not found for message')
     toast.error('ユーザー情報が見つかりません')
   }
 }
@@ -498,18 +464,12 @@ const handleWithdraw = async (applicationId: string) => {
 // データ読み込み関数
 const loadApplications = async () => {
   try {
-    console.log('Loading applications...')
-
     // 受信した応募を取得
-    console.log('Fetching received applications...')
     const receivedResult = await applicationApi.getReceivedApplications()
-    console.log('Received applications result:', receivedResult)
 
     if (receivedResult.error) {
       errorMessage.value = receivedResult.error
-      console.error('Received applications error:', receivedResult.error)
     } else {
-      console.log('Raw received applications data:', receivedResult.data)
       // データを ApplicationCard で使用する形式に変換
       receivedApplications.value = (receivedResult.data || []).map((app: unknown) => {
         if (typeof app !== 'object' || app === null)
@@ -582,17 +542,13 @@ const loadApplications = async () => {
           updatedAt: typeof a.updated_at === 'string' ? a.updated_at : '',
         }
       })
-      console.log('Final received applications data:', receivedApplications.value)
     }
 
     // 送信した応募を取得
-    console.log('Fetching sent applications...')
     const sentResult = await applicationApi.getMyApplications()
-    console.log('Sent applications result:', sentResult)
 
     if (sentResult.error) {
       errorMessage.value = sentResult.error
-      console.error('Sent applications error:', sentResult.error)
     } else {
       // データを ApplicationCard で使用する形式に変換
       sentApplications.value = (sentResult.data || []).map((app: unknown) => {
@@ -666,11 +622,9 @@ const loadApplications = async () => {
           updatedAt: typeof a.updated_at === 'string' ? a.updated_at : '',
         }
       })
-      console.log('Sent applications data:', sentApplications.value)
     }
   } catch (err) {
     errorMessage.value = 'データの読み込みに失敗しました'
-    console.error('Failed to load applications:', err)
   }
 }
 
@@ -684,7 +638,6 @@ onMounted(async () => {
   try {
     await loadApplications()
   } catch (err) {
-    console.error('データ取得エラー:', err)
     toast.error('データの取得に失敗しました')
   } finally {
     loading.value = false

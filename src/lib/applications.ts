@@ -239,42 +239,6 @@ export class ApplicationsService {
       if (updateData.response_message !== undefined) updatePayload.response_message = updateData.response_message
       if (updateData.responded_at !== undefined) updatePayload.responded_at = updateData.responded_at
 
-      console.log('ApplicationsService: updateApplication payload', { updateData, updatePayload, applicationId })
-
-      // RLS デバッグ: 現在の認証状態確認
-      const { data: { session }, error: sessionError } = await supabase.auth.getSession()
-      console.log('=== RLS デバッグ ===')
-      console.log('current session:', { 
-        userId: session?.user?.id,
-        hasSession: !!session,
-        sessionError 
-      })
-
-      // 該当応募の詳細確認
-      const { data: appDetail, error: appError } = await supabase
-        .from('applications')
-        .select(`
-          id,
-          user_id,
-          post_id,
-          posts!inner(
-            id,
-            user_id,
-            title
-          )
-        `)
-        .eq('id', applicationId)
-        .single()
-
-      console.log('応募詳細:', { appDetail, appError })
-      if (appDetail) {
-        console.log('応募者ID:', appDetail.user_id)
-        console.log('投稿ID:', appDetail.post_id)
-        console.log('投稿者ID:', (appDetail.posts as any)?.user_id)
-        console.log('現在のユーザーID:', session?.user?.id)
-        console.log('投稿者か:', (appDetail.posts as any)?.user_id === session?.user?.id)
-        console.log('応募者か:', appDetail.user_id === session?.user?.id)
-      }
 
       // 応募更新
       const { data: updatedApplication, error } = await supabase
@@ -285,7 +249,6 @@ export class ApplicationsService {
         .single()
 
       if (error) {
-        console.error('ApplicationsService: updateApplication error', { error, updatePayload, applicationId })
         return {
           data: null,
           error: errorHandler.handleError(error, {
