@@ -74,14 +74,14 @@ export class ApplicationsService {
     userProfile?: Tables<'users'>
   ): Promise<ApplicationsApiResult<Application>> {
     try {
-      // 権限チェック
-      if (!userProfile || !permissionManager.canCreateApplication(userProfile)) {
+      // 権限チェック - 認証済みユーザーは基本的に応募可能
+      if (!userProfile) {
         return {
           data: null,
           error: errorHandler.createError(
             ErrorCode.PERMISSION_DENIED,
             'Insufficient permissions to create application',
-            `User ${userId} cannot create applications`
+            `User ${userId} is not authenticated`
           )
         }
       }
@@ -570,7 +570,7 @@ export class ApplicationsService {
         .select('id')
         .eq('post_id', postId)
         .eq('user_id', userId)
-        .single()
+        .maybeSingle()
 
       if (existingApplication) {
         return {

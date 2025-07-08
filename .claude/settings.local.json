@@ -123,7 +123,8 @@
       "Bash(npx serve:*)",
       "mcp__supabase__get_project",
       "mcp__supabase__get_advisors",
-      "mcp__supabase__get_logs"
+      "mcp__supabase__get_logs",
+      "Bash(npx supabase:*)"
     ],
     "deny": []
   }
