@@ -177,7 +177,16 @@ const formatDateTime = (dateString: string) => {
 
 // ステータス更新
 const handleUpdateStatus = (status: string) => {
+  console.log('ApplicationDetailModal: handleUpdateStatus called', {
+    applicationId: props.application.id,
+    status,
+    statusType: typeof status,
+    statusLength: status.length,
+    statusCodeUnits: [...status].map(c => c.charCodeAt(0)),
+  })
+  
   if (confirm(`この応募を${status === 'accepted' ? '承認' : '却下'}しますか？`)) {
+    console.log('ApplicationDetailModal: emitting updateStatus', { applicationId: props.application.id, status })
     emit('updateStatus', props.application.id, status)
     emit('close')
   }

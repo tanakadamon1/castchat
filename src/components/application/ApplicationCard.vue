@@ -182,6 +182,9 @@ const handleUpdateStatus = (status: string) => {
   console.log('ApplicationCard: handleUpdateStatus called', {
     applicationId: props.application.id,
     status,
+    statusType: typeof status,
+    statusLength: status.length,
+    statusCodeUnits: [...status].map(c => c.charCodeAt(0)),
     application: props.application,
   })
   emit('updateStatus', props.application.id, status)
