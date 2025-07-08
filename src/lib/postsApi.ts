@@ -306,6 +306,7 @@ export const postsApi = {
         event_weekday: postData.eventWeekday !== undefined ? postData.eventWeekday : null,
         event_time: postData.eventTime || null,
         event_week_of_month: postData.eventWeekOfMonth !== undefined ? postData.eventWeekOfMonth : null,
+        status: postData.status || 'published', // statusフィールドを追加
         updated_at: new Date().toISOString()
       }
 

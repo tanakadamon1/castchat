@@ -367,7 +367,7 @@
             :disabled="!isFormValid"
             class="order-1 sm:order-4"
           >
-            {{ isEditing ? '更新する' : '投稿する' }}
+            {{ isEditing && !isDraftMode ? '更新する' : '投稿する' }}
           </BaseButton>
         </div>
       </form>
@@ -950,9 +950,9 @@ const submitPost = async () => {
     console.log('submitPost: Update success, returning data:', result.data)
     return result.data
   } else if (isDraftMode.value) {
-    console.log('submitPost: Draft publish mode - updating draft to active...')
+    console.log('submitPost: Draft publish mode - updating draft to published...')
     // 下書きから公開処理
-    const result = await postsApi.updatePost(draftId.value!, { ...postData, status: 'active' })
+    const result = await postsApi.updatePost(draftId.value!, { ...postData, status: 'published' })
     console.log('submitPost: Draft publish API result:', result)
     if (result.error) {
       console.error('submitPost: Draft publish API error:', result.error)
