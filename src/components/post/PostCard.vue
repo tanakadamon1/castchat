@@ -1,124 +1,127 @@
 <template>
   <article
-    class="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 hover:shadow-md transition-shadow duration-200 overflow-hidden focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
+    class="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 hover:shadow-md transition-shadow duration-200 overflow-hidden focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 flex flex-col h-full"
     :aria-label="`${post.title}の募集投稿`"
     data-post-card
     tabindex="0"
     role="article"
     @keydown="handleKeyDown"
   >
-    <!-- Header -->
-    <div class="p-4 pb-3">
-      <div class="flex items-start justify-between mb-3">
-        <div>
-          <p class="font-medium text-gray-900 dark:text-gray-100">{{ post.authorName }}</p>
-          <p class="text-sm text-gray-500 dark:text-gray-400">{{ formatDate(post.createdAt) }}</p>
+    <!-- Main Content -->
+    <div class="flex-grow">
+      <!-- Header -->
+      <div class="p-4 pb-3">
+        <div class="flex items-start justify-between mb-3">
+          <div>
+            <p class="font-medium text-gray-900 dark:text-gray-100">{{ post.authorName }}</p>
+            <p class="text-sm text-gray-500 dark:text-gray-400">{{ formatDate(post.createdAt) }}</p>
+          </div>
+          
+          <div class="flex items-center space-x-2">
+            <span :class="statusBadgeClasses">
+              {{ statusLabels[post.status] }}
+            </span>
+          </div>
         </div>
         
-        <div class="flex items-center space-x-2">
-          <span :class="statusBadgeClasses">
-            {{ statusLabels[post.status] }}
-          </span>
-        </div>
-      </div>
-      
-      <h3 class="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-2 line-clamp-2">
-        {{ post.title }}
-      </h3>
-      
-      <p class="text-gray-600 dark:text-gray-300 text-sm mb-3 line-clamp-3 whitespace-pre-wrap">
-        {{ post.description }}
-      </p>
-      
-      <!-- 画像プレビュー -->
-      <div v-if="post.images && post.images.length > 0" class="mb-3">
-        <div class="grid gap-2" :class="imageGridClasses">
-          <div
-            v-for="(image, index) in displayImages"
-            :key="index"
-            class="relative group cursor-pointer overflow-hidden rounded-lg"
-            @click="$emit('view-image', image, index)"
-          >
-            <LazyImage
-              :src="image"
-              :alt="`投稿画像 ${index + 1}`"
-              container-class="w-full aspect-video"
-              image-class="w-full h-full object-cover transition-transform duration-200 group-hover:scale-105"
-              :eager="index === 0"
-              :threshold="0.2"
-            />
-            
-            <!-- 残り画像数表示 -->
+        <h3 class="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-2 line-clamp-2">
+          {{ post.title }}
+        </h3>
+        
+        <p class="text-gray-600 dark:text-gray-300 text-sm mb-3 line-clamp-3 whitespace-pre-wrap">
+          {{ post.description }}
+        </p>
+        
+        <!-- 画像プレビュー -->
+        <div v-if="post.images && post.images.length > 0" class="mb-3">
+          <div class="grid gap-2" :class="imageGridClasses">
             <div
-              v-if="index === 2 && post.images!.length > 3"
-              class="absolute inset-0 bg-black bg-opacity-50 flex items-center justify-center text-white font-semibold"
+              v-for="(image, index) in displayImages"
+              :key="index"
+              class="relative group cursor-pointer overflow-hidden rounded-lg"
+              @click="$emit('view-image', image, index)"
             >
-              +{{ post.images!.length - 3 }}
+              <LazyImage
+                :src="image"
+                :alt="`投稿画像 ${index + 1}`"
+                container-class="w-full aspect-video"
+                image-class="w-full h-full object-cover transition-transform duration-200 group-hover:scale-105"
+                :eager="index === 0"
+                :threshold="0.2"
+              />
+              
+              <!-- 残り画像数表示 -->
+              <div
+                v-if="index === 2 && post.images!.length > 3"
+                class="absolute inset-0 bg-black bg-opacity-50 flex items-center justify-center text-white font-semibold"
+              >
+                +{{ post.images!.length - 3 }}
+              </div>
             </div>
           </div>
         </div>
       </div>
-    </div>
-    
-    <!-- Details -->
-    <div class="px-4 pb-3 space-y-2">
-      <div class="flex items-center text-sm text-gray-600 dark:text-gray-400">
-        <svg class="w-4 h-4 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.998 1.998 0 013 12V7a2 2 0 012-2z" />
-        </svg>
-        {{ categoryLabels[post.category] }}
-      </div>
       
-      <div
-        v-if="post.eventFrequency"
-        class="flex items-center text-sm text-blue-600 dark:text-blue-400"
-      >
-        <svg class="w-4 h-4 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
-        </svg>
-        {{ formatEventTime(post) }}
-      </div>
-      
-      <div
-        v-if="post.deadline"
-        class="flex items-center text-sm text-red-600 dark:text-red-400"
-      >
-        <svg class="w-4 h-4 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
-        </svg>
-        締切: {{ formatDate(post.deadline) }}
-      </div>
-      
-      <div
-        v-if="post.worldName"
-        class="flex items-center text-sm text-blue-600 dark:text-blue-400"
-      >
-        <svg class="w-4 h-4 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3.055 11H5a2 2 0 012 2v1a2 2 0 002 2 2 2 0 012 2v2.945M8 3.935V5.5A2.5 2.5 0 0010.5 8h.5a2 2 0 012 2 2 2 0 104 0 2 2 0 012-2h1.064M15 20.488V18a2 2 0 012-2h3.064" />
-        </svg>
-        {{ post.worldName }}
-      </div>
-    </div>
-    
-    <!-- Tags -->
-    <div
-      v-if="post.tags && post.tags.length > 0"
-      class="px-4 pb-3"
-    >
-      <div class="flex flex-wrap gap-1">
-        <span
-          v-for="tag in post.tags.slice(0, 4)"
-          :key="tag"
-          class="inline-flex items-center px-2 py-1 rounded-md text-xs font-medium bg-gray-100 dark:bg-gray-700 text-gray-800 dark:text-gray-200"
+      <!-- Details -->
+      <div class="px-4 pb-3 space-y-2">
+        <div class="flex items-center text-sm text-gray-600 dark:text-gray-400">
+          <svg class="w-4 h-4 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.998 1.998 0 013 12V7a2 2 0 012-2z" />
+          </svg>
+          {{ categoryLabels[post.category] }}
+        </div>
+        
+        <div
+          v-if="post.eventFrequency"
+          class="flex items-center text-sm text-blue-600 dark:text-blue-400"
         >
-          #{{ tag }}
-        </span>
-        <span
-          v-if="post.tags.length > 4"
-          class="inline-flex items-center px-2 py-1 rounded-md text-xs font-medium bg-gray-100 dark:bg-gray-700 text-gray-500 dark:text-gray-400"
+          <svg class="w-4 h-4 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+          </svg>
+          {{ formatEventTime(post) }}
+        </div>
+        
+        <div
+          v-if="post.deadline"
+          class="flex items-center text-sm text-red-600 dark:text-red-400"
         >
-          +{{ post.tags.length - 4 }}
-        </span>
+          <svg class="w-4 h-4 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+          </svg>
+          締切: {{ formatDate(post.deadline) }}
+        </div>
+        
+        <div
+          v-if="post.worldName"
+          class="flex items-center text-sm text-blue-600 dark:text-blue-400"
+        >
+          <svg class="w-4 h-4 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3.055 11H5a2 2 0 012 2v1a2 2 0 002 2 2 2 0 012 2v2.945M8 3.935V5.5A2.5 2.5 0 0010.5 8h.5a2 2 0 012 2 2 2 0 104 0 2 2 0 012-2h1.064M15 20.488V18a2 2 0 012-2h3.064" />
+          </svg>
+          {{ post.worldName }}
+        </div>
+      </div>
+      
+      <!-- Tags -->
+      <div
+        v-if="post.tags && post.tags.length > 0"
+        class="px-4 pb-3"
+      >
+        <div class="flex flex-wrap gap-1">
+          <span
+            v-for="tag in post.tags.slice(0, 4)"
+            :key="tag"
+            class="inline-flex items-center px-2 py-1 rounded-md text-xs font-medium bg-gray-100 dark:bg-gray-700 text-gray-800 dark:text-gray-200"
+          >
+            #{{ tag }}
+          </span>
+          <span
+            v-if="post.tags.length > 4"
+            class="inline-flex items-center px-2 py-1 rounded-md text-xs font-medium bg-gray-100 dark:bg-gray-700 text-gray-500 dark:text-gray-400"
+          >
+            +{{ post.tags.length - 4 }}
+          </span>
+        </div>
       </div>
     </div>
     
