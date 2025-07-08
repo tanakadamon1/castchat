@@ -189,6 +189,7 @@ export class ApplicationsService {
     userProfile?: Tables<'users'>
   ): Promise<ApplicationsApiResult<Application>> {
     try {
+      console.log('🟡 ApplicationsService.updateApplication START:', { applicationId, userId, updateData })
       // 応募の存在確認
       const { data: existingApplication, error: fetchError } = await supabase
         .from('applications')
@@ -252,14 +253,15 @@ export class ApplicationsService {
       console.log('🟡 ApplicationsService supabase.update result:', { updatedApplication, error })
 
       if (error) {
-        console.error('Application update error:', {
+        console.error('🟡 ApplicationsService supabase update ERROR:', {
           error,
           message: error.message,
           details: error.details,
           hint: error.hint,
           code: error.code,
           updatePayload,
-          applicationId
+          applicationId,
+          errorFull: JSON.stringify(error, null, 2)
         })
         return {
           data: null,
