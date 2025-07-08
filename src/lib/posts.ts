@@ -549,7 +549,8 @@ export class PostsService {
 
       if (filters.status) {
         supabaseQuery = supabaseQuery.eq('status', filters.status)
-      } else {
+      } else if (!filters.user_id) {
+        // user_idが指定されていない場合（公開一覧）のみpublishedに制限
         supabaseQuery = supabaseQuery.eq('status', 'published')
       }
 
