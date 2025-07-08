@@ -3,6 +3,21 @@ import { useAuthStore } from '@/stores/auth'
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
+  scrollBehavior(to, from, savedPosition) {
+    // ブラウザの戻る/進むボタンを使用した場合は、前回のスクロール位置を復元
+    if (savedPosition) {
+      return savedPosition
+    }
+    // ハッシュ（#section など）がある場合は、その要素にスクロール
+    if (to.hash) {
+      return {
+        el: to.hash,
+        behavior: 'smooth'
+      }
+    }
+    // それ以外の場合は、ページの最上部にスクロール
+    return { top: 0 }
+  },
   routes: [
     {
       path: '/',
