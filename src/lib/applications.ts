@@ -116,14 +116,11 @@ export class ApplicationsService {
         }
       }
 
-      // 応募作成
-      const insertData: ApplicationInsert = {
+      // 応募作成 - 最小限のフィールドのみ
+      const insertData = {
         user_id: userId,
         post_id: applicationData.post_id,
         message: applicationData.message,
-        portfolio_url: applicationData.portfolio_url,
-        // availability: applicationData.availability, // TODO: マイグレーション00019適用後に有効化
-        twitter_id: applicationData.twitter_id,
         status: 'pending'
       }
 

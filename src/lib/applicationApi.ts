@@ -1,6 +1,7 @@
 // フロントエンド統合用の応募API ラッパー
 import { applicationsService } from './applications'
 import { useAuthStore } from '@/stores/auth'
+import { supabase } from './supabase'
 import type { Tables } from './database.types'
 
 export type Application = Tables<'applications'>
@@ -79,29 +80,44 @@ class ApplicationApi {
         }
       }
 
-      // 一時的にavailabilityを削除（データベースに存在しないため）
-      const result = await applicationsService.createApplication(
-        userId,
-        {
+      // 直接Supabaseにアクセスして応募を作成（デバッグ用）
+      try {
+        console.log('Attempting to create application:', {
           post_id: data.postId,
-          message: data.message,
-          portfolio_url: data.experience || null, // experienceをportfolio_urlとして保存
-          // availability: data.availability || null, // TODO: マイグレーション00019適用後に有効化
-          twitter_id: data.twitterId || null
-        },
-        profile || undefined
-      )
+          user_id: userId,
+          message: data.message
+        })
 
-      if (result.error) {
+        const { data: applicationData, error: insertError } = await supabase
+          .from('applications')
+          .insert({
+            post_id: data.postId,
+            user_id: userId,
+            message: data.message,
+            status: 'pending'
+          })
+          .select()
+          .single()
+
+        if (insertError) {
+          console.error('Direct insert error:', insertError)
+          return {
+            data: null,
+            error: insertError.message
+          }
+        }
+
+        console.log('Direct insert success:', applicationData)
+        return {
+          data: applicationData,
+          error: undefined
+        }
+      } catch (directError) {
+        console.error('Direct insert exception:', directError)
         return {
           data: null,
-          error: result.error.message
+          error: '応募の送信に失敗しました'
         }
-      }
-
-      return {
-        data: result.data,
-        error: undefined
       }
 
     } catch (error) {
