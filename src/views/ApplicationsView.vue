@@ -344,7 +344,7 @@ const clearSentFilters = () => {
 
 // イベントハンドラー
 const handleUpdateStatus = async (applicationId: string, status: string) => {
-  console.log('handleUpdateStatus called with:', { applicationId, status })
+  console.log('🔴 ApplicationsView handleUpdateStatus called with:', { applicationId, status })
   // 日本語→ENUM値変換マップ
   const statusMap: Record<string, string> = {
     '承認': 'accepted',
@@ -370,6 +370,8 @@ const handleUpdateStatus = async (applicationId: string, status: string) => {
       apiStatus = status
     }
   }
+  
+  console.log('🔴 ApplicationsView status conversion:', { original: status, converted: apiStatus })
   try {
     // セッション状態の再確認
     if (!authStore.isAuthenticated) {
@@ -379,11 +381,13 @@ const handleUpdateStatus = async (applicationId: string, status: string) => {
       return
     }
 
+    console.log('🔴 ApplicationsView calling applicationApi.updateApplicationStatus with:', { applicationId, apiStatus })
     // 型キャストを追加してENUM型に合わせる
     const result = await applicationApi.updateApplicationStatus(
       applicationId,
       apiStatus as 'pending' | 'accepted' | 'rejected' | 'withdrawn',
     )
+    console.log('🔴 ApplicationsView API result:', result)
 
     if (result.error) {
       

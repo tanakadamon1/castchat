@@ -191,7 +191,7 @@ const displayAvatar = computed(() => {
 
 // イベントハンドラー
 const handleUpdateStatus = (status: string) => {
-  console.log('ApplicationCard handleUpdateStatus called:', status)
+  console.log('🔵 ApplicationCard handleUpdateStatus called:', status)
   
   // 必ず英語の enum 値を送信
   const validStatuses = ['accepted', 'rejected', 'pending', 'withdrawn']
@@ -207,7 +207,7 @@ const handleUpdateStatus = (status: string) => {
     }
   }
   
-  console.log('ApplicationCard emitting:', props.application.id, finalStatus)
+  console.log('🔵 ApplicationCard emitting:', props.application.id, finalStatus)
   emit('updateStatus', props.application.id, finalStatus)
 }
 

@@ -239,7 +239,8 @@ export class ApplicationsService {
       if (updateData.response_message !== undefined) updatePayload.response_message = updateData.response_message
       if (updateData.responded_at !== undefined) updatePayload.responded_at = updateData.responded_at
 
-
+      console.log('🟡 ApplicationsService about to call supabase.update with:', { applicationId, updatePayload })
+      
       // 応募更新
       const { data: updatedApplication, error } = await supabase
         .from('applications')
@@ -247,6 +248,8 @@ export class ApplicationsService {
         .eq('id', applicationId)
         .select()
         .single()
+      
+      console.log('🟡 ApplicationsService supabase.update result:', { updatedApplication, error })
 
       if (error) {
         console.error('Application update error:', {
