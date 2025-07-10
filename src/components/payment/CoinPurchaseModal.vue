@@ -74,36 +74,12 @@
                 クレジットカード情報を入力してください
               </p>
               
-              <!-- Card Number -->
+              <!-- Square Card Input -->
               <div class="mb-4">
                 <label class="block text-sm font-medium text-gray-700 mb-2">
-                  カード番号
+                  カード情報
                 </label>
-                <div id="card-number" class="border rounded-lg p-3 min-h-[45px]"></div>
-              </div>
-
-              <!-- Expiry and CVV -->
-              <div class="grid grid-cols-2 gap-4">
-                <div>
-                  <label class="block text-sm font-medium text-gray-700 mb-2">
-                    有効期限
-                  </label>
-                  <div id="expiry-date" class="border rounded-lg p-3 min-h-[45px]"></div>
-                </div>
-                <div>
-                  <label class="block text-sm font-medium text-gray-700 mb-2">
-                    CVV
-                  </label>
-                  <div id="cvv" class="border rounded-lg p-3 min-h-[45px]"></div>
-                </div>
-              </div>
-
-              <!-- Postal Code -->
-              <div class="mt-4">
-                <label class="block text-sm font-medium text-gray-700 mb-2">
-                  郵便番号
-                </label>
-                <div id="postal-code" class="border rounded-lg p-3 min-h-[45px]"></div>
+                <div id="card-number" class="border rounded-lg p-3 min-h-[200px] bg-white"></div>
               </div>
             </div>
           </div>
@@ -146,7 +122,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted, onUnmounted } from 'vue'
+import { ref, onMounted, onUnmounted, watch, nextTick } from 'vue'
 import { useToast } from '@/composables/useToast'
 import { CoinApi, coinPurchaseOptions } from '@/lib/coinApi'
 import { config } from '@/config/env'
@@ -175,17 +151,22 @@ const isSquareConfigured = ref(!!config.squareApplicationId)
 
 // Square Web Payments SDK
 let payments: any = null
-let card: any = null
+let cardNumber: any = null
 
 onMounted(async () => {
   await loadCoinBalance()
-  await initializeSquarePayments()
+})
+
+// モーダルが表示されたらSquare SDKを初期化
+watch(() => props.show, async (newValue) => {
+  if (newValue && !cardNumber) {
+    await nextTick() // DOM更新を待つ
+    await initializeSquarePayments()
+  }
 })
 
 onUnmounted(() => {
-  if (card) {
-    card.destroy()
-  }
+  if (cardNumber) cardNumber.destroy()
 })
 
 async function loadCoinBalance() {
@@ -203,38 +184,83 @@ async function initializeSquarePayments() {
       return
     }
 
+    // 要素の存在確認
+    const cardElement = document.getElementById('card-number')
+    if (!cardElement) {
+      console.error('Card number element not found')
+      return
+    }
+
+    // Square SDKがすでに読み込まれているかチェック
+    if (typeof window.Square !== 'undefined') {
+      await attachCard()
+      return
+    }
+
     // Load Square Web Payments SDK
     const script = document.createElement('script')
     script.src = 'https://sandbox.web.squarecdn.com/v1/square.js'
     script.async = true
     
     script.onload = async () => {
-      if (typeof window.Square === 'undefined') {
-        throw new Error('Square Web Payments SDK failed to load')
-      }
-
-      payments = window.Square.payments(config.squareApplicationId, config.squareLocationId)
-      
-      // Initialize card payment method
-      card = await payments.card()
-      await card.attach('#card-number')
+      console.log('Square SDK loaded')
+      await attachCard()
     }
     
-    document.head.appendChild(script)
+    script.onerror = () => {
+      console.error('Failed to load Square SDK')
+      addToast('決済システムの読み込みに失敗しました', 'error')
+    }
+    
+    // 重複読み込みを防ぐ
+    if (!document.head.querySelector('script[src*="square.js"]')) {
+      document.head.appendChild(script)
+    }
   } catch (error) {
     console.error('Failed to initialize Square payments:', error)
     addToast('決済システムの初期化に失敗しました', 'error')
   }
 }
 
+async function attachCard() {
+  try {
+    if (typeof window.Square === 'undefined') {
+      throw new Error('Square Web Payments SDK not loaded')
+    }
+
+    // カードがすでに初期化されている場合は何もしない
+    if (cardNumber) {
+      console.log('Card already initialized')
+      return
+    }
+
+    payments = window.Square.payments(config.squareApplicationId, config.squareLocationId)
+    console.log('Square payments initialized')
+    
+    // Initialize card payment method
+    const card = await payments.card()
+    
+    // Attach card to the container
+    await card.attach('#card-number')
+    
+    // Store card reference
+    cardNumber = card
+    
+    console.log('Card attached successfully')
+  } catch (attachError) {
+    console.error('Failed to attach card:', attachError)
+    addToast('カード入力フィールドの初期化に失敗しました', 'error')
+  }
+}
+
 async function handlePayment() {
-  if (!selectedOption.value || !card) return
+  if (!selectedOption.value || !cardNumber) return
 
   processing.value = true
 
   try {
     // Tokenize the card
-    const result = await card.tokenize()
+    const result = await cardNumber.tokenize()
     
     if (result.status === 'OK') {
       // Process payment
@@ -265,20 +291,15 @@ async function handlePayment() {
 </script>
 
 <style scoped>
-#card-number,
-#expiry-date,
-#cvv,
-#postal-code {
+#card-number {
   border: 1px solid #d1d5db;
   border-radius: 0.5rem;
   padding: 0.75rem;
-  min-height: 45px;
+  min-height: 200px;
+  background-color: white;
 }
 
-#card-number:focus-within,
-#expiry-date:focus-within,
-#cvv:focus-within,
-#postal-code:focus-within {
+#card-number:focus-within {
   border-color: #3b82f6;
   box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
 }
