@@ -22,6 +22,9 @@ export interface Post {
   eventTime?: string // HH:MM format
   eventWeekOfMonth?: number // 1=First, 2=Second, 3=Third, 4=Fourth
   eventSpecificDate?: string // For one-time events
+  isPriority?: boolean // Priority display
+  priorityExpiresAt?: string // Priority expiration time
+  priorityCost?: number // Cost of priority display
 }
 
 export type PostCategory = 
@@ -56,7 +59,7 @@ export interface PostFilter {
   search?: string
   tags?: string[]
   status?: PostStatus
-  sortBy?: 'newest' | 'oldest' | 'deadline' | 'popular'
+  sortBy?: 'newest' | 'oldest' | 'deadline' | 'popular' | 'priority'
 }
 
 export interface PostListResponse {

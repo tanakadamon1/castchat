@@ -52,6 +52,11 @@ export const postsApi = {
           sortBy = 'view_count'
           sortOrder = 'desc'
           break
+        case 'priority':
+          // Priority posts will be handled separately
+          sortBy = 'created_at'
+          sortOrder = 'desc'
+          break
         default:
           sortBy = 'created_at'
           sortOrder = 'desc'
@@ -99,8 +104,23 @@ export const postsApi = {
         eventWeekday: post.event_weekday !== null ? post.event_weekday : undefined,
         eventTime: post.event_time || undefined,
         eventWeekOfMonth: post.event_week_of_month !== null ? post.event_week_of_month : undefined,
-        images: post.post_images?.map(img => img.url) || []
+        images: post.post_images?.map(img => img.url) || [],
+        isPriority: post.is_priority || false,
+        priorityExpiresAt: post.priority_expires_at || undefined,
+        priorityCost: post.priority_cost || undefined
       }))
+
+      // Sort posts with priority first if applicable
+      if (filters.sortBy === 'priority' || !filters.sortBy) {
+        posts.sort((a, b) => {
+          // First, sort by priority status
+          if (a.isPriority && !b.isPriority) return -1
+          if (!a.isPriority && b.isPriority) return 1
+          
+          // If both have same priority status, sort by creation date (newest first)
+          return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+        })
+      }
 
       return { data: posts, total: result.count || 0 }
     } catch (error) {
