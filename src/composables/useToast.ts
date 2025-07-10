@@ -10,6 +10,14 @@ export function useToast() {
     info: (message: string) => store.info(message),
     warning: (message: string) => store.warning(message),
     add: store.add,
+    addToast: (message: string, type: 'success' | 'error' | 'warning' | 'info' = 'info') => {
+      switch (type) {
+        case 'success': return store.success(message)
+        case 'error': return store.error(message)
+        case 'warning': return store.warning(message)
+        case 'info': return store.info(message)
+      }
+    },
     remove: store.remove,
     clear: store.clear
   }

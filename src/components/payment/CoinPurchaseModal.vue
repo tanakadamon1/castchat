@@ -52,8 +52,23 @@
         <div class="border-t pt-4">
           <h3 class="font-semibold text-gray-900 mb-3">お支払い方法</h3>
           
+          <!-- Square Not Configured Warning -->
+          <div v-if="!isSquareConfigured" class="bg-yellow-50 border border-yellow-200 rounded-lg p-4 mb-4">
+            <div class="flex items-center">
+              <svg class="w-5 h-5 text-yellow-600 mr-2" fill="currentColor" viewBox="0 0 20 20">
+                <path fill-rule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clip-rule="evenodd"/>
+              </svg>
+              <div>
+                <h4 class="font-medium text-yellow-800">決済機能は現在無効です</h4>
+                <p class="text-sm text-yellow-700 mt-1">
+                  Square決済システムの設定が完了していません。管理者にお問い合わせください。
+                </p>
+              </div>
+            </div>
+          </div>
+          
           <!-- Square Payment Form will be injected here -->
-          <div id="square-payment-form" class="space-y-4">
+          <div v-else id="square-payment-form" class="space-y-4">
             <div class="bg-gray-50 p-4 rounded-lg">
               <p class="text-sm text-gray-600 mb-4">
                 クレジットカード情報を入力してください
@@ -118,11 +133,11 @@
           <BaseButton
             variant="primary"
             @click="handlePayment"
-            :disabled="!selectedOption || processing"
+            :disabled="!selectedOption || processing || !isSquareConfigured"
             :loading="processing"
             class="flex-1"
           >
-            {{ processing ? '処理中...' : '購入する' }}
+            {{ processing ? '処理中...' : isSquareConfigured ? '購入する' : '決済機能無効' }}
           </BaseButton>
         </div>
       </div>
@@ -155,6 +170,9 @@ const selectedOption = ref<CoinPurchaseOption | null>(null)
 const processing = ref(false)
 const coinBalance = ref(0)
 
+// Check if Square is configured
+const isSquareConfigured = ref(!!config.squareApplicationId)
+
 // Square Web Payments SDK
 let payments: any = null
 let card: any = null
@@ -181,7 +199,8 @@ async function loadCoinBalance() {
 async function initializeSquarePayments() {
   try {
     if (!config.squareApplicationId) {
-      throw new Error('Square Application ID not configured')
+      console.warn('Square Application ID not configured - payment disabled')
+      return
     }
 
     // Load Square Web Payments SDK

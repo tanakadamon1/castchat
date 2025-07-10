@@ -28,6 +28,10 @@ function getEnvVar(key: string, defaultValue?: string): string {
   return value
 }
 
+function getOptionalEnvVar(key: string, defaultValue?: string): string | undefined {
+  return import.meta.env[key] || defaultValue
+}
+
 function getBooleanEnvVar(key: string, defaultValue = false): boolean {
   const value = import.meta.env[key]
   if (value === undefined) return defaultValue
@@ -48,9 +52,9 @@ export const config: Config = {
   ),
   
   // Square Payment
-  squareApplicationId: getEnvVar('VITE_SQUARE_APPLICATION_ID', ''),
-  squareLocationId: getEnvVar('VITE_SQUARE_LOCATION_ID', ''),
-  squareEnvironment: (getEnvVar('VITE_SQUARE_ENVIRONMENT', 'sandbox') as 'sandbox' | 'production'),
+  squareApplicationId: getOptionalEnvVar('VITE_SQUARE_APPLICATION_ID'),
+  squareLocationId: getOptionalEnvVar('VITE_SQUARE_LOCATION_ID'),
+  squareEnvironment: (getOptionalEnvVar('VITE_SQUARE_ENVIRONMENT', 'sandbox') as 'sandbox' | 'production'),
   
   // Feature flags
   enableAnalytics: getBooleanEnvVar('VITE_ENABLE_ANALYTICS'),
