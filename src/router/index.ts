@@ -90,6 +90,12 @@ const router = createRouter({
       meta: { requiresAuth: true },
     },
     {
+      path: '/coins',
+      name: 'coin-history',
+      component: () => import('../views/CoinHistoryView.vue'),
+      meta: { requiresAuth: true },
+    },
+    {
       path: '/demo',
       name: 'demo',
       component: () => import('../views/ComponentDemoView.vue'),

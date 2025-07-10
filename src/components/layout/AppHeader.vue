@@ -102,6 +102,18 @@
                   >
                     応募管理
                   </router-link>
+                  <router-link
+                    to="/coins"
+                    class="block px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors duration-200"
+                    @click="handleNavClick('/coins')"
+                  >
+                    <div class="flex items-center justify-between">
+                      <span>コイン購入</span>
+                      <span class="text-xs bg-yellow-100 text-yellow-800 px-2 py-1 rounded-full">
+                        {{ coinBalance ?? 0 }}
+                      </span>
+                    </div>
+                  </router-link>
                   <button
                     @click="handleSignOut"
                     class="block w-full text-left px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors duration-200"
@@ -184,9 +196,10 @@
 </template>
 
 <script setup lang="ts">
-import { ref } from 'vue'
+import { ref, onMounted, computed } from 'vue'
 import { useAuthStore } from '@/stores/auth'
 import { useRouter } from 'vue-router'
+import { CoinApi } from '@/lib/coinApi'
 import DarkModeToggle from '@/components/ui/DarkModeToggle.vue'
 
 const authStore = useAuthStore()
@@ -194,6 +207,32 @@ const router = useRouter()
 
 const showUserMenu = ref(false)
 const showMobileMenu = ref(false)
+const coinBalance = ref<number | null>(null)
+
+// Load coin balance when authenticated
+const loadCoinBalance = async () => {
+  if (authStore.isAuthenticated) {
+    try {
+      coinBalance.value = await CoinApi.getCoinBalance()
+    } catch (error) {
+      console.error('Failed to load coin balance:', error)
+      coinBalance.value = 0
+    }
+  }
+}
+
+onMounted(() => {
+  loadCoinBalance()
+})
+
+// Reload balance when auth state changes
+authStore.$subscribe(() => {
+  if (authStore.isAuthenticated) {
+    loadCoinBalance()
+  } else {
+    coinBalance.value = null
+  }
+})
 
 const handleNavClick = (path: string) => {
   const clickId = Date.now() + Math.random()

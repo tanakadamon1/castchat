@@ -165,6 +165,7 @@
             @view-image="handleViewImage"
             @edit-post="handleEditPost"
             @delete-post="handleDeletePost"
+            @promote-post="handlePromotePost"
           />
         </div>
         
@@ -191,6 +192,22 @@
       :initial-index="selectedImageIndex"
       @close="closeImageViewer"
     />
+    
+    <!-- 優先表示モーダル -->
+    <PriorityPromotionModal
+      :show="showPriorityModal"
+      :post-id="selectedPostId"
+      @close="showPriorityModal = false"
+      @success="handlePrioritySuccess"
+      @purchase-coins="handlePurchaseCoins"
+    />
+    
+    <!-- コイン購入モーダル -->
+    <CoinPurchaseModal
+      :show="showCoinPurchaseModal"
+      @close="showCoinPurchaseModal = false"
+      @success="handleCoinPurchaseSuccess"
+    />
   </div>
 </template>
 
@@ -207,6 +224,8 @@ import LoadingSpinner from '@/components/ui/LoadingSpinner.vue'
 import ErrorState from '@/components/ui/ErrorState.vue'
 import EmptyState from '@/components/ui/EmptyState.vue'
 import ImageViewer from '@/components/ui/ImageViewer.vue'
+import PriorityPromotionModal from '@/components/payment/PriorityPromotionModal.vue'
+import CoinPurchaseModal from '@/components/payment/CoinPurchaseModal.vue'
 import { useToast } from '@/composables/useToast'
 import { postsApi } from '@/lib/postsApi'
 
@@ -228,6 +247,11 @@ const sortBy = ref('newest')
 const showImageViewer = ref(false)
 const selectedImages = ref<string[]>([])
 const selectedImageIndex = ref(0)
+
+// 優先表示・コイン購入関連
+const showPriorityModal = ref(false)
+const showCoinPurchaseModal = ref(false)
+const selectedPostId = ref('')
 
 // Select options
 const sortOptions = [
@@ -386,6 +410,29 @@ const closeImageViewer = () => {
   showImageViewer.value = false
   selectedImages.value = []
   selectedImageIndex.value = 0
+}
+
+// 優先表示関連のハンドラー
+const handlePromotePost = (postId: string) => {
+  selectedPostId.value = postId
+  showPriorityModal.value = true
+}
+
+const handlePrioritySuccess = () => {
+  toast.success('投稿を優先表示に設定しました')
+  loadPosts(false) // データを再読み込み
+}
+
+const handlePurchaseCoins = () => {
+  showPriorityModal.value = false
+  showCoinPurchaseModal.value = true
+}
+
+const handleCoinPurchaseSuccess = () => {
+  toast.success('コインを購入しました')
+  // 優先表示モーダルを再度表示
+  showCoinPurchaseModal.value = false
+  showPriorityModal.value = true
 }
 
 // Lifecycle
