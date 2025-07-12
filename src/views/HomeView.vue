@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { useAuthStore } from '@/stores/auth'
+import BaseButton from '@/components/ui/BaseButton.vue'
 
 const authStore = useAuthStore()
 </script>
@@ -21,26 +22,37 @@ const authStore = useAuthStore()
             VRChatでのキャスト募集・応募を簡単に。クリエイターとキャストをつなぐプラットフォームです。
           </p>
           <div class="mt-10 flex items-center justify-center gap-x-6">
-            <router-link
+            <BaseButton
+              as="router-link"
               to="/posts"
-              class="rounded-md bg-indigo-600 px-3.5 py-2.5 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
+              variant="primary"
+              size="lg"
+              aria-label="VRChatキャスト募集一覧ページを開く"
             >
               募集一覧を見る
-            </router-link>
-            <router-link
+            </BaseButton>
+            <BaseButton
               v-if="!authStore.isAuthenticated"
+              as="router-link"
               to="/register"
-              class="text-sm font-semibold leading-6 text-gray-900"
+              variant="ghost"
+              size="lg"
+              aria-label="新規アカウント登録ページへ移動"
+              class="text-gray-900 dark:text-gray-100"
             >
               新規登録 <span aria-hidden="true">→</span>
-            </router-link>
-            <router-link
+            </BaseButton>
+            <BaseButton
               v-else
+              as="router-link"
               to="/posts/create"
-              class="text-sm font-semibold leading-6 text-gray-900"
+              variant="ghost"
+              size="lg"
+              aria-label="新しい募集投稿作成ページへ移動"
+              class="text-gray-900 dark:text-gray-100"
             >
               募集を投稿 <span aria-hidden="true">→</span>
-            </router-link>
+            </BaseButton>
           </div>
         </div>
       </div>

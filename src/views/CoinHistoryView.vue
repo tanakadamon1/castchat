@@ -10,6 +10,65 @@
       </p>
     </div>
 
+    <!-- コインについて -->
+    <div class="mb-8 bg-gradient-to-r from-yellow-50 to-amber-50 dark:from-yellow-900/20 dark:to-amber-900/20 rounded-lg border border-yellow-200 dark:border-yellow-800 p-6">
+      <div class="flex items-start space-x-4">
+        <div class="flex-shrink-0">
+          <div class="w-12 h-12 bg-gradient-to-br from-yellow-400 to-amber-500 rounded-full flex items-center justify-center">
+            <svg class="w-6 h-6 text-white" fill="currentColor" viewBox="0 0 20 20">
+              <path d="M8.433 7.418c.155-.103.346-.196.567-.267v1.698a2.305 2.305 0 01-.567-.267C8.07 8.34 8 8.114 8 8c0-.114.07-.34.433-.582zM11 12.849v-1.698c.22.071.412.164.567.267.364.243.433.468.433.582 0 .114-.07.34-.433.582a2.305 2.305 0 01-.567.267z"/>
+              <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-13a1 1 0 10-2 0v.092a4.535 4.535 0 00-1.676.662C6.602 6.234 6 7.009 6 8c0 .99.602 1.765 1.324 2.246.48.32 1.054.545 1.676.662v1.941c-.391-.127-.68-.317-.843-.504a1 1 0 10-1.51 1.31c.562.649 1.413 1.076 2.353 1.253V15a1 1 0 102 0v-.092a4.535 4.535 0 001.676-.662C13.398 13.766 14 12.991 14 12c0-.99-.602-1.765-1.324-2.246A4.535 4.535 0 0011 9.092V7.151c.391.127.68.317.843.504a1 1 0 101.511-1.31c-.563-.649-1.413-1.076-2.354-1.253V5z" clip-rule="evenodd"/>
+            </svg>
+          </div>
+        </div>
+        <div class="flex-1">
+          <h3 class="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-3">
+            コインについて
+          </h3>
+          <div class="space-y-3 text-sm text-gray-700 dark:text-gray-300">
+            <p>
+              コインは投稿の優先表示機能で使用できるサイト内通貨です。
+            </p>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div class="flex items-start space-x-3">
+                <div class="w-2 h-2 bg-yellow-400 rounded-full mt-2 flex-shrink-0"></div>
+                <div>
+                  <p class="font-medium text-gray-900 dark:text-gray-100">優先表示</p>
+                  <p class="text-gray-600 dark:text-gray-400">1コインで投稿を24時間優先表示できます</p>
+                </div>
+              </div>
+              <div class="flex items-start space-x-3">
+                <div class="w-2 h-2 bg-yellow-400 rounded-full mt-2 flex-shrink-0"></div>
+                <div>
+                  <p class="font-medium text-gray-900 dark:text-gray-100">上位表示</p>
+                  <p class="text-gray-600 dark:text-gray-400">募集一覧の上部に表示され、より多くの人に見てもらえます</p>
+                </div>
+              </div>
+              <div class="flex items-start space-x-3">
+                <div class="w-2 h-2 bg-yellow-400 rounded-full mt-2 flex-shrink-0"></div>
+                <div>
+                  <p class="font-medium text-gray-900 dark:text-gray-100">視覚的な区別</p>
+                  <p class="text-gray-600 dark:text-gray-400">優先バッジと黄色い枠線で目立つ表示になります</p>
+                </div>
+              </div>
+              <div class="flex items-start space-x-3">
+                <div class="w-2 h-2 bg-yellow-400 rounded-full mt-2 flex-shrink-0"></div>
+                <div>
+                  <p class="font-medium text-gray-900 dark:text-gray-100">自動期限切れ</p>
+                  <p class="text-gray-600 dark:text-gray-400">24時間後に自動的に通常表示に戻ります</p>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="mt-4 p-3 bg-yellow-100 dark:bg-yellow-900/30 rounded-lg">
+            <p class="text-sm text-yellow-800 dark:text-yellow-200">
+              💡 <strong>ヒント:</strong> 重要な募集や早く人を集めたい時に優先表示を活用しましょう！
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+
     <!-- Coin Balance Card -->
     <div class="mb-8">
       <CoinBalance

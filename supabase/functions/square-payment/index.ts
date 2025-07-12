@@ -11,7 +11,6 @@ interface PaymentRequest {
   sourceId: string // Card token from Square Web Payments SDK
   amount: number // Amount in JPY
   coinAmount: number // Number of coins to purchase
-  locationId: string
 }
 
 serve(async (req) => {
@@ -20,10 +19,26 @@ serve(async (req) => {
     return new Response('ok', { headers: corsHeaders })
   }
 
+  console.log('=== Square Payment Function Started ===')
+  console.log('Request method:', req.method)
+  console.log('Request headers:', Object.fromEntries(req.headers.entries()))
+
   try {
     // Initialize Supabase client
-    const supabaseUrl = Deno.env.get('SUPABASE_URL')!
-    const supabaseServiceKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!
+    const supabaseUrl = Deno.env.get('SUPABASE_URL') || 'https://ewjfnquypoeyoicmgbnp.supabase.co'
+    const supabaseServiceKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')
+    
+    console.log('Supabase URL:', supabaseUrl)
+    console.log('Service key exists:', !!supabaseServiceKey)
+    
+    if (!supabaseServiceKey) {
+      console.error('SUPABASE_SERVICE_ROLE_KEY is missing!')
+      return new Response(
+        JSON.stringify({ error: 'Server configuration error: Missing service key' }),
+        { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      )
+    }
+    
     const supabase = createClient(supabaseUrl, supabaseServiceKey)
 
     // Get user from JWT
@@ -39,7 +54,14 @@ serve(async (req) => {
     }
 
     // Parse request body
-    const { sourceId, amount, coinAmount, locationId } = await req.json() as PaymentRequest
+    const requestBody = await req.json() as PaymentRequest
+    const { sourceId, amount, coinAmount } = requestBody
+    
+    console.log('Request body:', {
+      sourceId: sourceId?.substring(0, 10) + '...',
+      amount,
+      coinAmount
+    })
 
     // Validate amount (minimum 100 JPY)
     if (amount < 100 || coinAmount < 1) {
@@ -50,8 +72,35 @@ serve(async (req) => {
     }
 
     // Initialize Square client
-    const squareAccessToken = Deno.env.get('SQUARE_ACCESS_TOKEN')!
-    const squareEnvironment = Deno.env.get('SQUARE_ENVIRONMENT')!
+    const squareAccessToken = Deno.env.get('SQUARE_ACCESS_TOKEN')
+    const squareEnvironment = Deno.env.get('SQUARE_ENVIRONMENT') || 'sandbox'
+    const squareLocationId = Deno.env.get('SQUARE_LOCATION_ID')
+    
+    console.log('Square environment:', squareEnvironment)
+    console.log('Square access token exists:', !!squareAccessToken)
+    console.log('Square location ID exists:', !!squareLocationId)
+    
+    if (!squareAccessToken) {
+      console.error('SQUARE_ACCESS_TOKEN is missing!')
+      return new Response(
+        JSON.stringify({ 
+          error: 'Server configuration error: Missing Square access token',
+          details: 'SQUARE_ACCESS_TOKEN environment variable is required'
+        }),
+        { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      )
+    }
+    
+    if (!squareLocationId) {
+      console.error('SQUARE_LOCATION_ID is missing!')
+      return new Response(
+        JSON.stringify({ 
+          error: 'Server configuration error: Missing Square location ID',
+          details: 'SQUARE_LOCATION_ID environment variable is required'
+        }),
+        { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      )
+    }
     
     const client = new Client({
       accessToken: squareAccessToken,
@@ -62,23 +111,34 @@ serve(async (req) => {
     const paymentsApi = client.paymentsApi
     const idempotencyKey = crypto.randomUUID()
 
+    console.log('Creating Square payment with:', {
+      sourceId: sourceId?.substring(0, 10) + '...',
+      amount: amount,
+      currency: 'JPY',
+      locationId: squareLocationId
+    })
+
     try {
       const { result } = await paymentsApi.createPayment({
         sourceId,
         idempotencyKey,
         amountMoney: {
-          amount: BigInt(amount),
+          amount: BigInt(amount), // JPY amount as-is (no conversion needed)
           currency: 'JPY',
         },
-        locationId,
+        locationId: squareLocationId,
         note: `Purchase of ${coinAmount} coins for user ${user.id}`,
         referenceId: user.id,
       })
 
       const payment = result.payment
 
-      if (!payment || payment.status !== 'COMPLETED') {
-        throw new Error('Payment failed')
+      if (!payment) {
+        throw new Error('Payment result is null')
+      }
+      
+      if (payment.status !== 'COMPLETED') {
+        throw new Error(`Payment failed with status: ${payment.status}. Details: ${JSON.stringify(payment)}`)
       }
 
       // Add coins to user account using the database function
@@ -123,10 +183,15 @@ serve(async (req) => {
       )
     } catch (error) {
       console.error('Square API error:', error)
+      console.error('Error type:', error.constructor.name)
+      console.error('Error details:', error.errors || 'No additional error details')
+      
       return new Response(
         JSON.stringify({ 
           error: 'Payment processing failed',
-          details: error.message 
+          details: error.message,
+          type: error.constructor.name,
+          squareErrors: error.errors || null
         }),
         { 
           headers: { ...corsHeaders, 'Content-Type': 'application/json' },
@@ -135,11 +200,17 @@ serve(async (req) => {
       )
     }
   } catch (error) {
-    console.error('Unexpected error:', error)
+    console.error('=== Unexpected error ===')
+    console.error('Error type:', error.constructor.name)
+    console.error('Error message:', error.message)
+    console.error('Error stack:', error.stack)
+    console.error('Full error object:', JSON.stringify(error, null, 2))
+    
     return new Response(
       JSON.stringify({ 
         error: 'Internal server error',
-        details: error.message 
+        details: error.message,
+        type: error.constructor.name
       }),
       { 
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },

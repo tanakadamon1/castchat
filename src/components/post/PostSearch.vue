@@ -230,8 +230,17 @@ const isQuickFilterActive = (filter: any) => {
     return filters.value.category === filter.value
   }
   if (filter.type === 'special') {
-    // Handle special filters like deadline_soon
-    return false // TODO: Implement special filter logic
+    // 特別フィルターの処理（例: 締切間近、優先表示など）
+    switch (filter.value) {
+      case 'deadline_soon':
+        return filters.value.specialFilters?.includes('deadline_soon') || false
+      case 'priority':
+        return filters.value.specialFilters?.includes('priority') || false
+      case 'has_images':
+        return filters.value.specialFilters?.includes('has_images') || false
+      default:
+        return false
+    }
   }
   return false
 }

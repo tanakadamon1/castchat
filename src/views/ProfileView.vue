@@ -17,7 +17,7 @@
 
     <div class="container mx-auto px-4 py-8 max-w-4xl">
       <!-- プロフィール情報 -->
-      <div v-if="profileData" class="bg-white rounded-lg shadow-sm border p-6 mb-8">
+      <div v-if="profileData" class="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-6 mb-8">
           <div class="flex flex-col md:flex-row gap-6">
           <!-- アバター -->
           <div class="flex flex-col items-center">
@@ -57,7 +57,7 @@
           <div class="flex-1 space-y-4">
             <!-- 表示名 -->
             <div>
-              <label class="block text-sm font-medium text-gray-700 mb-1">
+              <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                 表示名
               </label>
               <BaseInput
@@ -67,7 +67,7 @@
                 :error="getFieldError('displayName')"
                 @blur="validateField('displayName', editData.displayName, displayNameRules)"
               />
-              <p v-else class="text-gray-900 font-medium">
+              <p v-else class="text-gray-900 dark:text-gray-100 font-medium">
                 {{ profileData.displayName || 'なし' }}
               </p>
             </div>
@@ -76,13 +76,13 @@
       </div>
 
       <!-- 連絡先情報 -->
-      <div class="bg-white rounded-lg shadow-sm border p-6 mb-8">
-        <h2 class="text-lg font-semibold text-gray-900 mb-4">連絡先情報</h2>
+      <div class="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-6 mb-8">
+        <h2 class="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-4">連絡先情報</h2>
         
         <div class="max-w-md">
           <!-- Twitter -->
           <div>
-            <label class="block text-sm font-medium text-gray-700 mb-1">
+            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
               Twitter/X ID
             </label>
             <BaseInput
@@ -92,7 +92,7 @@
               :error="getFieldError('twitterUsername')"
               @blur="validateTwitter"
             />
-            <p v-else class="text-gray-900">
+            <p v-else class="text-gray-900 dark:text-gray-100">
               {{ profileData?.twitterUsername || 'なし' }}
             </p>
           </div>
@@ -187,13 +187,6 @@ const displayNameRules = {
 // フォームの有効性
 const isFormValid = computed(() => {
   const hasRequiredFields = editData.value.displayName?.trim()
-  console.log('Form validation:', {
-    hasErrors: hasErrors.value,
-    displayName: editData.value.displayName,
-    hasRequiredFields,
-    errors: errors.value,
-    isValid: !hasErrors.value && hasRequiredFields
-  })
   // 一時的に簡素化 - hasErrorsチェックを外す
   return hasRequiredFields
 })
@@ -250,13 +243,7 @@ const handleAvatarUpload = async (event: Event) => {
 }
 
 const handleSave = async () => {
-  console.log('Save button clicked!')
-  console.log('Form valid?', isFormValid.value)
-  console.log('Has errors?', hasErrors.value) 
-  console.log('Edit data:', editData.value)
-  
   if (!isFormValid.value) {
-    console.log('Form validation failed!')
     toast.error('入力内容に誤りがあります')
     return
   }

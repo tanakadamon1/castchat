@@ -1,7 +1,7 @@
 <template>
   <article
     :class="[
-      'bg-white dark:bg-gray-800 rounded-lg shadow-sm border hover:shadow-md transition-shadow duration-200 overflow-hidden focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 flex flex-col h-full',
+      'bg-white dark:bg-gray-800 rounded-lg shadow-sm border hover:shadow-lg hover:-translate-y-1 transition-all duration-300 ease-out overflow-hidden focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 flex flex-col h-full',
       post.isPriority ? 'border-yellow-400 dark:border-yellow-500 ring-2 ring-yellow-200 dark:ring-yellow-900' : 'border-gray-200 dark:border-gray-700'
     ]"
     :aria-label="`${post.title}の募集投稿`"
@@ -14,26 +14,28 @@
     <div class="flex-grow">
       <!-- Header -->
       <div class="p-4 pb-0">
-        <div class="flex items-start justify-between mb-3">
-          <div>
-            <p class="font-medium text-gray-900 dark:text-gray-100">{{ post.authorName }}</p>
+        <div class="flex items-start justify-between mb-3 gap-2">
+          <div class="flex-1 min-w-0">
+            <p class="font-medium text-gray-900 dark:text-gray-100 truncate">{{ post.authorName }}</p>
             <p class="text-sm text-gray-500 dark:text-gray-400">{{ formatDate(post.createdAt) }}</p>
           </div>
           
-          <div class="flex items-center space-x-2">
+          <div class="flex items-center gap-1.5 flex-shrink-0">
             <!-- Priority Badge -->
             <span
               v-if="post.isPriority"
-              class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-yellow-100 dark:bg-yellow-900 text-yellow-800 dark:text-yellow-200"
+              class="inline-flex items-center justify-center px-1.5 py-0.5 rounded-full text-xs font-medium bg-yellow-100 dark:bg-yellow-900 text-yellow-800 dark:text-yellow-200 whitespace-nowrap"
             >
-              <svg class="w-3 h-3 mr-1" fill="currentColor" viewBox="0 0 20 20">
+              <svg class="w-3 h-3 mr-0.5 hidden sm:inline" fill="currentColor" viewBox="0 0 20 20">
                 <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/>
               </svg>
-              優先
+              <span class="hidden sm:inline">優先</span>
+              <span class="sm:hidden">★</span>
             </span>
             
-            <span :class="statusBadgeClasses">
-              {{ statusLabels[post.status] }}
+            <span :class="[statusBadgeClasses, 'inline-flex items-center justify-center whitespace-nowrap text-xs px-1.5 py-0.5']">
+              <span class="hidden sm:inline">{{ statusLabels[post.status] }}</span>
+              <span class="sm:hidden">{{ post.status === 'active' ? '募集中' : statusLabels[post.status] }}</span>
             </span>
           </div>
         </div>
@@ -164,7 +166,7 @@
               size="sm"
               variant="ghost"
               @click="$emit('promote-post', post.id)"
-              :aria-label="`${post.title}を優先表示`"
+              :aria-label="`${post.title}を優先表示に設定。優先表示にすると上位に表示されます。`"
               class="text-yellow-600 hover:text-yellow-700"
             >
               <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -176,7 +178,7 @@
               size="sm"
               variant="ghost"
               @click="handleEditClick"
-              :aria-label="`${post.title}を編集`"
+              :aria-label="`${post.title}を編集する。編集ページに移動します。`"
             >
               <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
@@ -186,7 +188,7 @@
               size="sm"
               variant="ghost"
               @click="$emit('delete-post', post.id)"
-              :aria-label="`${post.title}を削除`"
+              :aria-label="`${post.title}を削除する。この操作は元に戻すことができません。`"
               class="text-red-600 hover:text-red-700"
             >
               <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -199,7 +201,7 @@
             size="sm"
             variant="outline"
             @click="$emit('view-details', post.id)"
-            :aria-label="`${post.title}の詳細を見る`"
+            :aria-label="`${post.title}の詳細ページを開く。募集内容の詳細や応募方法が確認できます。`"
           >
             詳細を見る
           </BaseButton>
@@ -212,7 +214,7 @@
 <script setup lang="ts">
 import { computed } from 'vue'
 import type { Post } from '@/types/post'
-import { categoryLabels, statusLabels, eventFrequencyLabels, weekdayLabels, weekOfMonthLabels } from '@/utils/mockData'
+import { categoryLabels, statusLabels, eventFrequencyLabels, weekdayLabels, weekOfMonthLabels } from '@/utils/constants'
 import BaseButton from '@/components/ui/BaseButton.vue'
 import LazyImage from '@/components/ui/LazyImage.vue'
 import { useAuthStore } from '@/stores/auth'
@@ -235,14 +237,7 @@ const authStore = useAuthStore()
 
 // 投稿者かどうかの判定
 const isAuthor = computed(() => {
-  const result = authStore.user?.id === props.post.authorId
-  console.log('PostCard isAuthor check:', {
-    result,
-    userId: authStore.user?.id,
-    postAuthorId: props.post.authorId,
-    postTitle: props.post.title
-  })
-  return result
+  return authStore.user?.id === props.post.authorId
 })
 
 // キーボードイベント処理
@@ -255,11 +250,6 @@ const handleKeyDown = (event: KeyboardEvent) => {
 
 // 編集ボタンクリック処理
 const handleEditClick = () => {
-  console.log('=== PostCard: Edit button clicked ===')
-  console.log('PostCard: post.id:', props.post.id)
-  console.log('PostCard: isAuthor:', isAuthor.value)
-  console.log('PostCard: authStore.user?.id:', authStore.user?.id)
-  console.log('PostCard: post.authorId:', props.post.authorId)
   emit('edit-post', props.post.id)
 }
 
@@ -287,13 +277,6 @@ const formatDate = (dateString: string) => {
 }
 
 const formatEventTime = (post: Post) => {
-  console.log('PostCard formatEventTime debug:', {
-    eventFrequency: post.eventFrequency,
-    eventWeekday: post.eventWeekday,
-    eventTime: post.eventTime,
-    eventWeekOfMonth: post.eventWeekOfMonth
-  })
-  
   if (post.eventFrequency === 'once' && post.eventSpecificDate) {
     const date = new Date(post.eventSpecificDate)
     return date.toLocaleString('ja-JP', {
@@ -320,7 +303,6 @@ const formatEventTime = (post: Post) => {
     }
   }
   
-  console.log('PostCard formatEventTime fallback to:', eventFrequencyLabels[post.eventFrequency])
   return eventFrequencyLabels[post.eventFrequency] || ''
 }
 </script>

@@ -73,7 +73,6 @@ export const postsApi = {
         page
       }
       
-      // console.log('postsApi.getPosts: Query parameters:', queryParams)
       const result = await postsService.getPosts(queryParams)
 
       if (result.error) {
@@ -109,18 +108,6 @@ export const postsApi = {
         priorityExpiresAt: post.priority_expires_at || undefined,
         priorityCost: post.priority_cost || undefined
       }))
-
-      // Sort posts with priority first if applicable
-      if (filters.sortBy === 'priority' || !filters.sortBy) {
-        posts.sort((a, b) => {
-          // First, sort by priority status
-          if (a.isPriority && !b.isPriority) return -1
-          if (!a.isPriority && b.isPriority) return 1
-          
-          // If both have same priority status, sort by creation date (newest first)
-          return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
-        })
-      }
 
       return { data: posts, total: result.count || 0 }
     } catch (error) {
@@ -253,31 +240,63 @@ export const postsApi = {
           // 画像の保存に失敗してもポスト自体は成功とする
         }
       }
+      
+      // 優先表示が有効な場合、コインを消費して優先表示を有効化
+      if (postData.enablePriority) {
+        const { CoinApi } = await import('@/lib/coinApi')
+        
+        try {
+          await CoinApi.enablePriorityDisplay(insertedPost.id)
+          // authストアのコイン残高を更新
+          await authStore.refreshCoinBalance()
+        } catch (priorityError) {
+          console.error('Failed to enable priority display:', priorityError)
+          // 優先表示の有効化に失敗しても投稿自体は成功とする
+          // ただし、ユーザーにはエラーメッセージを表示すべき
+        }
+      }
+
+      // 優先表示が有効化された場合、データベースから最新の情報を取得
+      let finalPost = insertedPost
+      if (postData.enablePriority) {
+        const { data: updatedPost } = await supabase
+          .from('posts')
+          .select('*')
+          .eq('id', insertedPost.id)
+          .single()
+        
+        if (updatedPost) {
+          finalPost = updatedPost
+        }
+      }
 
       // レスポンスデータをフロントエンド形式に変換
       const transformedPost: Post = {
-        id: insertedPost.id,
-        title: insertedPost.title,
-        description: insertedPost.description,
+        id: finalPost.id,
+        title: finalPost.title,
+        description: finalPost.description,
         category: postData.category, // 元のカテゴリ値を使用
         status: 'active' as any,
-        deadline: insertedPost.deadline || undefined,
-        maxParticipants: insertedPost.recruitment_count || 1,
+        deadline: finalPost.deadline || undefined,
+        maxParticipants: finalPost.recruitment_count || 1,
         contactMethod: postData.contactMethod,
         contactValue: postData.contactValue,
         requirements: postData.requirements || [],
         tags: [],
-        authorId: insertedPost.user_id,
+        authorId: finalPost.user_id,
         authorName: authStore.user.user_metadata?.display_name || '匿名',
-        createdAt: insertedPost.created_at,
-        updatedAt: insertedPost.updated_at || insertedPost.created_at,
+        createdAt: finalPost.created_at,
+        updatedAt: finalPost.updated_at || finalPost.created_at,
         applicationsCount: 0,
         eventFrequency: postData.eventFrequency,
         eventSpecificDate: postData.eventSpecificDate,
         eventWeekday: postData.eventWeekday,
         eventTime: postData.eventTime,
         eventWeekOfMonth: postData.eventWeekOfMonth,
-        images: []
+        images: [],
+        isPriority: finalPost.is_priority || false,
+        priorityExpiresAt: finalPost.priority_expires_at || undefined,
+        priorityCost: finalPost.priority_cost || undefined
       }
 
       return { data: transformedPost }

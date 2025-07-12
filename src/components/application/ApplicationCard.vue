@@ -30,7 +30,6 @@
             v-if="application.status === 'pending'"
             size="sm"
             @click="() => handleUpdateStatus('accepted')"
-            data-test="accept-button"
           >
 承認
           </BaseButton>
@@ -39,7 +38,6 @@
             size="sm"
             variant="outline"
             @click="() => handleUpdateStatus('rejected')"
-            data-test="reject-button"
           >
 却下
           </BaseButton>

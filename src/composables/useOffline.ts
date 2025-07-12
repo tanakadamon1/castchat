@@ -102,7 +102,8 @@ export function useOffline() {
         
       case 'update_profile':
         // プロフィール更新の再実行
-        // TODO: プロフィールAPI実装時に追加
+        const profileApi = await import('@/lib/profileApi')
+        await profileApi.updateProfile(data)
         break
         
       default:

@@ -1,11 +1,11 @@
 <template>
-  <div class="min-h-screen flex items-center justify-center bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
+  <div class="min-h-screen flex items-center justify-center bg-gray-50 dark:bg-gray-900 py-12 px-4 sm:px-6 lg:px-8">
     <div class="max-w-md w-full space-y-8">
       <div>
-        <h2 class="mt-6 text-center text-3xl font-extrabold text-gray-900">
+        <h2 class="mt-6 text-center text-3xl font-extrabold text-gray-900 dark:text-gray-100">
           アカウント登録
         </h2>
-        <p class="mt-2 text-center text-sm text-gray-600">
+        <p class="mt-2 text-center text-sm text-gray-600 dark:text-gray-400">
           VRChatキャスト募集掲示板に参加しよう
         </p>
       </div>
@@ -29,7 +29,7 @@
       </div>
       
       <div class="text-center">
-        <p class="text-sm text-gray-600">
+        <p class="text-sm text-gray-600 dark:text-gray-400">
           既にアカウントをお持ちの場合は、
           <router-link 
             to="/login" 
@@ -46,11 +46,11 @@
             <div class="w-full border-t border-gray-300" />
           </div>
           <div class="relative flex justify-center text-sm">
-            <span class="px-2 bg-gray-50 text-gray-500">利用規約</span>
+            <span class="px-2 bg-gray-50 dark:bg-gray-900 text-gray-500 dark:text-gray-400">利用規約</span>
           </div>
         </div>
         
-        <div class="mt-4 text-xs text-gray-500 text-center">
+        <div class="mt-4 text-xs text-gray-500 dark:text-gray-400 text-center">
           <p>
             登録することで、
             <a href="#" class="text-indigo-600 hover:text-indigo-500">利用規約</a>
@@ -70,7 +70,6 @@ import { useAuthStore } from '@/stores/auth'
 const authStore = useAuthStore()
 
 const handleGoogleSignIn = async () => {
-  console.log('Register button clicked! Auth store loading:', authStore.loading)
   try {
     await authStore.signInWithGoogle()
     // OAuth redirect will handle navigation

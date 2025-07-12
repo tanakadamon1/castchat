@@ -518,8 +518,8 @@ export class PostsService {
         .from('posts')
         .select(`
           *,
-          users!posts_user_id_fkey(id, display_name, is_verified),
-          post_categories!posts_category_id_fkey(id, name, slug),
+          users:users!posts_user_id_fkey(id, display_name, is_verified),
+          post_categories:post_categories!posts_category_id_fkey(id, name, slug),
           post_images(url, display_order),
           post_tags(tags(name)),
           applications(id)
@@ -577,8 +577,10 @@ export class PostsService {
         )
       }
 
-      // ソート
-      supabaseQuery = supabaseQuery.order(sort_by, { ascending: sort_order === 'asc' })
+      // ソート - 優先表示を最初に、その後指定されたソート順
+      supabaseQuery = supabaseQuery
+        .order('is_priority', { ascending: false })  // 優先表示を先に
+        .order(sort_by, { ascending: sort_order === 'asc' })
 
       // ページネーション
       supabaseQuery = supabaseQuery.range(offset, offset + limit - 1)

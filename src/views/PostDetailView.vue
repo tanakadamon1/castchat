@@ -278,7 +278,7 @@ import LazyImage from '@/components/ui/LazyImage.vue'
 import ImageViewer from '@/components/ui/ImageViewer.vue'
 import ApplicationModal from '@/components/application/ApplicationModal.vue'
 import { postsApi } from '@/lib/postsApi'
-import { categoryLabels, statusLabels, contactMethodLabels, eventFrequencyLabels, weekdayLabels, weekOfMonthLabels } from '@/utils/mockData'
+import { categoryLabels, statusLabels, contactMethodLabels, eventFrequencyLabels, weekdayLabels, weekOfMonthLabels } from '@/utils/constants'
 
 const route = useRoute()
 const router = useRouter()
@@ -318,16 +318,6 @@ const imageGridClasses = computed(() => {
 })
 
 const canApply = computed(() => {
-  console.log('canApply check:', {
-    hasPost: !!post.value,
-    isAuthenticated: authStore.isAuthenticated,
-    postStatus: post.value?.status,
-    postUserId: post.value?.user_id,
-    postAuthorId: post.value?.authorId,
-    currentUserId: authStore.user?.id,
-    isOwnPost: (post.value?.user_id === authStore.user?.id) || (post.value?.authorId === authStore.user?.id)
-  })
-  
   if (!post.value) return false
   if (!authStore.isAuthenticated) return false
   if (post.value.status !== 'published' && post.value.status !== 'active') return false
@@ -499,7 +489,6 @@ const handleApplicationSubmit = async (applicationData: any) => {
       twitterId: applicationData.twitterId || null
     }
     
-    console.log('Submitting application:', submitData)
     const result = await applicationApi.submitApplication(submitData)
     
     if (result.error) {

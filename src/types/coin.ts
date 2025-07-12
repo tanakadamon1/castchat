@@ -38,5 +38,4 @@ export interface SquarePaymentRequest {
   sourceId: string
   amount: number
   coinAmount: number
-  locationId: string
 }

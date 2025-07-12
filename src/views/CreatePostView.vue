@@ -1,29 +1,52 @@
 <template>
-  <div class="min-h-screen bg-gray-50 py-8">
+  <div class="min-h-screen bg-gray-50 dark:bg-gray-900 py-8">
     <div class="container mx-auto px-4 max-w-4xl">
-      <!-- デバッグ表示 -->
-      <div class="mb-4 p-2 bg-yellow-100 text-yellow-800 text-xs rounded">
-        DEBUG: CreatePostView rendered. isEditing: {{ isEditing }}, postId: {{ postId }}, route: {{ $route.path }}
-      </div>
       <!-- エラー表示 -->
       <div v-if="loadError" class="mb-6 p-4 bg-red-100 text-red-700 rounded">
         {{ loadError }}
       </div>
       <!-- ヘッダー -->
       <div class="mb-8">
-        <h1 class="text-3xl font-bold text-gray-900 mb-2">
+        <h1 class="text-3xl font-bold text-gray-900 dark:text-gray-100 mb-2">
           {{ isEditing ? '募集を編集' : '新規募集投稿' }}
         </h1>
-        <p class="text-gray-600">
-          {{ isEditing ? '募集内容を編集してください' : 'VRChatでのキャスト募集を投稿しましょう' }}
-        </p>
+        <div class="flex justify-between items-center">
+          <p class="text-gray-600 dark:text-gray-400">
+            {{ isEditing ? '募集内容を編集してください' : 'VRChatでのキャスト募集を投稿しましょう' }}
+          </p>
+          <!-- オートセーブ状態表示 -->
+          <div v-if="!isEditing" class="flex items-center text-sm">
+            <span v-if="autoSaveStatus === 'saving'" class="text-blue-600 dark:text-blue-400 flex items-center">
+              <svg class="w-4 h-4 mr-1 animate-spin" fill="none" viewBox="0 0 24 24">
+                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+              </svg>
+              下書き保存中...
+            </span>
+            <span v-else-if="autoSaveStatus === 'saved'" class="text-green-600 dark:text-green-400 flex items-center">
+              <svg class="w-4 h-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+              </svg>
+              下書き保存済み
+            </span>
+            <span v-else-if="autoSaveStatus === 'error'" class="text-red-600 dark:text-red-400 flex items-center">
+              <svg class="w-4 h-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+              </svg>
+              保存エラー
+            </span>
+            <span v-else-if="lastSaved" class="text-gray-500 dark:text-gray-400">
+              最終保存: {{ lastSaved.toLocaleTimeString() }}
+            </span>
+          </div>
+        </div>
       </div>
 
       <!-- フォーム -->
       <form @submit.prevent="handleSubmit" class="space-y-8">
         <!-- 基本情報 -->
-        <div class="bg-white rounded-lg shadow-sm border p-6">
-          <h2 class="text-xl font-semibold text-gray-900 mb-4">基本情報</h2>
+        <div class="bg-white dark:bg-gray-800 rounded-lg shadow-sm border dark:border-gray-700 p-6">
+          <h2 class="text-xl font-semibold text-gray-900 dark:text-gray-100 mb-4">基本情報</h2>
 
           <div class="space-y-4">
             <!-- タイトル -->
@@ -53,8 +76,8 @@
         </div>
 
         <!-- 詳細情報 -->
-        <div class="bg-white rounded-lg shadow-sm border p-6">
-          <h2 class="text-xl font-semibold text-gray-900 mb-4">詳細情報</h2>
+        <div class="bg-white dark:bg-gray-800 rounded-lg shadow-sm border dark:border-gray-700 p-6">
+          <h2 class="text-xl font-semibold text-gray-900 dark:text-gray-100 mb-4">詳細情報</h2>
 
           <div class="space-y-4">
             <!-- 説明文 -->
@@ -113,7 +136,7 @@
               <!-- 月1回の場合 -->
               <div
                 v-if="formData.eventFrequency === 'monthly'"
-                class="grid grid-cols-1 md:grid-cols-3 gap-4"
+                class="space-y-4 sm:space-y-0 sm:grid sm:grid-cols-2 lg:grid-cols-3 sm:gap-4"
               >
                 <div>
                   <BaseSelect
@@ -147,7 +170,7 @@
               <!-- 隔週の場合 -->
               <div
                 v-else-if="formData.eventFrequency === 'biweekly'"
-                class="grid grid-cols-1 md:grid-cols-3 gap-4"
+                class="space-y-4 sm:space-y-0 sm:grid sm:grid-cols-2 lg:grid-cols-3 sm:gap-4"
               >
                 <div>
                   <BaseSelect
@@ -181,7 +204,7 @@
               <!-- 週1回の場合 -->
               <div
                 v-else-if="formData.eventFrequency === 'weekly'"
-                class="grid grid-cols-1 md:grid-cols-2 gap-4"
+                class="space-y-4 sm:space-y-0 sm:grid sm:grid-cols-2 sm:gap-4"
               >
                 <div>
                   <BaseSelect
@@ -223,8 +246,8 @@
         </div>
 
         <!-- 連絡先情報 -->
-        <div class="bg-white rounded-lg shadow-sm border p-6">
-          <h2 class="text-xl font-semibold text-gray-900 mb-4">連絡先情報</h2>
+        <div class="bg-white dark:bg-gray-800 rounded-lg shadow-sm border dark:border-gray-700 p-6">
+          <h2 class="text-xl font-semibold text-gray-900 dark:text-gray-100 mb-4">連絡先情報</h2>
 
           <div class="space-y-4">
             <!-- Twitter ID -->
@@ -242,18 +265,18 @@
         </div>
 
         <!-- 画像アップロード -->
-        <div class="bg-white rounded-lg shadow-sm border p-6 mb-8">
-          <h2 class="text-xl font-semibold text-gray-900 mb-4">画像</h2>
+        <div class="bg-white dark:bg-gray-800 rounded-lg shadow-sm border dark:border-gray-700 p-6 mb-8">
+          <h2 class="text-xl font-semibold text-gray-900 dark:text-gray-100 mb-4">画像</h2>
 
           <div class="space-y-4">
             <div>
-              <label class="block text-sm font-medium text-gray-700 mb-2"> 募集画像（任意） </label>
+              <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2"> 募集画像（任意） </label>
               <div
                 @drop="handleDrop"
                 @dragover.prevent
                 @dragenter.prevent="dragOver = true"
                 @dragleave="dragOver = false"
-                class="border-2 border-dashed border-gray-300 rounded-lg p-6 text-center hover:border-gray-400 transition-colors"
+                class="border-2 border-dashed border-gray-300 dark:border-gray-600 rounded-lg p-6 text-center hover:border-gray-400 dark:hover:border-gray-500 transition-colors"
                 :class="{ 'border-indigo-500 bg-indigo-50': dragOver }"
               >
                 <input
@@ -279,10 +302,10 @@
                   />
                 </svg>
 
-                <p class="text-gray-600 mb-2">
+                <p class="text-gray-600 dark:text-gray-400 mb-2">
                   画像をドラッグ&ドロップまたはクリックしてアップロード
                 </p>
-                <p class="text-sm text-gray-500">PNG, JPG, GIF形式をサポート（最大3枚、各5MB）</p>
+                <p class="text-sm text-gray-500 dark:text-gray-400">PNG, JPG, GIF形式をサポート（最大3枚、各5MB）</p>
 
                 <BaseButton
                   type="button"
@@ -298,7 +321,7 @@
               <!-- 選択された画像のプレビュー -->
               <div
                 v-if="selectedImages.length > 0"
-                class="mt-4 grid grid-cols-2 md:grid-cols-4 gap-4"
+                class="mt-4 grid grid-cols-1 xs:grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4"
               >
                 <div v-for="(image, index) in selectedImages" :key="index" class="relative group">
                   <img
@@ -330,25 +353,50 @@
           </div>
         </div>
 
+        <!-- 優先表示オプション -->
+        <div class="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-6 mb-8">
+          <h2 class="text-xl font-semibold text-gray-900 dark:text-gray-100 mb-4">表示オプション</h2>
+          
+          <div class="space-y-4">
+            <div class="flex items-start space-x-3 p-4 border border-gray-200 dark:border-gray-700 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors">
+              <input
+                id="priority-display"
+                v-model="formData.enablePriority"
+                type="checkbox"
+                class="mt-1 h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300 dark:border-gray-600 rounded"
+              />
+              <label for="priority-display" class="flex-1 cursor-pointer">
+                <div class="font-medium text-gray-900 dark:text-gray-100">優先表示を有効にする</div>
+                <div class="text-sm text-gray-600 dark:text-gray-400 mt-1">
+                  1コインを使用して、投稿を24時間優先表示します。
+                  優先表示された投稿は一覧の上部に表示され、より多くの人に見てもらえます。
+                </div>
+                <div v-if="authStore.profile" class="text-sm text-gray-500 dark:text-gray-400 mt-2">
+                  現在のコイン残高: <span class="font-medium">{{ authStore.profile.coin_balance || 0 }} コイン</span>
+                  <a 
+                    v-if="(authStore.profile.coin_balance || 0) < 1"
+                    href="#"
+                    @click.prevent="showPurchaseModal = true"
+                    class="ml-2 text-indigo-600 dark:text-indigo-400 hover:text-indigo-800 dark:hover:text-indigo-300"
+                  >
+                    コインを購入
+                  </a>
+                </div>
+              </label>
+            </div>
+          </div>
+        </div>
+
         <!-- アクションボタン -->
-        <div class="flex flex-col sm:flex-row gap-4 justify-end">
+        <div class="flex flex-col-reverse sm:flex-row gap-3 sm:gap-4 justify-end">
           <BaseButton
             type="button"
             variant="outline"
             @click="handleCancel"
-            class="order-2 sm:order-1"
+            class="w-full sm:w-auto"
+            size="lg"
           >
             キャンセル
-          </BaseButton>
-
-          <!-- デバッグ用テストボタン -->
-          <BaseButton
-            type="button"
-            variant="outline"
-            @click="handleTestPost"
-            class="order-2 sm:order-2 bg-yellow-500 text-white"
-          >
-            テスト投稿
           </BaseButton>
 
           <BaseButton
@@ -356,7 +404,8 @@
             variant="outline"
             @click="handleSaveDraft"
             :loading="saving"
-            class="order-3 sm:order-3"
+            class="w-full sm:w-auto"
+            size="lg"
           >
             {{ isDraftMode ? '下書き更新' : '下書き保存' }}
           </BaseButton>
@@ -365,19 +414,26 @@
             type="submit"
             :loading="submitting"
             :disabled="!isFormValid"
-            class="order-1 sm:order-4"
+            class="w-full sm:w-auto"
+            size="lg"
           >
             {{ isEditing && !isDraftMode ? '更新する' : '投稿する' }}
           </BaseButton>
         </div>
       </form>
     </div>
+    
+    <!-- コイン購入モーダル -->
+    <CoinPurchaseModal
+      :show="showPurchaseModal"
+      @close="showPurchaseModal = false"
+      @success="handlePurchaseSuccess"
+    />
   </div>
 </template>
 
 <script setup lang="ts">
-console.log('=== CreatePostView SCRIPT LOADED ===')
-import { ref, computed, onMounted } from 'vue'
+import { ref, computed, onMounted, watch, nextTick } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
 import { useAuthStore } from '@/stores/auth'
 import { useToast } from '@/composables/useToast'
@@ -389,29 +445,76 @@ import BaseTextarea from '@/components/ui/BaseTextarea.vue'
 import BaseSelect from '@/components/ui/BaseSelect.vue'
 import BaseButton from '@/components/ui/BaseButton.vue'
 import PostCard from '@/components/post/PostCard.vue'
+import CoinPurchaseModal from '@/components/payment/CoinPurchaseModal.vue'
 import type { PostCategory, ContactMethod, Post, EventFrequency } from '@/types/post'
 
 const router = useRouter()
 const route = useRoute()
 const authStore = useAuthStore()
 const toast = useToast()
-const { validate: validateField, validateAll, getFieldError, hasErrors } = useValidation()
+const { validate: validateField, validateAll, getFieldError } = useValidation()
+
+// オートセーブ機能
+const autoSaveKey = computed(() => `draft_${isEditing.value ? postId.value : 'new'}`)
+const lastSaved = ref<Date | null>(null)
+const autoSaveStatus = ref<'saved' | 'saving' | 'error' | null>(null)
+
+// ローカルストレージからドラフトを復元
+const loadDraft = () => {
+  if (isEditing.value) return // 編集モードではドラフト復元しない
+  
+  const saved = localStorage.getItem(autoSaveKey.value)
+  if (saved) {
+    try {
+      const draftData = JSON.parse(saved)
+      Object.assign(formData.value, draftData)
+      lastSaved.value = new Date()
+      toast.info('保存されたドラフトを復元しました')
+    } catch (error) {
+      console.error('ドラフト復元エラー:', error)
+    }
+  }
+}
+
+// オートセーブ実行
+const autoSave = async () => {
+  if (autoSaveStatus.value === 'saving') return
+  
+  try {
+    autoSaveStatus.value = 'saving'
+    localStorage.setItem(autoSaveKey.value, JSON.stringify(formData.value))
+    lastSaved.value = new Date()
+    autoSaveStatus.value = 'saved'
+    
+    // 3秒後にステータスをクリア
+    setTimeout(() => {
+      if (autoSaveStatus.value === 'saved') {
+        autoSaveStatus.value = null
+      }
+    }, 3000)
+  } catch (error) {
+    console.error('オートセーブエラー:', error)
+    autoSaveStatus.value = 'error'
+  }
+}
+
+// ドラフトクリア
+const clearDraft = () => {
+  localStorage.removeItem(autoSaveKey.value)
+  lastSaved.value = null
+  autoSaveStatus.value = null
+}
 
 // 編集モードと下書きモードの判定
-const isEditing = computed(() => {
-  const editing = !!route.params.id
-  console.log('isEditing computed:', { editing, routeParams: route.params, routePath: route.path })
-  return editing
-})
-const postId = computed(() => {
-  const id = route.params.id as string
-  console.log('postId computed:', { id, routeParams: route.params })
-  return id
-})
+const isEditing = computed(() => !!route.params.id)
+const postId = computed(() => route.params.id as string)
 
 // 下書きID管理
 const draftId = ref<string | null>(null)
 const isDraftMode = computed(() => !!draftId.value)
+
+// コイン購入モーダル
+const showPurchaseModal = ref(false)
 
 // フォームデータ
 const formData = ref({
@@ -428,6 +531,7 @@ const formData = ref({
   contactMethod: 'twitter' as ContactMethod,
   contactInfo: '',
   deadline: '',
+  enablePriority: false, // 優先表示フラグ
 })
 
 // 画像アップロード関連
@@ -441,6 +545,15 @@ const uploadingImages = ref(false)
 // ローディング状態
 const submitting = ref(false)
 const saving = ref(false)
+
+// フォームデータの変更を監視してオートセーブ
+let autoSaveTimeout: NodeJS.Timeout | null = null
+watch(formData, () => {
+  if (autoSaveTimeout) {
+    clearTimeout(autoSaveTimeout)
+  }
+  autoSaveTimeout = setTimeout(autoSave, 3000) // 3秒後にオートセーブ
+}, { deep: true })
 
 // エラー表示
 const loadError = ref<string | null>(null)
@@ -567,12 +680,6 @@ const isFormValid = computed(() => {
     }
   }
 
-  console.log('Post form validation:', {
-    hasErrors: hasErrors.value,
-    basicRequiredFields,
-    eventRequiredFields,
-    formData: formData.value,
-  })
 
   return basicRequiredFields && eventRequiredFields
 })
@@ -648,15 +755,6 @@ const removeImage = (index: number) => {
 
 // フォーム送信
 const handleSubmit = async () => {
-  console.log('=== Submit button clicked ===')
-  console.log('Form valid?', isFormValid.value)
-  console.log('Form data:', formData.value)
-  console.log('Event fields check:', {
-    eventFrequency: formData.value.eventFrequency,
-    eventWeekday: formData.value.eventWeekday,
-    eventTime: formData.value.eventTime,
-    eventWeekOfMonth: formData.value.eventWeekOfMonth
-  })
 
   if (!authStore.isAuthenticated) {
     toast.error('ログインが必要です')
@@ -721,29 +819,33 @@ const handleSubmit = async () => {
     return
   }
 
+  // 優先表示が有効でコイン残高が不足している場合
+  if (formData.value.enablePriority && authStore.profile) {
+    const balance = authStore.profile.coin_balance || 0
+    if (balance < 1) {
+      toast.error('優先表示にはコインが1枚必要です')
+      showPurchaseModal.value = true
+      return
+    }
+  }
+
   submitting.value = true
-  console.log('Starting post submission process...')
-  console.log('Form data at submission:', formData.value)
-  console.log('Auth store user:', authStore.user)
-  console.log('Selected images:', selectedImages.value)
 
   try {
-    console.log('Calling submitPost()...')
     const result = await submitPost()
-    console.log('submitPost() completed successfully:', result)
 
     toast.success(isEditing.value ? '募集を更新しました' : '募集を投稿しました')
+    
+    // 投稿成功時はドラフトをクリア
+    if (!isEditing.value) {
+      clearDraft()
+    }
 
-    console.log('Navigating to /posts...')
     router.push('/posts')
   } catch (error) {
-    console.error('投稿エラー - handleSubmit catch:', error)
-    console.error('Error type:', typeof error)
-    console.error('Error message:', error?.message)
-    console.error('Error stack:', error?.stack)
+    console.error('投稿エラー:', error)
     toast.error('投稿に失敗しました')
   } finally {
-    console.log('handleSubmit finally block - resetting submitting')
     submitting.value = false
   }
 }
@@ -764,11 +866,9 @@ const handleSaveDraft = async () => {
   saving.value = true
 
   try {
-    console.log('=== Draft Save Process Started ===')
     
     // 画像をアップロード
     const imageUrls = await uploadImages(draftId.value)
-    console.log('Draft save: Images uploaded:', imageUrls)
 
     // 投稿データを準備
     const postData = {
@@ -789,11 +889,9 @@ const handleSaveDraft = async () => {
       images: imageUrls,
     }
 
-    console.log('Draft save: Post data prepared:', postData)
 
     // 下書き保存API呼び出し
     const result = await postsApi.saveDraft(postData, draftId.value)
-    console.log('Draft save: API result:', result)
 
     if (result.error) {
       throw new Error(result.error)
@@ -803,7 +901,6 @@ const handleSaveDraft = async () => {
       draftId.value = result.data.id
       const message = isDraftMode.value ? '下書きを更新しました' : '下書きを保存しました'
       toast.success(message)
-      console.log('Draft save: Success, draftId set to:', draftId.value)
     }
   } catch (error) {
     console.error('Draft save error:', error)
@@ -820,89 +917,57 @@ const handleCancel = () => {
   }
 }
 
-// デバッグ用テスト投稿
-const handleTestPost = async () => {
-  console.log('=== TEST POST BUTTON CLICKED ===')
-  try {
-    const result = await postsApi.testCreatePost()
-    console.log('Test post result:', result)
-    if (result.error) {
-      toast.error(`テスト投稿失敗: ${result.error}`)
-    } else {
-      toast.success('テスト投稿成功！')
-    }
-  } catch (error) {
-    console.error('Test post error:', error)
-    toast.error('テスト投稿でエラーが発生しました')
-  }
-}
 
 // 画像アップロード処理
 const uploadImages = async (postId?: string) => {
-  console.log('uploadImages: Starting with', selectedImages.value.length, 'images')
   if (selectedImages.value.length === 0) {
-    console.log('uploadImages: No images to upload')
     return []
   }
 
   if (!authStore.user?.id) {
-    console.error('uploadImages: No user ID found')
     throw new Error('ユーザー情報が見つかりません')
   }
 
-  console.log('uploadImages: User ID:', authStore.user.id)
   uploadingImages.value = true
   const uploadedUrls = []
 
   try {
     for (let i = 0; i < selectedImages.value.length; i++) {
       const imageData = selectedImages.value[i]
-      console.log(`uploadImages: Processing image ${i + 1}/${selectedImages.value.length}`)
 
       if (imageData.uploaded) {
-        console.log(`uploadImages: Image ${i + 1} already uploaded:`, imageData.uploaded.url)
         // 既にアップロード済み
         uploadedUrls.push(imageData.uploaded.url)
         continue
       }
 
       if (!imageData.file) {
-        console.error(`uploadImages: Image ${i + 1} has no file object`)
         continue
       }
       
-      console.log(`uploadImages: Uploading image ${i + 1}:`, imageData.file.name)
       const result = await uploadPostImage(imageData.file, authStore.user.id, postId)
-      console.log(`uploadImages: Upload result for image ${i + 1}:`, result)
 
       if (result.error) {
-        console.error(`uploadImages: Error uploading image ${i + 1}:`, result.error)
         throw new Error(result.error)
       }
 
       if (result.data) {
-        console.log(`uploadImages: Image ${i + 1} uploaded successfully:`, result.data.url)
         uploadedUrls.push(result.data.url)
         // アップロード情報をキャッシュ
         imageData.uploaded = result.data
       }
     }
 
-    console.log('uploadImages: All images processed, URLs:', uploadedUrls)
     return uploadedUrls
   } finally {
     uploadingImages.value = false
-    console.log('uploadImages: Finished, reset uploading state')
   }
 }
 
 // API呼び出し関数
 const submitPost = async () => {
-  console.log('submitPost: Starting...')
   // まず画像をアップロード
-  console.log('submitPost: Uploading images...')
   const imageUrls = await uploadImages()
-  console.log('submitPost: Images uploaded:', imageUrls)
 
   const postData: Partial<Post> = {
     title: formData.value.title,
@@ -920,56 +985,34 @@ const submitPost = async () => {
     eventWeekOfMonth: formData.value.eventWeekOfMonth,
     tags: [],
     images: imageUrls,
+    enablePriority: formData.value.enablePriority, // 優先表示フラグを追加
   }
-  console.log('submitPost: Post data prepared:', postData)
-  console.log('submitPost: Event details:', {
-    eventFrequency: postData.eventFrequency,
-    eventWeekday: postData.eventWeekday,
-    eventTime: postData.eventTime,
-    eventWeekOfMonth: postData.eventWeekOfMonth,
-  })
   
-  // 送信前の最終チェックログ
+  // 送信前の最終チェック
   if (postData.eventFrequency === 'weekly' && (postData.eventWeekday === undefined || !postData.eventTime)) {
-    console.error('VALIDATION ERROR: Weekly event missing required fields:', {
-      eventWeekday: postData.eventWeekday,
-      eventTime: postData.eventTime
-    })
     throw new Error('週1回イベントに必要な情報が不足しています')
   }
 
   if (isEditing.value) {
-    console.log('submitPost: Editing mode - calling updatePost API...')
     // 更新処理
     const result = await postsApi.updatePost(postId.value, postData)
-    console.log('submitPost: Update API result:', result)
     if (result.error) {
-      console.error('submitPost: Update API error:', result.error)
       throw new Error(result.error)
     }
-    console.log('submitPost: Update success, returning data:', result.data)
     return result.data
   } else if (isDraftMode.value) {
-    console.log('submitPost: Draft publish mode - updating draft to published...')
     // 下書きから公開処理
     const result = await postsApi.updatePost(draftId.value!, { ...postData, status: 'published' })
-    console.log('submitPost: Draft publish API result:', result)
     if (result.error) {
-      console.error('submitPost: Draft publish API error:', result.error)
       throw new Error(result.error)
     }
-    console.log('submitPost: Draft publish success, returning data:', result.data)
     return result.data
   } else {
-    console.log('submitPost: Creating new post via API...')
     // 新規作成処理
     const result = await postsApi.createPost(postData)
-    console.log('submitPost: API result:', result)
     if (result.error) {
-      console.error('submitPost: API error:', result.error)
       throw new Error(result.error)
     }
-    console.log('submitPost: Success, returning data:', result.data)
     return result.data
   }
 }
@@ -993,23 +1036,29 @@ const loadUserProfile = () => {
   }
 }
 
+// コイン購入成功時の処理
+const handlePurchaseSuccess = (newBalance: number) => {
+  // authストアのプロファイルを更新
+  if (authStore.profile) {
+    authStore.profile.coin_balance = newBalance
+  }
+  // または、refreshCoinBalanceを呼び出し
+  authStore.refreshCoinBalance()
+  toast.success('コインを購入しました')
+}
+
 // 編集時のデータ読み込み
 onMounted(async () => {
-  console.log('=== CreatePostView onMounted called ===')
-  console.log('isEditing.value:', isEditing.value)
-  console.log('postId.value:', postId.value)
-  console.log('route.params:', route.params)
-  console.log('Current URL:', window.location.href)
   
-  // 新規投稿の場合、プロフィールからTwitterIDを自動入力
+  // 新規投稿の場合、プロフィールからTwitterIDを自動入力とドラフト復元
   if (!isEditing.value) {
     loadUserProfile()
+    loadDraft()
   }
   
   if (isEditing.value) {
     try {
       const postData = await loadPost()
-      console.log('編集モード: 取得した投稿データ', postData)
       if (postData) {
         formData.value = {
           title: postData.title,
@@ -1029,19 +1078,16 @@ onMounted(async () => {
         
         // 画像データの読み込み
         if (postData.images && postData.images.length > 0) {
-          console.log('編集モード: 画像データを読み込み中...', postData.images)
           selectedImages.value = postData.images.map((url, index) => ({
             file: null as any, // 既存画像の場合はファイルオブジェクトは無い
             preview: url, // 既存画像のURLをプレビューとして使用
             uploaded: { url, path: '' } // 既にアップロード済みとしてマーク
           }))
-          console.log('編集モード: selectedImages設定完了', selectedImages.value)
         }
         
         // 下書きの場合はdraftIdを設定
         if (postData.status === 'draft') {
           draftId.value = postData.id
-          console.log('下書きモード: draftId設定完了', draftId.value)
         }
         
         loadError.value = null
@@ -1049,14 +1095,7 @@ onMounted(async () => {
         loadError.value = '投稿データが見つかりませんでした。URLや権限をご確認ください。'
       }
     } catch (error: unknown) {
-      if (typeof error === 'object' && error !== null) {
-        const errObj = error as Record<string, unknown>
-        const errMsg = typeof errObj.message === 'string' ? errObj.message : ''
-        const errStack = typeof errObj.stack === 'string' ? errObj.stack : ''
-        console.error('投稿データ取得エラー:', errMsg, errStack)
-      } else {
-        console.error('投稿データ取得エラー:', error)
-      }
+      console.error('投稿データ取得エラー:', error)
       loadError.value = '投稿データの取得に失敗しました。しばらくしてから再度お試しください。'
       router.push('/posts')
     }

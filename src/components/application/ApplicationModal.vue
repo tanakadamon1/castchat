@@ -198,17 +198,6 @@ const isFormValid = computed(() => {
   
   const isValid = !hasActualErrors && messageValid && twitterIdValid
   
-  console.log('Form validation:', {
-    hasErrors: hasErrors.value,
-    hasActualErrors,
-    actualErrors,
-    errorsObject: errors.value,
-    messageLength: formData.value.message.trim().length,
-    messageValid,
-    twitterIdValid,
-    isValid
-  })
-  
   return isValid
 })
 

@@ -1,6 +1,11 @@
-// デバッグ用ユーティリティ
+// デバッグ用ユーティリティ（開発環境でのみ使用）
 
 export const clearAllStorageAndReload = async () => {
+  // 本番環境では実行しない
+  if (import.meta.env.PROD) {
+    console.warn('Debug utilities are disabled in production')
+    return
+  }
   console.log('=== Clearing all storage and ServiceWorker ===')
   
   try {

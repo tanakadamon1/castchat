@@ -88,16 +88,24 @@
           <div v-if="posts.length === 0" class="col-span-full text-center py-8">
             <p class="text-gray-500 dark:text-gray-400">投稿がありません</p>
           </div>
-          <PostCard
-            v-for="post in posts"
-            :key="post.id"
-            :post="post"
-            @view-details="goToPostDetail"
-            @view-image="handleViewImage"
-            @edit-post="handleEditPost"
-            @delete-post="handleDeletePost"
-            @promote-post="handlePromotePost"
-          />
+          <TransitionGroup
+            name="post-list"
+            tag="div"
+            class="contents"
+          >
+            <PostCard
+              v-for="(post, index) in posts"
+              :key="post.id"
+              :post="post"
+              :style="{ '--delay': index * 50 + 'ms' }"
+              class="post-list-item"
+              @view-details="goToPostDetail"
+              @view-image="handleViewImage"
+              @edit-post="handleEditPost"
+              @delete-post="handleDeletePost"
+              @promote-post="handlePromotePost"
+            />
+          </TransitionGroup>
         </div>
         
         <!-- Pagination -->
@@ -158,7 +166,6 @@ import PriorityPromotionModal from '@/components/payment/PriorityPromotionModal.
 import CoinPurchaseModal from '@/components/payment/CoinPurchaseModal.vue'
 import { useToast } from '@/composables/useToast'
 import { postsApi } from '@/lib/postsApi'
-// import { useMemoizedComputed, useListMemoization } from '@/composables/useMemoizedComputed'
 import { useKeyboardNavigation } from '@/composables/useKeyboardNavigation'
 import { useScreenReader } from '@/composables/useScreenReader'
 
@@ -200,11 +207,6 @@ const selectedPostId = ref('')
 // Computed - シンプルなcomputed
 const totalPages = computed(() => Math.ceil(total.value / perPage.value))
 
-// リストメモ化を一時的に無効化
-// const { itemsMap: postsMap, hasChanged: hasPostChanged } = useListMemoization(
-//   computed(() => posts.value)
-// )
-
 // Methods
 const loadPosts = async (showLoading = true) => {
   if (showLoading) {
@@ -235,14 +237,6 @@ const loadPosts = async (showLoading = true) => {
     posts.value = result.data || []
     total.value = result.total
     
-    // 画像データをデバッグ
-    if (posts.value.length > 0) {
-      posts.value.forEach(post => {
-        if (post.images && post.images.length > 0) {
-          console.log(`Post "${post.title}" has images:`, post.images)
-        }
-      })
-    }
     
     // スクリーンリーダーに結果を通知
     announceLoadComplete('募集情報の読み込み', result.total)
@@ -347,7 +341,6 @@ const handleCoinPurchaseSuccess = () => {
 
 // Watch for filter changes - immediate: false を追加してマウント時の実行を防ぐ
 watch(filters, () => {
-  console.log('Filters changed, reloading posts')
   currentPage.value = 1
   loadPosts()
 }, { deep: true, immediate: false })
@@ -358,3 +351,58 @@ onMounted(() => {
   announcePageLoad('募集一覧', 'VRChatでのキャスト募集・応募情報を閲覧できます')
 })
 </script>
+
+<style scoped>
+/* Post list animations */
+.post-list-item {
+  animation: fadeInUp 0.6s ease-out forwards;
+  animation-delay: var(--delay);
+  opacity: 0;
+  transform: translateY(20px);
+}
+
+@keyframes fadeInUp {
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* TransitionGroup animations for dynamic content updates */
+.post-list-enter-active {
+  transition: all 0.4s ease-out;
+}
+
+.post-list-leave-active {
+  transition: all 0.3s ease-in;
+}
+
+.post-list-enter-from {
+  opacity: 0;
+  transform: translateY(20px) scale(0.95);
+}
+
+.post-list-leave-to {
+  opacity: 0;
+  transform: translateY(-10px) scale(0.95);
+}
+
+.post-list-move {
+  transition: transform 0.3s ease;
+}
+
+/* Reduce motion for users who prefer it */
+@media (prefers-reduced-motion: reduce) {
+  .post-list-item {
+    animation: none;
+    opacity: 1;
+    transform: none;
+  }
+  
+  .post-list-enter-active,
+  .post-list-leave-active,
+  .post-list-move {
+    transition: none;
+  }
+}
+</style>

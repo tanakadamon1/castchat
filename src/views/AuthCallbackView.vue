@@ -72,24 +72,12 @@ const handleAuthCallback = async () => {
     loading.value = true
     error.value = null
 
-    console.log('=== Auth callback started ===')
-    console.log('Current URL:', window.location.href)
-    console.log('URL hash:', window.location.hash)
-    console.log('URL search params:', window.location.search)
-
     // URLパラメータを解析
     const urlParams = new URLSearchParams(window.location.search)
     const hashParams = new URLSearchParams(window.location.hash.substring(1))
 
-    console.log('URL params:', Object.fromEntries(urlParams.entries()))
-    console.log('Hash params:', Object.fromEntries(hashParams.entries()))
-
     // Supabaseの認証コールバックを処理
-    console.log('Processing OAuth callback...')
     const { data, error: authError } = await supabase.auth.getSession()
-
-    console.log('Session data:', data)
-    console.log('Auth error:', authError)
 
     if (authError) {
       console.error('Auth error details:', authError)
@@ -101,21 +89,8 @@ const handleAuthCallback = async () => {
       throw new Error('セッションが見つかりません。OAuth認証が完了していない可能性があります。')
     }
 
-    console.log('Session found:', {
-      user: data.session.user?.id,
-      email: data.session.user?.email,
-      expiresAt: data.session.expires_at,
-    })
-
     // 認証ストアを初期化
-    console.log('Initializing auth store...')
     await authStore.initialize()
-
-    console.log('Auth store state:', {
-      isAuthenticated: authStore.isAuthenticated,
-      user: authStore.user?.id,
-      profile: authStore.profile?.id,
-    })
 
     if (authStore.isAuthenticated) {
       if (isRecovery.value) {
@@ -127,7 +102,6 @@ const handleAuthCallback = async () => {
         toast.success('ログインしました')
         setTimeout(() => {
           const redirectTo = (route.query.redirect as string) || '/'
-          console.log('Redirecting to:', redirectTo)
           router.push(redirectTo)
         }, 1500)
       }

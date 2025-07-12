@@ -63,6 +63,53 @@ export type Database = {
           },
         ]
       }
+      coin_transactions: {
+        Row: {
+          amount: number
+          balance_after: number
+          created_at: string
+          description: string | null
+          id: string
+          metadata: Json | null
+          square_payment_id: string | null
+          square_receipt_url: string | null
+          transaction_type: string
+          user_id: string
+        }
+        Insert: {
+          amount: number
+          balance_after: number
+          created_at?: string
+          description?: string | null
+          id?: string
+          metadata?: Json | null
+          square_payment_id?: string | null
+          square_receipt_url?: string | null
+          transaction_type: string
+          user_id: string
+        }
+        Update: {
+          amount?: number
+          balance_after?: number
+          created_at?: string
+          description?: string | null
+          id?: string
+          metadata?: Json | null
+          square_payment_id?: string | null
+          square_receipt_url?: string | null
+          transaction_type?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "coin_transactions_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "users"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       favorites: {
         Row: {
           created_at: string
@@ -299,6 +346,9 @@ export type Database = {
           description: string
           id: string
           is_featured: boolean
+          is_priority: boolean
+          priority_expires_at: string | null
+          priority_cost: number | null
           published_at: string | null
           recruitment_count: number | null
           requirements: string | null
@@ -317,6 +367,9 @@ export type Database = {
           description: string
           id?: string
           is_featured?: boolean
+          is_priority?: boolean
+          priority_expires_at?: string | null
+          priority_cost?: number | null
           published_at?: string | null
           recruitment_count?: number | null
           requirements?: string | null
@@ -335,6 +388,9 @@ export type Database = {
           description?: string
           id?: string
           is_featured?: boolean
+          is_priority?: boolean
+          priority_expires_at?: string | null
+          priority_cost?: number | null
           published_at?: string | null
           recruitment_count?: number | null
           requirements?: string | null
@@ -437,6 +493,7 @@ export type Database = {
         Row: {
           avatar_url: string | null
           bio: string | null
+          coin_balance: number
           created_at: string
           discord_username: string | null
           display_name: string
@@ -451,6 +508,7 @@ export type Database = {
         Insert: {
           avatar_url?: string | null
           bio?: string | null
+          coin_balance?: number
           created_at?: string
           discord_username?: string | null
           display_name: string
@@ -465,6 +523,7 @@ export type Database = {
         Update: {
           avatar_url?: string | null
           bio?: string | null
+          coin_balance?: number
           created_at?: string
           discord_username?: string | null
           display_name?: string

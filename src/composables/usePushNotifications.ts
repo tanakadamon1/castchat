@@ -1,4 +1,5 @@
 import { ref, onMounted } from 'vue'
+import { useAuthStore } from '@/stores/auth'
 
 export interface NotificationPermission {
   state: 'default' | 'granted' | 'denied'
@@ -128,18 +129,17 @@ export function usePushNotifications() {
   // サーバーにサブスクリプションを登録
   const registerSubscription = async (subscriptionData: PushSubscription) => {
     try {
-      // TODO: 実際のAPIエンドポイントに送信
-      const response = await fetch('/api/push/subscribe', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${getAuthToken()}`
-        },
-        body: JSON.stringify(subscriptionData)
+      // Supabase functionsを使用してプッシュ通知サブスクリプションを登録
+      const { supabase } = await import('@/lib/supabase')
+      const { error } = await supabase.functions.invoke('push-notifications', {
+        body: {
+          action: 'subscribe',
+          subscription: subscriptionData
+        }
       })
       
-      if (!response.ok) {
-        throw new Error('Failed to register subscription')
+      if (error) {
+        throw error
       }
     } catch (error) {
       console.error('Failed to register subscription on server:', error)
@@ -150,13 +150,17 @@ export function usePushNotifications() {
   // サーバーからサブスクリプションを削除
   const unregisterSubscription = async () => {
     try {
-      // TODO: 実際のAPIエンドポイントから削除
-      await fetch('/api/push/unsubscribe', {
-        method: 'DELETE',
-        headers: {
-          'Authorization': `Bearer ${getAuthToken()}`
+      // Supabase functionsを使用してプッシュ通知サブスクリプションを削除
+      const { supabase } = await import('@/lib/supabase')
+      const { error } = await supabase.functions.invoke('push-notifications', {
+        body: {
+          action: 'unsubscribe'
         }
       })
+      
+      if (error) {
+        throw error
+      }
     } catch (error) {
       console.error('Failed to unregister subscription on server:', error)
     }
@@ -281,8 +285,9 @@ export function usePushNotifications() {
   }
 
   const getAuthToken = (): string => {
-    // TODO: 実際の認証トークンを取得
-    return 'mock-token'
+    // 認証ストアからトークンを取得
+    const authStore = useAuthStore()
+    return authStore.session?.access_token || ''
   }
 
   onMounted(() => {

@@ -370,9 +370,6 @@ const goToCreatePost = () => {
 }
 
 const handleEditPost = (postId: string) => {
-  console.log('=== handleEditPost called ===')
-  console.log('postId:', postId)
-  console.log('Navigating to:', `/posts/${postId}/edit`)
   router.push(`/posts/${postId}/edit`)
 }
 
@@ -439,14 +436,12 @@ const handleCoinPurchaseSuccess = () => {
 onMounted(async () => {
   // 認証ストアが初期化されていない場合は待機
   if (!authStore.user && authStore.initializing) {
-    console.log('MyPostsView: Waiting for auth initialization...')
     let waitTime = 0
     const maxWaitTime = 3000 // 3秒
     while (authStore.initializing && waitTime < maxWaitTime) {
       await new Promise(resolve => setTimeout(resolve, 100))
       waitTime += 100
     }
-    console.log('MyPostsView: Auth initialization wait completed')
   }
   
   loadPosts()

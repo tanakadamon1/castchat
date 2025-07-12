@@ -96,11 +96,6 @@ const router = createRouter({
       meta: { requiresAuth: true },
     },
     {
-      path: '/demo',
-      name: 'demo',
-      component: () => import('../views/ComponentDemoView.vue'),
-    },
-    {
       path: '/privacy-policy',
       name: 'privacy-policy',
       component: () => import('../views/PrivacyPolicyView.vue'),
@@ -122,64 +117,43 @@ const router = createRouter({
 router.beforeEach(async (to, from, next) => {
   const authStore = useAuthStore()
   const navigationId = Date.now() + Math.random()
-  console.log(`[NAV-${navigationId}] Starting navigation from ${from.path} to ${to.path}`)
   
   // 編集ページの特別なデバッグ
   if (to.path.includes('/edit')) {
-    console.log(`[NAV-${navigationId}] EDIT PAGE NAVIGATION DETECTED`)
-    console.log(`[NAV-${navigationId}] Route params:`, to.params)
-    console.log(`[NAV-${navigationId}] Route matched:`, to.matched)
-    console.log(`[NAV-${navigationId}] Route name:`, to.name)
+    // Debug logs removed
   }
 
   try {
     // 認証が必要なルートかチェック
     if (to.meta.requiresAuth) {
-      console.log(`[NAV-${navigationId}] Protected route detected`)
-      console.log(`[NAV-${navigationId}] Auth state:`, {
-        hasUser: !!authStore.user,
-        isAuthenticated: authStore.isAuthenticated,
-        isLoading: authStore.loading,
-        isInitializing: authStore.initializing
-      })
-
       // 認証ストアが初期化中の場合は短時間だけ待機
       if (authStore.initializing) {
-        console.log(`[NAV-${navigationId}] Auth store is initializing, waiting briefly...`)
         await new Promise(resolve => setTimeout(resolve, 500)) // 500msだけ待機
       }
 
       // 認証ストアが初期化されていない場合は初期化
       if (!authStore.user && !authStore.loading && !authStore.initializing) {
-        console.log(`[NAV-${navigationId}] Initializing auth store for protected route`)
         await authStore.initialize()
-        console.log(`[NAV-${navigationId}] Auth initialization completed`)
       }
 
       // 初期化後も認証されていない場合はログインページにリダイレクト
       if (!authStore.isAuthenticated) {
-        console.log(`[NAV-${navigationId}] User not authenticated, redirecting to login`)
         next({ name: 'login', query: { redirect: to.fullPath } })
         return
       }
-
-      console.log(`[NAV-${navigationId}] User authenticated, proceeding to protected route`)
     }
 
     // 既にログインしている場合はログインページからリダイレクト
     if (to.name === 'login' && authStore.isAuthenticated) {
-      console.log(`[NAV-${navigationId}] User already authenticated, redirecting to home`)
       next({ name: 'home' })
       return
     }
 
-    console.log(`[NAV-${navigationId}] Navigation allowed to: ${to.path}`)
     next()
   } catch (error) {
     console.error(`[NAV-${navigationId}] Navigation guard error:`, error)
     console.error(`[NAV-${navigationId}] Error stack:`, error instanceof Error ? error.stack : 'No stack trace')
     // エラーが発生した場合は通常のナビゲーションを許可
-    console.log(`[NAV-${navigationId}] Allowing navigation despite error`)
     next()
   }
 })

@@ -80,33 +80,8 @@ class ApplicationApi {
         }
       }
 
-      // 直接Supabaseにアクセスして応募を作成（デバッグ用）
+      // 直接Supabaseにアクセスして応募を作成
       try {
-        // まず、テーブル構造を確認
-        console.log('Checking applications table structure...')
-        const { data: tableStructure } = await supabase
-          .from('information_schema.columns')
-          .select('column_name, data_type, is_nullable')
-          .eq('table_schema', 'public')
-          .eq('table_name', 'applications')
-
-        console.log('Applications table columns:', tableStructure)
-
-        // 既存の応募があるかチェック
-        console.log('Checking for existing applications...')
-        const { data: existingApps, error: selectError } = await supabase
-          .from('applications')
-          .select('id, post_id, user_id')
-          .limit(5)
-
-        console.log('Existing applications:', existingApps, 'Error:', selectError)
-
-        console.log('Attempting to create application:', {
-          post_id: data.postId,
-          user_id: userId,
-          message: data.message,
-        })
-
         const insertPayload = {
           post_id: data.postId,
           user_id: userId,
@@ -115,10 +90,6 @@ class ApplicationApi {
           availability: data.availability || null,
           twitter_id: data.twitterId || null,
         }
-
-        console.log('Full insert payload:', insertPayload)
-        // console.log('User auth state:', authStore.user)
-        // console.log('User profile:', authStore.profile)
 
         const { data: applicationData, error: insertError } = await supabase
           .from('applications')
@@ -139,8 +110,6 @@ class ApplicationApi {
             error: `${insertError.message} (${insertError.code})`,
           }
         }
-
-        console.log('Direct insert success:', applicationData)
         return {
           data: applicationData,
           error: undefined,

@@ -90,7 +90,6 @@ export const uploadImage = async (
     }
     
     // Supabase Storageにアップロード
-    console.log('Uploading to bucket:', bucket, 'path:', path, 'file size:', fileToUpload.size)
     const { data, error } = await supabase.storage
       .from(bucket)
       .upload(path, fileToUpload, {
@@ -108,8 +107,6 @@ export const uploadImage = async (
       })
       return { error: `アップロードに失敗しました: ${error.message}` }
     }
-    
-    console.log('Upload successful:', data)
     
     // 公開URLを取得
     const { data: urlData } = supabase.storage

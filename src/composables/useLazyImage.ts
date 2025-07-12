@@ -36,8 +36,11 @@ export function useLazyImage(options: LazyImageOptions = {}) {
     }
     
     img.onerror = (event) => {
-      console.error('useLazyImage: Failed to load image:', src, event)
-      console.error('useLazyImage: Image element:', img)
+      // 開発環境でのみコンソールにエラーを出力
+      if (import.meta.env.DEV) {
+        console.error('useLazyImage: Failed to load image:', src, event)
+        console.error('useLazyImage: Image element:', img)
+      }
       currentSrc.value = fallback
       isLoaded.value = false
       isError.value = true
