@@ -1,7 +1,7 @@
 <template>
   <article
     :class="[
-      'bg-white dark:bg-gray-800 rounded-lg shadow-sm border hover:shadow-lg hover:-translate-y-1 transition-all duration-300 ease-out overflow-hidden focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 flex flex-col h-full',
+      'bg-white dark:bg-gray-800 rounded-lg shadow-sm border hover:shadow-lg hover:-translate-y-1 transition-all duration-300 ease-out overflow-hidden focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 flex flex-col h-full cursor-pointer',
       post.isPriority ? 'border-yellow-400 dark:border-yellow-500 ring-2 ring-yellow-200 dark:ring-yellow-900' : 'border-gray-200 dark:border-gray-700'
     ]"
     :aria-label="`${post.title}の募集投稿`"
@@ -9,6 +9,7 @@
     tabindex="0"
     role="article"
     @keydown="handleKeyDown"
+    @click="handleCardClick"
   >
     <!-- Main Content -->
     <div class="flex-grow">
@@ -55,7 +56,7 @@
       <!-- Image Section with aspect ratio -->
       <div class="px-4 pb-3">
         <div v-if="post.images && post.images.length > 0">
-          <div class="relative group cursor-pointer overflow-hidden rounded-lg bg-gray-100 dark:bg-gray-800" @click="$emit('view-image', post.images[0], 0)">
+          <div class="relative group cursor-pointer overflow-hidden rounded-lg bg-gray-100 dark:bg-gray-800" @click.stop="$emit('view-image', post.images[0], 0)">
             <LazyImage
               :src="post.images[0]"
               :alt="`投稿画像 1`"
@@ -165,7 +166,7 @@
               v-if="!post.isPriority"
               size="sm"
               variant="ghost"
-              @click="$emit('promote-post', post.id)"
+              @click.stop="$emit('promote-post', post.id)"
               :aria-label="`${post.title}を優先表示に設定。優先表示にすると上位に表示されます。`"
               class="text-yellow-600 hover:text-yellow-700"
             >
@@ -177,7 +178,7 @@
             <BaseButton
               size="sm"
               variant="ghost"
-              @click="handleEditClick"
+              @click.stop="handleEditClick"
               :aria-label="`${post.title}を編集する。編集ページに移動します。`"
             >
               <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -187,7 +188,7 @@
             <BaseButton
               size="sm"
               variant="ghost"
-              @click="$emit('delete-post', post.id)"
+              @click.stop="$emit('delete-post', post.id)"
               :aria-label="`${post.title}を削除する。この操作は元に戻すことができません。`"
               class="text-red-600 hover:text-red-700"
             >
@@ -200,7 +201,7 @@
           <BaseButton
             size="sm"
             variant="outline"
-            @click="$emit('view-details', post.id)"
+            @click.stop="$emit('view-details', post.id)"
             :aria-label="`${post.title}の詳細ページを開く。募集内容の詳細や応募方法が確認できます。`"
           >
             詳細を見る
@@ -246,6 +247,16 @@ const handleKeyDown = (event: KeyboardEvent) => {
     event.preventDefault()
     emit('view-details', props.post.id)
   }
+}
+
+// カードクリック処理（ボタンクリック時は除外）
+const handleCardClick = (event: MouseEvent) => {
+  // ボタンやリンクをクリックした場合は詳細遷移しない
+  const target = event.target as HTMLElement
+  if (target.closest('button') || target.closest('a')) {
+    return
+  }
+  emit('view-details', props.post.id)
 }
 
 // 編集ボタンクリック処理

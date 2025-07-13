@@ -41,6 +41,10 @@
           >
 却下
           </BaseButton>
+          <!-- 承認済みの場合のTwitter連絡案内 -->
+          <div v-if="application.status === 'accepted'" class="text-xs text-green-600 dark:text-green-400 bg-green-50 dark:bg-green-900/20 px-2 py-1 rounded">
+            応募者のTwitterにご連絡ください
+          </div>
         </template>
 
         <!-- 送信した応募の場合 -->

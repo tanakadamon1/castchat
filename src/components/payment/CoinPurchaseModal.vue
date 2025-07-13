@@ -393,7 +393,11 @@ function loadSquareSDK(): Promise<void> {
     }
 
     const script = document.createElement('script')
-    script.src = 'https://sandbox.web.squarecdn.com/v1/square.js'
+    // 環境に応じてSquare SDKのURLを選択
+    const isProduction = import.meta.env.VITE_SQUARE_ENVIRONMENT === 'production'
+    script.src = isProduction 
+      ? 'https://web.squarecdn.com/v1/square.js'
+      : 'https://sandbox.web.squarecdn.com/v1/square.js'
     script.async = true
 
     script.onload = () => {

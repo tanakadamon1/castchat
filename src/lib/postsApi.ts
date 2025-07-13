@@ -621,39 +621,81 @@ export const postsApi = {
   // 投稿削除
   async deletePost(postId: string): Promise<{ success: boolean; error?: string }> {
     try {
+      console.log('postsApi.deletePost 開始:', postId)
       const authStore = useAuthStore()
       
       if (!authStore.user?.id) {
+        console.log('認証エラー: ユーザーIDなし')
         return { success: false, error: 'ログインが必要です' }
       }
+
+      console.log('投稿所有者確認中:', postId, 'by user:', authStore.user.id)
 
       // 投稿の所有者確認のため、投稿情報を取得
       const { data: post, error: fetchError } = await supabase
         .from('posts')
-        .select('user_id')
+        .select('user_id, status, title')
         .eq('id', postId)
         .single()
 
+      console.log('投稿取得結果:', { post, fetchError })
+
       if (fetchError || !post) {
+        console.log('投稿が見つからない:', fetchError?.message)
         return { success: false, error: '投稿が見つかりません' }
       }
 
       // 投稿者本人かチェック
       if (post.user_id !== authStore.user.id) {
+        console.log('権限エラー: 投稿者不一致', { postUserId: post.user_id, currentUserId: authStore.user.id })
         return { success: false, error: '削除権限がありません' }
       }
 
-      // 投稿を削除（CASCADE設定により関連データも削除される）
-      const { error: deleteError } = await supabase
+      console.log('削除実行中:', { id: postId, title: post.title, status: post.status })
+
+      // より確実な削除のため、複数の条件で削除を試行
+      const { error: deleteError, count } = await supabase
         .from('posts')
-        .delete()
+        .delete({ count: 'exact' })
         .eq('id', postId)
+        .eq('user_id', authStore.user.id) // ユーザーIDも明示的に指定
+
+      console.log('削除結果:', { deleteError, count })
 
       if (deleteError) {
         console.error('Delete post error:', deleteError.message)
+        
+        // RLSエラーの可能性をチェック
+        if (deleteError.message.includes('policy') || deleteError.message.includes('permission')) {
+          console.error('RLSポリシーエラーの可能性:', deleteError)
+          return { success: false, error: `権限エラー: ${deleteError.message}` }
+        }
+        
         return { success: false, error: `削除に失敗しました: ${deleteError.message}` }
       }
 
+      if (count === 0) {
+        console.log('削除対象が見つからなかった - 再確認中...')
+        
+        // 削除対象が見つからない場合、再度存在確認
+        const { data: recheck, error: recheckError } = await supabase
+          .from('posts')
+          .select('id, status')
+          .eq('id', postId)
+          .single()
+        
+        console.log('再確認結果:', { recheck, recheckError })
+        
+        if (recheckError && recheckError.code === 'PGRST116') {
+          // データが見つからない = 削除済み
+          console.log('実際には削除済みでした')
+          return { success: true }
+        }
+        
+        return { success: false, error: '削除対象が見つかりませんでした' }
+      }
+
+      console.log('削除成功:', postId, 'deleted count:', count)
       return { success: true }
     } catch (error) {
       console.error('Unexpected delete error:', error)

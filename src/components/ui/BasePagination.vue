@@ -1,6 +1,6 @@
 <template>
   <nav
-    class="flex items-center justify-between border-t border-gray-200 bg-white px-4 py-3 sm:px-6"
+    class="flex items-center justify-between border-t border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 px-4 py-3 sm:px-6"
     aria-label="Pagination"
   >
     <!-- Mobile view -->
@@ -13,7 +13,7 @@
         前へ
       </button>
       
-      <div class="flex items-center text-sm text-gray-700">
+      <div class="flex items-center text-sm text-gray-700 dark:text-gray-300">
         {{ currentPage }} / {{ totalPages }}
       </div>
       
@@ -29,7 +29,7 @@
     <!-- Desktop view -->
     <div class="hidden sm:flex sm:flex-1 sm:items-center sm:justify-between">
       <div>
-        <p class="text-sm text-gray-700">
+        <p class="text-sm text-gray-700 dark:text-gray-300">
           <span class="font-medium">{{ startItem }}</span>
           -
           <span class="font-medium">{{ endItem }}</span>
@@ -68,7 +68,7 @@
             
             <span
               v-else
-              class="relative inline-flex items-center px-4 py-2 text-sm font-medium text-gray-500 ring-1 ring-inset ring-gray-300 focus:outline-offset-0"
+              class="relative inline-flex items-center px-4 py-2 text-sm font-medium text-gray-500 dark:text-gray-400 ring-1 ring-inset ring-gray-300 dark:ring-gray-600 focus:outline-offset-0"
             >
               ...
             </span>
@@ -171,10 +171,10 @@ const mobileButtonClasses = (disabled: boolean) => {
   const baseClasses = 'relative inline-flex items-center rounded-md px-4 py-2 text-sm font-medium'
   
   if (disabled) {
-    return `${baseClasses} border border-gray-300 bg-white text-gray-300 cursor-not-allowed`
+    return `${baseClasses} border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-300 dark:text-gray-600 cursor-not-allowed`
   }
   
-  return `${baseClasses} border border-gray-300 bg-white text-gray-700 hover:bg-gray-50`
+  return `${baseClasses} border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700`
 }
 
 const desktopButtonClasses = (type: 'prev' | 'next' | 'page', disabled = false, active = false) => {
@@ -183,25 +183,25 @@ const desktopButtonClasses = (type: 'prev' | 'next' | 'page', disabled = false, 
   if (type === 'prev') {
     const prevClasses = 'rounded-l-md px-2 py-2'
     if (disabled) {
-      return `${baseClasses} ${prevClasses} text-gray-300 ring-1 ring-inset ring-gray-300 cursor-not-allowed`
+      return `${baseClasses} ${prevClasses} text-gray-300 dark:text-gray-600 ring-1 ring-inset ring-gray-300 dark:ring-gray-600 cursor-not-allowed`
     }
-    return `${baseClasses} ${prevClasses} text-gray-400 ring-1 ring-inset ring-gray-300 hover:bg-gray-50 focus:ring-2 focus:ring-indigo-600`
+    return `${baseClasses} ${prevClasses} text-gray-400 dark:text-gray-500 ring-1 ring-inset ring-gray-300 dark:ring-gray-600 hover:bg-gray-50 dark:hover:bg-gray-700 focus:ring-2 focus:ring-indigo-600 dark:focus:ring-indigo-500`
   }
   
   if (type === 'next') {
     const nextClasses = 'rounded-r-md px-2 py-2'
     if (disabled) {
-      return `${baseClasses} ${nextClasses} text-gray-300 ring-1 ring-inset ring-gray-300 cursor-not-allowed`
+      return `${baseClasses} ${nextClasses} text-gray-300 dark:text-gray-600 ring-1 ring-inset ring-gray-300 dark:ring-gray-600 cursor-not-allowed`
     }
-    return `${baseClasses} ${nextClasses} text-gray-400 ring-1 ring-inset ring-gray-300 hover:bg-gray-50 focus:ring-2 focus:ring-indigo-600`
+    return `${baseClasses} ${nextClasses} text-gray-400 dark:text-gray-500 ring-1 ring-inset ring-gray-300 dark:ring-gray-600 hover:bg-gray-50 dark:hover:bg-gray-700 focus:ring-2 focus:ring-indigo-600 dark:focus:ring-indigo-500`
   }
   
   // Page button
   const pageClasses = 'px-4 py-2'
   if (active) {
-    return `${baseClasses} ${pageClasses} z-10 bg-indigo-600 text-white focus:ring-2 focus:ring-indigo-600`
+    return `${baseClasses} ${pageClasses} z-10 bg-indigo-600 dark:bg-indigo-500 text-white focus:ring-2 focus:ring-indigo-600 dark:focus:ring-indigo-500`
   }
   
-  return `${baseClasses} ${pageClasses} text-gray-900 ring-1 ring-inset ring-gray-300 hover:bg-gray-50 focus:ring-2 focus:ring-indigo-600`
+  return `${baseClasses} ${pageClasses} text-gray-900 dark:text-gray-100 ring-1 ring-inset ring-gray-300 dark:ring-gray-600 hover:bg-gray-50 dark:hover:bg-gray-700 focus:ring-2 focus:ring-indigo-600 dark:focus:ring-indigo-500`
 }
 </script>

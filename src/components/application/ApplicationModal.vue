@@ -82,16 +82,24 @@
         </div>
 
         <!-- 注意事項 -->
-        <div class="p-4 bg-blue-50 rounded-lg">
+        <div class="p-4 bg-blue-50 dark:bg-blue-900/20 rounded-lg">
           <div class="flex items-start">
-            <Info class="w-5 h-5 text-blue-600 mt-0.5 mr-2 flex-shrink-0" />
-            <div class="text-sm text-blue-800">
-              <p class="font-medium mb-1">応募時の注意事項</p>
+            <Info class="w-5 h-5 text-blue-600 dark:text-blue-400 mt-0.5 mr-2 flex-shrink-0" />
+            <div class="text-sm text-blue-800 dark:text-blue-200">
+              <p class="font-medium mb-2">応募時の注意事項</p>
               <ul class="space-y-1 text-xs">
                 <li>• 応募後は投稿者からの連絡をお待ちください</li>
                 <li>• 応募内容は投稿者にのみ表示されます</li>
                 <li>• 不適切な内容の応募は削除される場合があります</li>
               </ul>
+              <div class="mt-3 pt-2 border-t border-blue-200 dark:border-blue-800">
+                <p class="font-medium mb-1 text-blue-900 dark:text-blue-100">⚠️ 今後のやり取りについて</p>
+                <ul class="space-y-1 text-xs">
+                  <li>• 応募が承認された場合、今後の詳細なやり取りはTwitterで行います</li>
+                  <li>• Twitter IDは正確に入力してください（連絡が取れなくなります）</li>
+                  <li>• DM受信設定を確認しておいてください</li>
+                </ul>
+              </div>
             </div>
           </div>
         </div>

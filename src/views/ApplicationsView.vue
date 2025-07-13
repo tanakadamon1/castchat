@@ -39,6 +39,30 @@
     </div>
 
     <div class="container mx-auto px-4 py-8">
+      <!-- Twitter連絡に関する案内 -->
+      <div class="mb-6 bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg p-4">
+        <div class="flex items-start">
+          <div class="flex-shrink-0">
+            <svg class="w-5 h-5 text-blue-600 dark:text-blue-400 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+            </svg>
+          </div>
+          <div class="ml-3">
+            <h3 class="text-sm font-medium text-blue-800 dark:text-blue-200">
+              今後のやり取りについて
+            </h3>
+            <div class="mt-2 text-sm text-blue-700 dark:text-blue-300">
+              <p class="mb-2">応募が承認された場合、今後の詳細なやり取りはTwitterで行います。</p>
+              <ul class="list-disc list-inside space-y-1 ml-2">
+                <li>応募時にTwitter IDを必ず正確に入力してください</li>
+                <li>承認後は投稿者からTwitterでDMまたはリプライでご連絡します</li>
+                <li>Twitterアカウントのプライバシー設定でDMを受信できるようにしておいてください</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      </div>
+
       <!-- 受信した応募 -->
       <div v-if="activeTab === 'received'">
         <!-- フィルター -->

@@ -40,8 +40,8 @@
         <div class="p-6 border-b border-gray-200">
           <div class="flex items-start justify-between mb-4">
             <div>
-              <h2 class="font-semibold text-gray-900">{{ post.authorName || '匿名' }}</h2>
-              <p class="text-sm text-gray-500">{{ formatDate(post.createdAt) }}に投稿</p>
+              <h2 class="font-semibold text-gray-900 dark:text-gray-100">{{ post.authorName || '匿名' }}</h2>
+              <p class="text-sm text-gray-500 dark:text-gray-400">{{ formatDate(post.createdAt) }}に投稿</p>
             </div>
             
             <div class="flex items-center space-x-2">
@@ -51,9 +51,9 @@
             </div>
           </div>
           
-          <h1 class="text-2xl font-bold text-gray-900 mb-4">{{ post.title }}</h1>
+          <h1 class="text-2xl font-bold text-gray-900 dark:text-gray-100 mb-4">{{ post.title }}</h1>
           
-          <div class="flex flex-wrap items-center gap-4 text-sm text-gray-600">
+          <div class="flex flex-wrap items-center gap-4 text-sm text-gray-600 dark:text-gray-400">
             <div class="flex items-center">
               <svg class="w-4 h-4 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.998 1.998 0 013 12V7a2 2 0 012-2z" />
@@ -187,7 +187,7 @@
             v-if="post.requirements && post.requirements.length > 0"
             class="mb-8"
           >
-            <h3 class="text-lg font-semibold text-gray-900 mb-3">応募条件</h3>
+            <h3 class="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-3">応募条件</h3>
             <ul class="space-y-2">
               <li
                 v-for="(requirement, index) in post.requirements"
@@ -197,7 +197,7 @@
                 <svg class="w-5 h-5 text-green-500 mr-2 mt-0.5 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
                 </svg>
-                <span class="text-gray-700">{{ requirement }}</span>
+                <span class="text-gray-700 dark:text-gray-300">{{ requirement }}</span>
               </li>
             </ul>
           </section>
@@ -207,12 +207,12 @@
             v-if="post.tags && post.tags.length > 0"
             class="mb-8"
           >
-            <h3 class="text-lg font-semibold text-gray-900 mb-3">タグ</h3>
+            <h3 class="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-3">タグ</h3>
             <div class="flex flex-wrap gap-2">
               <span
                 v-for="(tag, index) in post.tags"
                 :key="`tag-${index}`"
-                class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-gray-100 text-gray-800"
+                class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-gray-100 dark:bg-gray-700 text-gray-800 dark:text-gray-200"
               >
                 #{{ tag }}
               </span>
@@ -301,9 +301,9 @@ const statusBadgeClasses = computed(() => {
   const baseClasses = 'inline-flex items-center px-3 py-1 rounded-full text-sm font-medium'
   
   const variants = {
-    active: 'bg-green-100 text-green-800',
-    closed: 'bg-gray-100 text-gray-800',
-    draft: 'bg-yellow-100 text-yellow-800'
+    active: 'bg-green-100 dark:bg-green-900 text-green-800 dark:text-green-200',
+    closed: 'bg-gray-100 dark:bg-gray-700 text-gray-800 dark:text-gray-200',
+    draft: 'bg-yellow-100 dark:bg-yellow-900 text-yellow-800 dark:text-yellow-200'
   }
   
   return `${baseClasses} ${variants[post.value.status]}`

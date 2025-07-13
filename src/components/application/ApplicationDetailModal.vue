@@ -3,10 +3,10 @@
     <div class="p-6">
       <!-- ヘッダー -->
       <div class="flex items-center justify-between mb-6">
-        <h2 class="text-xl font-bold text-gray-900">
+        <h2 class="text-xl font-bold text-gray-900 dark:text-gray-100">
           {{ type === 'received' ? '応募詳細' : '応募履歴詳細' }}
         </h2>
-        <button @click="emit('close')" class="text-gray-400 hover:text-gray-600">
+        <button @click="emit('close')" class="text-gray-400 hover:text-gray-600 dark:text-gray-500 dark:hover:text-gray-400">
           <X class="w-6 h-6" />
         </button>
       </div>
@@ -14,22 +14,22 @@
       <!-- 基本情報 -->
       <div class="space-y-6">
         <!-- ユーザー情報 -->
-        <div class="flex items-center gap-4 p-4 bg-gray-50 rounded-lg">
-          <div class="w-16 h-16 rounded-full bg-gray-200 overflow-hidden flex-shrink-0">
+        <div class="flex items-center gap-4 p-4 bg-gray-50 dark:bg-gray-700 rounded-lg">
+          <div class="w-16 h-16 rounded-full bg-gray-200 dark:bg-gray-600 overflow-hidden flex-shrink-0">
             <img
               v-if="userAvatar"
               :src="userAvatar"
               :alt="userName"
               class="w-full h-full object-cover"
             />
-            <div v-else class="w-full h-full flex items-center justify-center text-gray-400">
+            <div v-else class="w-full h-full flex items-center justify-center text-gray-400 dark:text-gray-500">
               <User class="w-8 h-8" />
             </div>
           </div>
 
           <div>
-            <h3 class="font-semibold text-gray-900">{{ userName }}</h3>
-            <p class="text-sm text-gray-600">{{ userRole }}</p>
+            <h3 class="font-semibold text-gray-900 dark:text-gray-100">{{ userName }}</h3>
+            <p class="text-sm text-gray-600 dark:text-gray-400">{{ userRole }}</p>
             <div class="mt-2">
               <ApplicationStatusBadge :status="application.status" />
             </div>
@@ -37,35 +37,35 @@
         </div>
 
         <!-- 投稿情報 -->
-        <div class="p-4 border rounded-lg">
-          <h4 class="font-medium text-gray-900 mb-2">募集投稿</h4>
-          <p class="text-sm text-gray-800 font-medium">{{ postTitle }}</p>
-          <p class="text-xs text-gray-500 mt-1">投稿者: {{ postAuthor }}</p>
+        <div class="p-4 border border-gray-200 dark:border-gray-600 rounded-lg">
+          <h4 class="font-medium text-gray-900 dark:text-gray-100 mb-2">募集投稿</h4>
+          <p class="text-sm text-gray-800 dark:text-gray-200 font-medium">{{ postTitle }}</p>
+          <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">投稿者: {{ postAuthor }}</p>
         </div>
 
         <!-- 応募メッセージ -->
-        <div v-if="application.message" class="p-4 border rounded-lg">
-          <h4 class="font-medium text-gray-900 mb-2">応募メッセージ</h4>
-          <p class="text-sm text-gray-800 whitespace-pre-wrap">{{ application.message }}</p>
+        <div v-if="application.message" class="p-4 border border-gray-200 dark:border-gray-600 rounded-lg">
+          <h4 class="font-medium text-gray-900 dark:text-gray-100 mb-2">応募メッセージ</h4>
+          <p class="text-sm text-gray-800 dark:text-gray-200 whitespace-pre-wrap">{{ application.message }}</p>
         </div>
 
         <!-- 日時情報 -->
         <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <div class="p-4 border rounded-lg">
-            <h4 class="font-medium text-gray-900 mb-1">応募日時</h4>
-            <p class="text-sm text-gray-600">{{ formatDateTime(application.appliedAt) }}</p>
+          <div class="p-4 border border-gray-200 dark:border-gray-600 rounded-lg">
+            <h4 class="font-medium text-gray-900 dark:text-gray-100 mb-1">応募日時</h4>
+            <p class="text-sm text-gray-600 dark:text-gray-400">{{ formatDateTime(application.appliedAt) }}</p>
           </div>
 
-          <div v-if="application.respondedAt" class="p-4 border rounded-lg">
-            <h4 class="font-medium text-gray-900 mb-1">回答日時</h4>
-            <p class="text-sm text-gray-600">{{ formatDateTime(application.respondedAt) }}</p>
+          <div v-if="application.respondedAt" class="p-4 border border-gray-200 dark:border-gray-600 rounded-lg">
+            <h4 class="font-medium text-gray-900 dark:text-gray-100 mb-1">回答日時</h4>
+            <p class="text-sm text-gray-600 dark:text-gray-400">{{ formatDateTime(application.respondedAt) }}</p>
           </div>
         </div>
 
         <!-- アクション（受信した応募の場合） -->
         <div
           v-if="type === 'received' && application.status === 'pending'"
-          class="flex flex-col sm:flex-row gap-3 pt-4 border-t"
+          class="flex flex-col sm:flex-row gap-3 pt-4 border-t border-gray-200 dark:border-gray-600"
         >
           <BaseButton @click="handleUpdateStatus('accepted')" class="flex-1" data-test="modal-accept">
             <CheckCircle class="w-4 h-4 mr-2" />

@@ -14,31 +14,6 @@
           <p class="text-gray-600 dark:text-gray-400">
             {{ isEditing ? '募集内容を編集してください' : 'VRChatでのキャスト募集を投稿しましょう' }}
           </p>
-          <!-- オートセーブ状態表示 -->
-          <div v-if="!isEditing" class="flex items-center text-sm">
-            <span v-if="autoSaveStatus === 'saving'" class="text-blue-600 dark:text-blue-400 flex items-center">
-              <svg class="w-4 h-4 mr-1 animate-spin" fill="none" viewBox="0 0 24 24">
-                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
-                <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-              </svg>
-              下書き保存中...
-            </span>
-            <span v-else-if="autoSaveStatus === 'saved'" class="text-green-600 dark:text-green-400 flex items-center">
-              <svg class="w-4 h-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
-              </svg>
-              下書き保存済み
-            </span>
-            <span v-else-if="autoSaveStatus === 'error'" class="text-red-600 dark:text-red-400 flex items-center">
-              <svg class="w-4 h-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-              </svg>
-              保存エラー
-            </span>
-            <span v-else-if="lastSaved" class="text-gray-500 dark:text-gray-400">
-              最終保存: {{ lastSaved.toLocaleTimeString() }}
-            </span>
-          </div>
         </div>
       </div>
 
@@ -411,6 +386,17 @@
           </BaseButton>
 
           <BaseButton
+            v-if="draftId"
+            type="button"
+            variant="ghost"
+            @click="handleClearDraft"
+            class="w-full sm:w-auto text-red-600 hover:text-red-700"
+            size="lg"
+          >
+            下書きを削除
+          </BaseButton>
+
+          <BaseButton
             type="submit"
             :loading="submitting"
             :disabled="!isFormValid"
@@ -433,7 +419,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, onMounted, watch, nextTick } from 'vue'
+import { ref, computed, onMounted, onUnmounted, watch, nextTick } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
 import { useAuthStore } from '@/stores/auth'
 import { useToast } from '@/composables/useToast'
@@ -454,55 +440,119 @@ const authStore = useAuthStore()
 const toast = useToast()
 const { validate: validateField, validateAll, getFieldError } = useValidation()
 
-// オートセーブ機能
-const autoSaveKey = computed(() => `draft_${isEditing.value ? postId.value : 'new'}`)
-const lastSaved = ref<Date | null>(null)
-const autoSaveStatus = ref<'saved' | 'saving' | 'error' | null>(null)
 
-// ローカルストレージからドラフトを復元
-const loadDraft = () => {
-  if (isEditing.value) return // 編集モードではドラフト復元しない
-  
-  const saved = localStorage.getItem(autoSaveKey.value)
-  if (saved) {
-    try {
-      const draftData = JSON.parse(saved)
-      Object.assign(formData.value, draftData)
-      lastSaved.value = new Date()
-      toast.info('保存されたドラフトを復元しました')
-    } catch (error) {
-      console.error('ドラフト復元エラー:', error)
-    }
+
+
+// ローカルドラフトクリア（手動下書き保存のみ対応）
+const clearDraft = () => {
+  // 手動保存の下書きのみクリア
+  if (isEditing.value && postId.value) {
+    localStorage.removeItem(`draft_${postId.value}`)
+  } else {
+    localStorage.removeItem('draft_new')
   }
 }
 
-// オートセーブ実行
-const autoSave = async () => {
-  if (autoSaveStatus.value === 'saving') return
+// サーバー側の下書き削除
+const deleteDraft = async (id: string) => {
+  console.log('下書き削除処理開始:', id)
+  try {
+    const result = await postsApi.deletePost(id)
+    console.log('削除API結果:', result)
+    if (result.error) {
+      console.error('下書き削除エラー:', result.error)
+      return false
+    }
+    if (result.success) {
+      console.log('下書き削除成功:', id)
+      return true
+    }
+    return false
+  } catch (error) {
+    console.error('下書き削除エラー:', error)
+    return false
+  }
+}
+
+// 全ての下書きをクリア（サーバー側のみ）
+const clearAllDrafts = async () => {
+  console.log('clearAllDrafts 開始 - 編集モード:', isEditing.value, 'postId:', postId.value)
+  
+  // サーバー側の下書きのみ削除
+  if (draftId.value) {
+    console.log('サーバー側下書き削除:', draftId.value)
+    await deleteDraft(draftId.value)
+    draftId.value = null
+  }
+  
+  // 全ての下書きを検索して削除（投稿完了時は常に実行）
+  await deleteAllUserDrafts()
+}
+
+
+// ユーザーの全ての下書きを削除
+const deleteAllUserDrafts = async () => {
+  if (!authStore.user?.id) {
+    console.log('ユーザーIDが見つかりません')
+    return
+  }
+  
+  console.log('ユーザーの下書き検索開始:', authStore.user.id)
   
   try {
-    autoSaveStatus.value = 'saving'
-    localStorage.setItem(autoSaveKey.value, JSON.stringify(formData.value))
-    lastSaved.value = new Date()
-    autoSaveStatus.value = 'saved'
+    // ユーザーの下書きを全て取得
+    const result = await postsApi.getPosts({
+      user_id: authStore.user.id,
+      status: 'draft',
+      limit: 100
+    })
     
-    // 3秒後にステータスをクリア
-    setTimeout(() => {
-      if (autoSaveStatus.value === 'saved') {
-        autoSaveStatus.value = null
+    console.log('下書き検索結果:', result)
+    
+    if (result.data && result.data.length > 0) {
+      console.log(`${result.data.length}件の下書きが見つかりました:`, result.data.map(d => ({ id: d.id, title: d.title })))
+      
+      let deletedCount = 0
+      let failedCount = 0
+      
+      // 下書きを削除
+      for (const draft of result.data) {
+        console.log(`下書き削除試行: ${draft.id} - ${draft.title}`)
+        const success = await deleteDraft(draft.id)
+        if (success) {
+          deletedCount++
+        } else {
+          failedCount++
+        }
       }
-    }, 3000)
+      
+      console.log(`下書き削除結果: 成功${deletedCount}件, 失敗${failedCount}件`)
+      
+      // 削除後に再度検索して確認
+      console.log('削除後の確認検索を実行中...')
+      const verifyResult = await postsApi.getPosts({
+        user_id: authStore.user.id,
+        status: 'draft',
+        limit: 100
+      })
+      console.log('削除後の下書き数:', verifyResult.data?.length || 0)
+      if (verifyResult.data && verifyResult.data.length > 0) {
+        console.log('まだ残っている下書き:', verifyResult.data.map(d => ({ id: d.id, title: d.title })))
+      }
+      
+      if (deletedCount > 0) {
+        toast.success(`${deletedCount}件の下書きを削除しました`)
+      }
+      if (failedCount > 0) {
+        toast.error(`${failedCount}件の下書き削除に失敗しました`)
+      }
+    } else {
+      console.log('削除対象の下書きが見つかりませんでした')
+    }
   } catch (error) {
-    console.error('オートセーブエラー:', error)
-    autoSaveStatus.value = 'error'
+    console.error('下書き一括削除エラー:', error)
+    toast.error('下書きの削除中にエラーが発生しました')
   }
-}
-
-// ドラフトクリア
-const clearDraft = () => {
-  localStorage.removeItem(autoSaveKey.value)
-  lastSaved.value = null
-  autoSaveStatus.value = null
 }
 
 // 編集モードと下書きモードの判定
@@ -546,14 +596,6 @@ const uploadingImages = ref(false)
 const submitting = ref(false)
 const saving = ref(false)
 
-// フォームデータの変更を監視してオートセーブ
-let autoSaveTimeout: NodeJS.Timeout | null = null
-watch(formData, () => {
-  if (autoSaveTimeout) {
-    clearTimeout(autoSaveTimeout)
-  }
-  autoSaveTimeout = setTimeout(autoSave, 3000) // 3秒後にオートセーブ
-}, { deep: true })
 
 // エラー表示
 const loadError = ref<string | null>(null)
@@ -836,10 +878,8 @@ const handleSubmit = async () => {
 
     toast.success(isEditing.value ? '募集を更新しました' : '募集を投稿しました')
     
-    // 投稿成功時はドラフトをクリア
-    if (!isEditing.value) {
-      clearDraft()
-    }
+    // 投稿成功時はドラフトをクリア（新規投稿・編集投稿問わず）
+    await clearAllDrafts()
 
     router.push('/posts')
   } catch (error) {
@@ -914,6 +954,35 @@ const handleSaveDraft = async () => {
 const handleCancel = () => {
   if (confirm('編集内容が失われますが、よろしいですか？')) {
     router.back()
+  }
+}
+
+// 下書きクリア
+const handleClearDraft = async () => {
+  if (confirm('保存された下書きを削除しますか？この操作は取り消せません。')) {
+    await clearAllDrafts()
+    toast.success('下書きを削除しました')
+    
+    // フォームをリセット
+    formData.value = {
+      title: '',
+      category: '' as PostCategory | '',
+      description: '',
+      requirements: '',
+      eventFrequency: '' as EventFrequency | '',
+      eventSpecificDate: '',
+      eventWeekday: undefined,
+      eventTime: '',
+      eventWeekOfMonth: undefined,
+      maxParticipants: undefined,
+      contactMethod: 'twitter' as ContactMethod,
+      contactInfo: '',
+      deadline: '',
+      enablePriority: false,
+    }
+    
+    // プロフィールからTwitterIDを再設定
+    loadUserProfile()
   }
 }
 
@@ -1002,10 +1071,14 @@ const submitPost = async () => {
     return result.data
   } else if (isDraftMode.value) {
     // 下書きから公開処理
+    console.log('下書きから公開処理:', draftId.value)
     const result = await postsApi.updatePost(draftId.value!, { ...postData, status: 'published' })
     if (result.error) {
       throw new Error(result.error)
     }
+    // 下書きから公開への移行なので、draftIdをクリアして公開投稿に変換
+    console.log('下書きから公開完了、draftIdクリア')
+    draftId.value = null
     return result.data
   } else {
     // 新規作成処理
@@ -1013,6 +1086,7 @@ const submitPost = async () => {
     if (result.error) {
       throw new Error(result.error)
     }
+    
     return result.data
   }
 }
@@ -1050,23 +1124,39 @@ const handlePurchaseSuccess = (newBalance: number) => {
 // 編集時のデータ読み込み
 onMounted(async () => {
   
-  // 新規投稿の場合、プロフィールからTwitterIDを自動入力とドラフト復元
+  // 新規投稿の場合、プロフィールからTwitterIDを自動入力
   if (!isEditing.value) {
     loadUserProfile()
-    loadDraft()
   }
   
   if (isEditing.value) {
     try {
       const postData = await loadPost()
       if (postData) {
+        console.log('編集対象の投稿データ:', postData)
+        console.log('eventSpecificDate値:', postData.eventSpecificDate)
+        console.log('eventFrequency値:', postData.eventFrequency)
         formData.value = {
           title: postData.title,
           category: postData.category,
           description: postData.description,
           requirements: postData.requirements?.join(', ') || '',
           eventFrequency: postData.eventFrequency || '',
-          eventSpecificDate: postData.eventSpecificDate || '',
+          eventSpecificDate: (() => {
+            if (postData.eventSpecificDate) {
+              // UTC時間をローカル時間に変換
+              const date = new Date(postData.eventSpecificDate)
+              const year = date.getFullYear()
+              const month = String(date.getMonth() + 1).padStart(2, '0')
+              const day = String(date.getDate()).padStart(2, '0')
+              const hours = String(date.getHours()).padStart(2, '0')
+              const minutes = String(date.getMinutes()).padStart(2, '0')
+              const converted = `${year}-${month}-${day}T${hours}:${minutes}`
+              console.log('日時変換:', postData.eventSpecificDate, '->', converted)
+              return converted
+            }
+            return ''
+          })(),
           eventWeekday: postData.eventWeekday,
           eventTime: postData.eventTime || '',
           eventWeekOfMonth: postData.eventWeekOfMonth,
@@ -1074,6 +1164,7 @@ onMounted(async () => {
           contactMethod: postData.contactMethod,
           contactInfo: postData.contactValue || '',
           deadline: postData.deadline || '',
+          enablePriority: postData.enablePriority || false,
         }
         
         // 画像データの読み込み
@@ -1088,6 +1179,7 @@ onMounted(async () => {
         // 下書きの場合はdraftIdを設定
         if (postData.status === 'draft') {
           draftId.value = postData.id
+          console.log('下書き編集モード開始:', { draftId: draftId.value, postId: postId.value })
         }
         
         loadError.value = null

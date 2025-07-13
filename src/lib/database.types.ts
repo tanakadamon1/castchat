@@ -341,9 +341,16 @@ export type Database = {
         Row: {
           category_id: string | null
           closed_at: string | null
+          contact_method: string | null
+          contact_value: string | null
           created_at: string
           deadline: string | null
           description: string
+          event_frequency: string | null
+          event_specific_date: string | null
+          event_time: string | null
+          event_week_of_month: number | null
+          event_weekday: number | null
           id: string
           is_featured: boolean
           is_priority: boolean
@@ -362,9 +369,16 @@ export type Database = {
         Insert: {
           category_id?: string | null
           closed_at?: string | null
+          contact_method?: string | null
+          contact_value?: string | null
           created_at?: string
           deadline?: string | null
           description: string
+          event_frequency?: string | null
+          event_specific_date?: string | null
+          event_time?: string | null
+          event_week_of_month?: number | null
+          event_weekday?: number | null
           id?: string
           is_featured?: boolean
           is_priority?: boolean
@@ -383,9 +397,16 @@ export type Database = {
         Update: {
           category_id?: string | null
           closed_at?: string | null
+          contact_method?: string | null
+          contact_value?: string | null
           created_at?: string
           deadline?: string | null
           description?: string
+          event_frequency?: string | null
+          event_specific_date?: string | null
+          event_time?: string | null
+          event_week_of_month?: number | null
+          event_weekday?: number | null
           id?: string
           is_featured?: boolean
           is_priority?: boolean
