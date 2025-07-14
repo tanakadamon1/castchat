@@ -22,6 +22,15 @@ console.error('App Config Debug:', {
   appVersion: config.appVersion
 })
 
+// Debug: Check raw env vars
+console.error('Raw ENV vars:', {
+  VITE_SQUARE_APPLICATION_ID: import.meta.env.VITE_SQUARE_APPLICATION_ID,
+  VITE_SQUARE_LOCATION_ID: import.meta.env.VITE_SQUARE_LOCATION_ID,
+  VITE_SQUARE_ENVIRONMENT: import.meta.env.VITE_SQUARE_ENVIRONMENT,
+  VITE_ENABLE_PREMIUM: import.meta.env.VITE_ENABLE_PREMIUM,
+  MODE: import.meta.env.MODE
+})
+
 onMounted(async () => {
   try {
     // URLパラメータをチェックして強制リセット
