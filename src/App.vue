@@ -6,9 +6,20 @@ import AppFooter from './components/layout/AppFooter.vue'
 import ToastContainer from './components/ui/ToastContainer.vue'
 import { useAuthStore } from './stores/auth'
 import { useThemeStore } from './stores/theme'
+import { config } from './config/env'
 
 const authStore = useAuthStore()
 const themeStore = useThemeStore()
+
+// Debug: Log config values on app start
+console.log('App Config Debug:', {
+  squareApplicationId: config.squareApplicationId,
+  squareLocationId: config.squareLocationId,
+  squareEnvironment: config.squareEnvironment,
+  enablePremium: config.enablePremium,
+  appName: config.appName,
+  appVersion: config.appVersion
+})
 
 onMounted(async () => {
   try {
