@@ -158,6 +158,14 @@ const maxRetryAttempts = 5
 // Check if Square is configured
 const isSquareConfigured = ref(!!config.squareApplicationId)
 
+// Debug: Log config values
+console.log('Square Config:', {
+  applicationId: config.squareApplicationId,
+  locationId: config.squareLocationId,
+  environment: config.squareEnvironment,
+  enablePremium: config.enablePremium
+})
+
 // Computed properties for safe access
 const safeSelectedOption = computed(() => {
   return selectedOption.value || null
