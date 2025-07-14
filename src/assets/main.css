@@ -27,7 +27,7 @@
     --ring: 262.1 83.3% 57.8%;
     --radius: 0.5rem;
   }
- 
+
   .dark {
     --background: 222.2 84% 4.9%;
     --foreground: 210 40% 98%;
@@ -58,4 +58,63 @@
   body {
     @apply bg-background text-foreground;
   }
+}
+
+/* mainタグの::beforeでクリエイティブな背景パターンを追加 */
+main {
+  position: relative;
+}
+
+main::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 0;
+  pointer-events: none;
+
+  background: 
+    /* 縦の格子線 */
+    repeating-linear-gradient(
+      90deg,
+      transparent 0px,
+      transparent 39px,
+      rgba(139, 92, 246, 0.15) 40px,
+      rgba(139, 92, 246, 0.15) 41px
+    ),
+    /* 横の格子線 */
+    repeating-linear-gradient(
+      0deg,
+      transparent 0px,
+      transparent 39px,
+      rgba(59, 130, 246, 0.15) 40px,
+      rgba(59, 130, 246, 0.15) 41px
+    );
+
+  background-size:
+    40px 40px,
+    40px 40px;
+}
+
+/* ダークモード用のmain::beforeパターン */
+.dark main::before {
+  background: 
+    /* ダークモード用縦の格子線 */
+    repeating-linear-gradient(
+      90deg,
+      transparent 0px,
+      transparent 39px,
+      rgba(139, 92, 246, 0.1) 40px,
+      rgba(139, 92, 246, 0.1) 41px
+    ),
+    /* ダークモード用横の格子線 */
+    repeating-linear-gradient(
+      0deg,
+      transparent 0px,
+      transparent 39px,
+      rgba(59, 130, 246, 0.1) 40px,
+      rgba(59, 130, 246, 0.1) 41px
+    );
 }
