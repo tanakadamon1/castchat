@@ -12,7 +12,8 @@ const authStore = useAuthStore()
 const themeStore = useThemeStore()
 
 // Debug: Log config values on app start
-console.log('App Config Debug:', {
+window.appConfig = config
+console.error('App Config Debug:', {
   squareApplicationId: config.squareApplicationId,
   squareLocationId: config.squareLocationId,
   squareEnvironment: config.squareEnvironment,
