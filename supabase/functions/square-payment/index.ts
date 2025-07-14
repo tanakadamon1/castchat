@@ -152,9 +152,59 @@ serve(async (req) => {
 
       if (dbError) {
         // If database update fails, we should refund the payment
-        // In production, implement proper refund logic
         console.error('Database error:', dbError)
-        throw new Error('Failed to update coin balance')
+        console.error('Attempting to refund payment:', payment.id)
+        
+        try {
+          // Attempt to refund the payment
+          const refundsApi = client.refundsApi
+          const refundIdempotencyKey = crypto.randomUUID()
+          
+          const { result: refundResult } = await refundsApi.refundPayment({
+            paymentId: payment.id,
+            idempotencyKey: refundIdempotencyKey,
+            amountMoney: {
+              amount: BigInt(amount),
+              currency: 'JPY',
+            },
+            reason: 'Database update failed - automatic refund',
+          })
+          
+          console.log('Refund successful:', refundResult.refund?.id)
+          
+          return new Response(
+            JSON.stringify({ 
+              error: 'Payment processed but coin balance update failed',
+              refundId: refundResult.refund?.id,
+              refundStatus: refundResult.refund?.status,
+              message: 'Payment has been automatically refunded. Please try again or contact support.',
+              details: dbError.message
+            }),
+            { 
+              headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+              status: 500,
+            }
+          )
+        } catch (refundError) {
+          console.error('Refund also failed:', refundError)
+          
+          // Critical error - payment successful but couldn't refund
+          return new Response(
+            JSON.stringify({ 
+              error: 'Critical payment error',
+              paymentId: payment.id,
+              message: 'Payment was processed but coin balance could not be updated. Refund also failed. Please contact support immediately.',
+              details: {
+                dbError: dbError.message,
+                refundError: refundError.message
+              }
+            }),
+            { 
+              headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+              status: 500,
+            }
+          )
+        }
       }
 
       // Get updated user data

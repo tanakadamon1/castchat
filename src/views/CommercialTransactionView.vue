@@ -56,13 +56,21 @@
               <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
                 <div class="font-medium text-gray-900 dark:text-gray-100">有料サービス</div>
                 <div class="md:col-span-2 text-gray-700 dark:text-gray-300">
-                  <div
-                    class="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg p-4"
-                  >
-                    <p class="text-sm text-blue-800 dark:text-blue-200">
-                      現在、有料サービスは提供しておりません。<br />
-                      将来的に有料機能を追加する場合は、事前にお知らせいたします。
-                    </p>
+                  <div class="space-y-3">
+                    <div class="bg-indigo-50 dark:bg-indigo-900/20 border border-indigo-200 dark:border-indigo-800 rounded-lg p-4">
+                      <h4 class="font-medium text-indigo-900 dark:text-indigo-100 mb-2">コイン購入システム</h4>
+                      <p class="text-sm text-indigo-800 dark:text-indigo-200">
+                        投稿の優先表示機能を利用するためのコイン購入が可能です。<br />
+                        1コイン = 100円（税込）
+                      </p>
+                    </div>
+                    <div class="bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 rounded-lg p-4">
+                      <h4 class="font-medium text-green-900 dark:text-green-100 mb-2">優先表示機能</h4>
+                      <p class="text-sm text-green-800 dark:text-green-200">
+                        1コイン消費で投稿を24時間優先表示できます。<br />
+                        より多くのユーザーに投稿を見てもらえます。
+                      </p>
+                    </div>
                   </div>
                 </div>
               </div>
@@ -76,12 +84,21 @@
               <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
                 <div class="font-medium text-gray-900 dark:text-gray-100">決済方法</div>
                 <div class="md:col-span-2 text-gray-700 dark:text-gray-300">
-                  <div
-                    class="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg p-4"
-                  >
-                    <p class="text-sm text-blue-800 dark:text-blue-200">
-                      現在、有料サービスは提供しておりませんので、決済は発生いたしません。
-                    </p>
+                  <div class="space-y-3">
+                    <div class="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg p-4">
+                      <h4 class="font-medium text-blue-900 dark:text-blue-100 mb-2">クレジットカード決済</h4>
+                      <p class="text-sm text-blue-800 dark:text-blue-200">
+                        Square決済システムを使用した安全な決済処理<br />
+                        対応カード：Visa、Mastercard、American Express、JCB
+                      </p>
+                    </div>
+                    <div class="bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg p-4">
+                      <h4 class="font-medium text-gray-900 dark:text-gray-100 mb-2">決済タイミング</h4>
+                      <p class="text-sm text-gray-700 dark:text-gray-300">
+                        コイン購入完了と同時に決済が確定します。<br />
+                        購入したコインは即座にアカウントに反映されます。
+                      </p>
+                    </div>
                   </div>
                 </div>
               </div>
@@ -128,13 +145,29 @@
               <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
                 <div class="font-medium text-gray-900 dark:text-gray-100">返品・返金</div>
                 <div class="md:col-span-2 text-gray-700 dark:text-gray-300">
-                  <div
-                    class="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg p-4"
-                  >
-                    <p class="text-sm text-blue-800 dark:text-blue-200">
-                      現在、有料サービスは提供しておりませんので、返品・返金の対象となる取引はございません。<br />
-                      アカウントの削除は、プロフィール設定からいつでも実行できます。
-                    </p>
+                  <div class="space-y-3">
+                    <div class="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg p-4">
+                      <h4 class="font-medium text-red-900 dark:text-red-100 mb-2">コイン購入の返金について</h4>
+                      <p class="text-sm text-red-800 dark:text-red-200">
+                        購入したコインは原則として返金いたしません。<br />
+                        ただし、システムエラーによる重複決済等の場合は個別に対応いたします。
+                      </p>
+                    </div>
+                    <div class="bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-800 rounded-lg p-4">
+                      <h4 class="font-medium text-yellow-900 dark:text-yellow-100 mb-2">返金対象となる場合</h4>
+                      <ul class="text-sm text-yellow-800 dark:text-yellow-200 list-disc list-inside space-y-1">
+                        <li>システムエラーによる重複決済</li>
+                        <li>決済完了後にコインが正常に付与されない場合</li>
+                        <li>サービス側の不具合によりコインが利用できない場合</li>
+                      </ul>
+                    </div>
+                    <div class="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg p-4">
+                      <h4 class="font-medium text-blue-900 dark:text-blue-100 mb-2">返金手続き</h4>
+                      <p class="text-sm text-blue-800 dark:text-blue-200">
+                        返金が必要な場合は、お問い合わせフォームまたは運営メールにご連絡ください。<br />
+                        返金処理には最大14営業日お時間をいただく場合があります。
+                      </p>
+                    </div>
                   </div>
                 </div>
               </div>
@@ -196,7 +229,7 @@
 import { ref } from 'vue'
 
 // 最終更新日
-const lastUpdated = ref('2025-01-06')
+const lastUpdated = ref('2025-07-14')
 
 // 日付フォーマット関数
 const formatDate = (dateString: string) => {

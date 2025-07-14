@@ -49,7 +49,10 @@ export class CoinApi {
 
     if (!response.ok) {
       const error = await response.json()
-      throw new Error(error.error || 'Payment failed')
+      console.error('Edge Function Error:', error)
+      console.error('Error details:', error.details)
+      console.error('Error type:', error.type)
+      throw new Error(error.error || error.message || 'Payment failed')
     }
 
     return await response.json()

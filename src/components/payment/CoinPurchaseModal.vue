@@ -334,9 +334,37 @@ async function initializeSquarePayments() {
     throw new Error(`Square payments initialization failed: ${paymentsError.message}`)
   }
 
-  // 4. カードコンポーネントの作成（最小限のオプション）
+  // 4. カードコンポーネントの作成（詳細なオプション）
   try {
-    card = await payments.card()
+    card = await payments.card({
+      style: {
+        input: {
+          color: '#374151',
+          fontFamily: 'Arial, sans-serif',
+          fontSize: '16px',
+          fontWeight: 'normal',
+        },
+        '.input-container': {
+          borderRadius: '6px',
+          borderWidth: '1px',
+          borderColor: '#d1d5db',
+          backgroundColor: '#ffffff',
+        },
+        '.input-container.is-focus': {
+          borderColor: '#3b82f6',
+        },
+        '.input-container.is-error': {
+          borderColor: '#ef4444',
+        },
+        '.message-text': {
+          color: '#6b7280',
+          fontSize: '14px',
+        },
+        '.message-text.is-error': {
+          color: '#ef4444',
+        },
+      },
+    })
   } catch (cardError) {
     console.error('❌ Failed to create Square card component:', cardError)
     throw new Error(`Card component creation failed: ${cardError.message}`)
@@ -345,6 +373,21 @@ async function initializeSquarePayments() {
   // 5. カードコンポーネントのアタッチ
   try {
     await card.attach('#card-number')
+    
+    // カード状態の監視
+    card.addEventListener('cardBrandChanged', (event) => {
+      console.log('Card brand changed:', event.detail)
+    })
+    
+    card.addEventListener('errorClassAdded', (event) => {
+      console.log('Card error:', event.detail)
+    })
+    
+    card.addEventListener('errorClassRemoved', (event) => {
+      console.log('Card error cleared:', event.detail)
+    })
+    
+    console.log('✅ Square card component attached successfully')
   } catch (attachError) {
     console.error('❌ Failed to attach card to DOM:', attachError)
     throw new Error(`Card attachment failed: ${attachError.message}`)
@@ -458,7 +501,23 @@ async function handlePayment() {
     }
   } catch (error) {
     console.error('Payment error:', error)
-    addToast('決済に失敗しました', 'error')
+    
+    // エラーの種類に応じた詳細なメッセージ
+    let errorMessage = '決済に失敗しました'
+    
+    if (error.message.includes('refund')) {
+      errorMessage = '決済は処理されましたが、システムエラーにより返金されました。再度お試しください。'
+    } else if (error.message.includes('Critical payment error')) {
+      errorMessage = '決済処理中に重大なエラーが発生しました。サポートまでご連絡ください。'
+    } else if (error.message.includes('Card tokenization failed')) {
+      errorMessage = 'カード情報の処理に失敗しました。カード情報を確認してください。'
+    } else if (error.message.includes('Payment processing failed')) {
+      errorMessage = '決済処理中にエラーが発生しました。時間をおいて再度お試しください。'
+    } else if (error.message.includes('configuration')) {
+      errorMessage = 'システム設定エラーです。管理者にお問い合わせください。'
+    }
+    
+    addToast(errorMessage, 'error')
   } finally {
     processing.value = false
   }
