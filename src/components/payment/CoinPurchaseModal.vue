@@ -341,14 +341,12 @@ async function initializeSquarePayments() {
         input: {
           color: '#374151',
           fontFamily: 'Arial, sans-serif',
-          fontSize: '16px',
           fontWeight: 'normal',
         },
         '.input-container': {
           borderRadius: '6px',
           borderWidth: '1px',
           borderColor: '#d1d5db',
-          backgroundColor: '#ffffff',
         },
         '.input-container.is-focus': {
           borderColor: '#3b82f6',
@@ -358,7 +356,6 @@ async function initializeSquarePayments() {
         },
         '.message-text': {
           color: '#6b7280',
-          fontSize: '14px',
         },
         '.message-text.is-error': {
           color: '#ef4444',
