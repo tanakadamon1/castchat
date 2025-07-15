@@ -158,13 +158,7 @@ const maxRetryAttempts = 5
 // Check if Square is configured
 const isSquareConfigured = ref(!!config.squareApplicationId)
 
-// Debug: Log config values
-console.log('Square Config:', {
-  applicationId: config.squareApplicationId,
-  locationId: config.squareLocationId,
-  environment: config.squareEnvironment,
-  enablePremium: config.enablePremium
-})
+// Square configuration loaded
 
 // Computed properties for safe access
 const safeSelectedOption = computed(() => {
@@ -373,18 +367,16 @@ async function initializeSquarePayments() {
     
     // カード状態の監視
     card.addEventListener('cardBrandChanged', (event) => {
-      console.log('Card brand changed:', event.detail)
+      // Card brand recognition
     })
     
     card.addEventListener('errorClassAdded', (event) => {
-      console.log('Card error:', event.detail)
+      // Card error handling
     })
     
     card.addEventListener('errorClassRemoved', (event) => {
-      console.log('Card error cleared:', event.detail)
+      // Card error cleared
     })
-    
-    console.log('✅ Square card component attached successfully')
   } catch (attachError) {
     console.error('❌ Failed to attach card to DOM:', attachError)
     throw new Error(`Card attachment failed: ${attachError.message}`)

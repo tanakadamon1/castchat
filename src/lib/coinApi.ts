@@ -49,19 +49,22 @@ export class CoinApi {
 
     if (!response.ok) {
       const error = await response.json()
-      console.error('Edge Function Error:', error)
-      console.error('Error details:', error.details)
-      console.error('Error type:', error.type)
-      if (error.squareErrors) {
-        console.error('Square API Errors:', error.squareErrors)
-        error.squareErrors.forEach((err: any, index: number) => {
-          console.error(`Square Error ${index + 1}:`, {
-            category: err.category,
-            code: err.code,
-            detail: err.detail,
-            field: err.field
+      // Log error details for debugging in development
+      if (import.meta.env.DEV) {
+        console.error('Edge Function Error:', error)
+        console.error('Error details:', error.details)
+        console.error('Error type:', error.type)
+        if (error.squareErrors) {
+          console.error('Square API Errors:', error.squareErrors)
+          error.squareErrors.forEach((err: any, index: number) => {
+            console.error(`Square Error ${index + 1}:`, {
+              category: err.category,
+              code: err.code,
+              detail: err.detail,
+              field: err.field
+            })
           })
-        })
+        }
       }
       throw new Error(error.error || error.message || 'Payment failed')
     }

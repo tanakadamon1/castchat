@@ -76,7 +76,7 @@ export class SessionManager {
         return { session: null, error }
       }
 
-      console.log('Session refreshed successfully')
+      // Session refreshed
       return { session: data.session, error: null }
     } catch (error) {
       console.error('Refresh session error:', error)
@@ -92,7 +92,7 @@ export class SessionManager {
     }
 
     if (this.shouldRefreshSession(currentSessionState.session)) {
-      console.log('Session needs refresh')
+      // Session needs refresh
       const { session: refreshedSession, error } = await this.refreshSession()
       
       if (error || !refreshedSession) {

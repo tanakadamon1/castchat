@@ -19,17 +19,12 @@ serve(async (req) => {
     return new Response('ok', { headers: corsHeaders })
   }
 
-  console.log('=== Square Payment Function Started ===')
-  console.log('Request method:', req.method)
-  console.log('Request headers:', Object.fromEntries(req.headers.entries()))
+  // Square Payment Function Started
 
   try {
     // Initialize Supabase client
     const supabaseUrl = Deno.env.get('SUPABASE_URL') || 'https://ewjfnquypoeyoicmgbnp.supabase.co'
     const supabaseServiceKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')
-    
-    console.log('Supabase URL:', supabaseUrl)
-    console.log('Service key exists:', !!supabaseServiceKey)
     
     if (!supabaseServiceKey) {
       console.error('SUPABASE_SERVICE_ROLE_KEY is missing!')
@@ -57,11 +52,7 @@ serve(async (req) => {
     const requestBody = await req.json() as PaymentRequest
     const { sourceId, amount, coinAmount } = requestBody
     
-    console.log('Request body:', {
-      sourceId: sourceId?.substring(0, 10) + '...',
-      amount,
-      coinAmount
-    })
+    // Request body processed
 
     // Validate amount (minimum 100 JPY)
     if (amount < 100 || coinAmount < 1) {
@@ -75,10 +66,6 @@ serve(async (req) => {
     const squareAccessToken = Deno.env.get('SQUARE_ACCESS_TOKEN')
     const squareEnvironment = Deno.env.get('SQUARE_ENVIRONMENT') || 'sandbox'
     const squareLocationId = Deno.env.get('SQUARE_LOCATION_ID')
-    
-    console.log('Square environment:', squareEnvironment)
-    console.log('Square access token exists:', !!squareAccessToken)
-    console.log('Square location ID exists:', !!squareLocationId)
     
     if (!squareAccessToken) {
       console.error('SQUARE_ACCESS_TOKEN is missing!')
@@ -111,12 +98,7 @@ serve(async (req) => {
     const paymentsApi = client.paymentsApi
     const idempotencyKey = crypto.randomUUID()
 
-    console.log('Creating Square payment with:', {
-      sourceId: sourceId?.substring(0, 10) + '...',
-      amount: amount,
-      currency: 'JPY',
-      locationId: squareLocationId
-    })
+    // Creating Square payment
 
     try {
       const { result } = await paymentsApi.createPayment({
@@ -129,6 +111,13 @@ serve(async (req) => {
         locationId: squareLocationId,
         note: `Purchase of ${coinAmount} coins for user ${user.id}`,
         referenceId: user.id,
+        // 住所情報を含めない設定
+        autocomplete: false,
+        // レシートに個人情報を含めない
+        receiptOptions: {
+          isPrintReceiptEnabled: false,
+          isEmailReceiptEnabled: false,
+        },
       })
 
       const payment = result.payment
@@ -170,7 +159,7 @@ serve(async (req) => {
             reason: 'Database update failed - automatic refund',
           })
           
-          console.log('Refund successful:', refundResult.refund?.id)
+          // Refund successful
           
           return new Response(
             JSON.stringify({ 

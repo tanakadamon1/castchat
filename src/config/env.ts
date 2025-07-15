@@ -69,7 +69,7 @@ export const isProduction = import.meta.env.PROD
 
 // Debug logging
 export function debugLog(message: string, ...args: any[]) {
-  if (config.debugMode || isDevelopment) {
+  if (config.debugMode && isDevelopment) {
     console.log(`[DEBUG] ${message}`, ...args)
   }
 }

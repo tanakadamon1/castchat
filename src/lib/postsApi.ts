@@ -621,15 +621,15 @@ export const postsApi = {
   // 投稿削除
   async deletePost(postId: string): Promise<{ success: boolean; error?: string }> {
     try {
-      console.log('postsApi.deletePost 開始:', postId)
+      // Delete post request started
       const authStore = useAuthStore()
       
       if (!authStore.user?.id) {
-        console.log('認証エラー: ユーザーIDなし')
+        // Authentication error
         return { success: false, error: 'ログインが必要です' }
       }
 
-      console.log('投稿所有者確認中:', postId, 'by user:', authStore.user.id)
+      // Checking post ownership
 
       // 投稿の所有者確認のため、投稿情報を取得
       const { data: post, error: fetchError } = await supabase
@@ -638,20 +638,20 @@ export const postsApi = {
         .eq('id', postId)
         .single()
 
-      console.log('投稿取得結果:', { post, fetchError })
+      // Post fetch result
 
       if (fetchError || !post) {
-        console.log('投稿が見つからない:', fetchError?.message)
+        // Post not found
         return { success: false, error: '投稿が見つかりません' }
       }
 
       // 投稿者本人かチェック
       if (post.user_id !== authStore.user.id) {
-        console.log('権限エラー: 投稿者不一致', { postUserId: post.user_id, currentUserId: authStore.user.id })
+        // Permission denied
         return { success: false, error: '削除権限がありません' }
       }
 
-      console.log('削除実行中:', { id: postId, title: post.title, status: post.status })
+      // Executing deletion
 
       // より確実な削除のため、複数の条件で削除を試行
       const { error: deleteError, count } = await supabase
@@ -660,7 +660,7 @@ export const postsApi = {
         .eq('id', postId)
         .eq('user_id', authStore.user.id) // ユーザーIDも明示的に指定
 
-      console.log('削除結果:', { deleteError, count })
+      // Delete result
 
       if (deleteError) {
         console.error('Delete post error:', deleteError.message)
@@ -675,7 +675,7 @@ export const postsApi = {
       }
 
       if (count === 0) {
-        console.log('削除対象が見つからなかった - 再確認中...')
+        // Recheck deletion
         
         // 削除対象が見つからない場合、再度存在確認
         const { data: recheck, error: recheckError } = await supabase
@@ -684,18 +684,18 @@ export const postsApi = {
           .eq('id', postId)
           .single()
         
-        console.log('再確認結果:', { recheck, recheckError })
+        // Recheck result
         
         if (recheckError && recheckError.code === 'PGRST116') {
           // データが見つからない = 削除済み
-          console.log('実際には削除済みでした')
+          // Already deleted
           return { success: true }
         }
         
         return { success: false, error: '削除対象が見つかりませんでした' }
       }
 
-      console.log('削除成功:', postId, 'deleted count:', count)
+      // Delete successful
       return { success: true }
     } catch (error) {
       console.error('Unexpected delete error:', error)
