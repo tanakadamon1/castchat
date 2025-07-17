@@ -80,8 +80,73 @@ class ApplicationApi {
         }
       }
 
-      // 直接Supabaseにアクセスして応募を作成
+      // 直接Supabaseにアクセスして応募を作成または更新
       try {
+        // まず既存の応募をチェック
+        const { data: existingApplication, error: checkError } = await supabase
+          .from('applications')
+          .select('*')
+          .eq('post_id', data.postId)
+          .eq('user_id', userId)
+          .single()
+
+        if (checkError && checkError.code !== 'PGRST116') {
+          // PGRST116 = レコードが見つからない場合のエラー
+          console.error('Check existing application error:', checkError)
+          return {
+            data: null,
+            error: '応募状態の確認に失敗しました',
+          }
+        }
+
+        // 既存の応募がある場合
+        if (existingApplication) {
+          // 却下された応募の場合は再応募を許可
+          if (existingApplication.status === 'rejected') {
+            const updatePayload = {
+              message: data.message,
+              status: 'pending',
+              availability: data.availability || null,
+              twitter_id: data.twitterId || null,
+              updated_at: new Date().toISOString(),
+              responded_at: null,
+              response_message: null,
+            }
+
+            const { data: updatedApplication, error: updateError } = await supabase
+              .from('applications')
+              .update(updatePayload)
+              .eq('id', existingApplication.id)
+              .select()
+              .single()
+
+            if (updateError) {
+              console.error('Update application error:', updateError)
+              return {
+                data: null,
+                error: '応募の更新に失敗しました',
+              }
+            }
+
+            return {
+              data: updatedApplication,
+              error: undefined,
+            }
+          } else {
+            // pending, accepted, withdrawn の場合は重複エラー
+            const statusMessages = {
+              pending: '既にこの募集に応募済みです',
+              accepted: 'この募集への応募は既に承認されています',
+              withdrawn: '取り下げた応募への再応募はできません',
+            }
+            return {
+              data: null,
+              error: statusMessages[existingApplication.status as keyof typeof statusMessages] || '既に応募済みです',
+            }
+          }
+        }
+
+        // 新規応募の場合
         const insertPayload = {
           post_id: data.postId,
           user_id: userId,

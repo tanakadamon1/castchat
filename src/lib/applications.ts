@@ -586,16 +586,34 @@ export class ApplicationsService {
       // 重複応募の確認
       const { data: existingApplication } = await supabase
         .from('applications')
-        .select('id')
+        .select('id, status')
         .eq('post_id', postId)
         .eq('user_id', userId)
         .maybeSingle()
 
       if (existingApplication) {
+        // 却下された応募の場合は再応募可能
+        if (existingApplication.status === 'rejected') {
+          return {
+            data: {
+              canApply: true,
+              reason: '再応募が可能です'
+            },
+            error: null
+          }
+        }
+        
+        // その他のステータスの場合は応募不可
+        const statusMessages = {
+          pending: 'すでに応募済みです（審査中）',
+          accepted: 'すでに承認された応募があります',
+          withdrawn: '取り下げた応募があります'
+        }
+        
         return {
           data: {
             canApply: false,
-            reason: 'すでに応募済みです'
+            reason: statusMessages[existingApplication.status as keyof typeof statusMessages] || 'すでに応募済みです'
           },
           error: null
         }
