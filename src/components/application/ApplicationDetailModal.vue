@@ -12,9 +12,9 @@
       </div>
 
       <!-- 基本情報 -->
-      <div class="space-y-6">
+      <div class="space-y-4">
         <!-- ユーザー情報 -->
-        <div class="flex items-center gap-4 p-4 bg-gray-50 dark:bg-gray-700 rounded-lg">
+        <div class="flex items-center gap-4 p-3 bg-gray-50 dark:bg-gray-700 rounded-lg">
           <div class="w-16 h-16 rounded-full bg-gray-200 dark:bg-gray-600 overflow-hidden flex-shrink-0">
             <img
               v-if="userAvatar"
@@ -37,26 +37,26 @@
         </div>
 
         <!-- 投稿情報 -->
-        <div class="p-4 border border-gray-200 dark:border-gray-600 rounded-lg">
-          <h4 class="font-medium text-gray-900 dark:text-gray-100 mb-2">募集投稿</h4>
+        <div class="p-3 border border-gray-200 dark:border-gray-600 rounded-lg">
+          <h4 class="font-medium text-gray-900 dark:text-gray-100 mb-1">募集投稿</h4>
           <p class="text-sm text-gray-800 dark:text-gray-200 font-medium">{{ postTitle }}</p>
           <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">投稿者: {{ postAuthor }}</p>
         </div>
 
         <!-- 応募メッセージ -->
-        <div v-if="application.message" class="p-4 border border-gray-200 dark:border-gray-600 rounded-lg">
-          <h4 class="font-medium text-gray-900 dark:text-gray-100 mb-2">応募メッセージ</h4>
+        <div v-if="application.message" class="p-3 border border-gray-200 dark:border-gray-600 rounded-lg">
+          <h4 class="font-medium text-gray-900 dark:text-gray-100 mb-1">応募メッセージ</h4>
           <p class="text-sm text-gray-800 dark:text-gray-200 whitespace-pre-wrap">{{ application.message }}</p>
         </div>
 
         <!-- 日時情報 -->
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <div class="p-4 border border-gray-200 dark:border-gray-600 rounded-lg">
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+          <div class="p-3 border border-gray-200 dark:border-gray-600 rounded-lg">
             <h4 class="font-medium text-gray-900 dark:text-gray-100 mb-1">応募日時</h4>
             <p class="text-sm text-gray-600 dark:text-gray-400">{{ formatDateTime(application.appliedAt) }}</p>
           </div>
 
-          <div v-if="application.respondedAt" class="p-4 border border-gray-200 dark:border-gray-600 rounded-lg">
+          <div v-if="application.respondedAt" class="p-3 border border-gray-200 dark:border-gray-600 rounded-lg">
             <h4 class="font-medium text-gray-900 dark:text-gray-100 mb-1">回答日時</h4>
             <p class="text-sm text-gray-600 dark:text-gray-400">{{ formatDateTime(application.respondedAt) }}</p>
           </div>
@@ -79,7 +79,7 @@
         </div>
 
         <!-- 承認済み/却下済みの場合のメッセージ -->
-        <div v-if="application.status !== 'pending'" class="p-4 bg-blue-50 rounded-lg">
+        <div v-if="application.status !== 'pending'" class="p-3 bg-blue-50 rounded-lg">
           <div class="flex items-center gap-2">
             <Info class="w-5 h-5 text-blue-600" />
             <p class="text-sm text-blue-800">

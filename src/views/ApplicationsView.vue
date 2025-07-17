@@ -38,7 +38,7 @@
       </div>
     </div>
 
-    <div class="container mx-auto px-4 py-8">
+    <div class="container mx-auto px-4 py-6">
       <!-- Twitter連絡に関する案内 -->
       <div class="mb-6 bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg p-4">
         <div class="flex items-start">
@@ -107,7 +107,7 @@
           </EmptyState>
         </div>
 
-        <div v-else class="space-y-4">
+        <div v-else class="space-y-3">
           <ApplicationCard
             v-for="application in filteredReceivedApplications"
             :key="application.id"
@@ -164,7 +164,7 @@
           </EmptyState>
         </div>
 
-        <div v-else class="space-y-4">
+        <div v-else class="space-y-3">
           <ApplicationCard
             v-for="application in filteredSentApplications"
             :key="application.id"

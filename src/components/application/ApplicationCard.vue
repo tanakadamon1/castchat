@@ -1,6 +1,6 @@
 <template>
   <div
-    class="bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 shadow-sm p-6"
+    class="bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 shadow-sm p-4"
   >
     <div class="flex flex-col lg:flex-row lg:items-start gap-4">
       <!-- 左側：ユーザー情報またはポスト情報 -->
@@ -65,10 +65,10 @@
     <!-- 送信した応募のメッセージプレビュー -->
     <div
       v-if="type === 'sent' && application.message"
-      class="mt-4 pt-4 border-t border-gray-200 dark:border-gray-700"
+      class="mt-3 pt-3 border-t border-gray-200 dark:border-gray-700"
     >
-      <p class="text-sm font-bold text-gray-700 mb-1.5 dark:text-gray-200">送信したメッセージ</p>
-      <div class="bg-gray-50 dark:bg-gray-800 rounded-lg p-3">
+      <p class="text-sm font-bold text-gray-700 mb-1 dark:text-gray-200">送信したメッセージ</p>
+      <div class="bg-gray-50 dark:bg-gray-800 rounded-lg p-2">
         <p class="text-sm text-gray-800 dark:text-gray-100 line-clamp-2">
           {{ application.message }}
         </p>
@@ -78,37 +78,37 @@
     <!-- 応募内容プレビュー（受信した応募のみ詳細表示） -->
     <div
       v-if="type === 'received'"
-      class="mt-4 pt-4 border-t border-gray-200 dark:border-gray-700"
+      class="mt-3 pt-3 border-t border-gray-200 dark:border-gray-700"
     >
-      <div v-if="application.message" class="mb-4">
-        <p class="text-sm font-bold text-gray-700 mb-1.5 dark:text-gray-200">応募メッセージ</p>
-        <div class="bg-gray-50 dark:bg-gray-800 rounded-lg p-3">
+      <div v-if="application.message" class="mb-3">
+        <p class="text-sm font-bold text-gray-700 mb-1 dark:text-gray-200">応募メッセージ</p>
+        <div class="bg-gray-50 dark:bg-gray-800 rounded-lg p-2">
           <p class="text-sm text-gray-800 dark:text-gray-100 whitespace-pre-wrap">
             {{ application.message }}
           </p>
         </div>
       </div>
-      <div v-if="application.experience" class="mb-4">
-        <p class="text-sm font-bold text-gray-700 mb-1.5 dark:text-gray-200">
+      <div v-if="application.experience" class="mb-3">
+        <p class="text-sm font-bold text-gray-700 mb-1 dark:text-gray-200">
           関連する経験・スキル（任意）
         </p>
-        <div class="bg-gray-50 dark:bg-gray-800 rounded-lg p-3">
+        <div class="bg-gray-50 dark:bg-gray-800 rounded-lg p-2">
           <p class="text-sm text-gray-800 dark:text-gray-100 whitespace-pre-wrap">
             {{ application.experience }}
           </p>
         </div>
       </div>
-      <div v-if="application.availability" class="mb-4">
-        <p class="text-sm font-bold text-gray-700 mb-1.5 dark:text-gray-200">
+      <div v-if="application.availability" class="mb-3">
+        <p class="text-sm font-bold text-gray-700 mb-1 dark:text-gray-200">
           参加可能な時間帯（任意）
         </p>
-        <div class="bg-gray-50 dark:bg-gray-800 rounded-lg p-3">
+        <div class="bg-gray-50 dark:bg-gray-800 rounded-lg p-2">
           <p class="text-sm text-gray-800 dark:text-gray-100">{{ application.availability }}</p>
         </div>
       </div>
       <div v-if="application.twitterId" class="mb-2">
-        <p class="text-sm font-bold text-gray-700 mb-1.5 dark:text-gray-200">Twitter ID</p>
-        <div class="bg-gray-50 dark:bg-gray-800 rounded-lg p-3">
+        <p class="text-sm font-bold text-gray-700 mb-1 dark:text-gray-200">Twitter ID</p>
+        <div class="bg-gray-50 dark:bg-gray-800 rounded-lg p-2">
           <p class="text-sm text-gray-800 dark:text-gray-100">
             <a
               :href="`https://twitter.com/${application.twitterId}`"

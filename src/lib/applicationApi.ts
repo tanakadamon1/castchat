@@ -88,10 +88,9 @@ class ApplicationApi {
           .select('*')
           .eq('post_id', data.postId)
           .eq('user_id', userId)
-          .single()
+          .maybeSingle()
 
-        if (checkError && checkError.code !== 'PGRST116') {
-          // PGRST116 = レコードが見つからない場合のエラー
+        if (checkError) {
           console.error('Check existing application error:', checkError)
           return {
             data: null,
