@@ -222,6 +222,9 @@ export class PostsService {
     userProfile?: Tables<'users'>
   ): Promise<PostsApiResult<Post>> {
     try {
+      // 期限切れ優先表示の自動更新を実行
+      await this.updateExpiredPriorities()
+      
       // 投稿の取得と権限チェック
       const { data: existingPost, error: fetchError } = await supabase
         .from('posts')
@@ -355,6 +358,9 @@ export class PostsService {
     userProfile?: Tables<'users'>
   ): Promise<PostsApiResult<void>> {
     try {
+      // 期限切れ優先表示の自動更新を実行
+      await this.updateExpiredPriorities()
+      
       // 投稿の取得と権限チェック
       const { data: existingPost, error: fetchError } = await supabase
         .from('posts')
@@ -417,6 +423,9 @@ export class PostsService {
 
   async getPost(postId: string, userId?: string): Promise<PostsApiResult<PostWithDetails>> {
     try {
+      // 期限切れ優先表示の自動更新を実行
+      await this.updateExpiredPriorities()
+      
       // 投稿の基本情報を取得
       const { data: post, error: postError } = await supabase
         .from('posts')
@@ -502,6 +511,21 @@ export class PostsService {
     }
   }
 
+  // 期限切れ優先表示を更新する関数
+  async updateExpiredPriorities(): Promise<number> {
+    try {
+      const { data, error } = await supabase.rpc('check_and_expire_priorities')
+      if (error) {
+        console.error('期限切れ更新エラー:', error)
+        return 0
+      }
+      return data || 0
+    } catch (error) {
+      console.error('期限切れ更新エラー:', error)
+      return 0
+    }
+  }
+
   async getPosts(query: PostsQuery = {}): Promise<PostsApiResult<PostWithDetails[]>> {
     try {
       const {
@@ -577,9 +601,16 @@ export class PostsService {
         )
       }
 
-      // ソート - 優先表示を最初に、その後指定されたソート順
+      // 期限切れ優先表示の自動更新を実行
+      const expiredCount = await this.updateExpiredPriorities()
+      if (expiredCount > 0) {
+        console.log(`期限切れ優先表示投稿 ${expiredCount} 件を更新しました`)
+      }
+
+      // ソート - 有効な優先表示を最初に、その後指定されたソート順
       supabaseQuery = supabaseQuery
         .order('is_priority', { ascending: false })  // 優先表示を先に
+        .order('priority_expires_at', { ascending: false, nullsFirst: false })  // 期限が近い順
         .order(sort_by, { ascending: sort_order === 'asc' })
 
       // ページネーション

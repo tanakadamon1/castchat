@@ -21,7 +21,7 @@
               <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
                 <div class="font-medium text-gray-900 dark:text-gray-100">提供サービス</div>
                 <div class="md:col-span-2 text-gray-700 dark:text-gray-300">
-                  VRChatキャスト募集・応募マッチングプラットフォームの提供
+                  キャスト募集・応募マッチングプラットフォームの提供
                 </div>
               </div>
 
@@ -187,7 +187,7 @@
             <h2 class="text-2xl font-semibold text-gray-900 dark:text-gray-100 mb-4">免責事項</h2>
             <div class="space-y-4 text-gray-700 dark:text-gray-300">
               <p>
-                本サービスは、VRChatキャスト募集のマッチングプラットフォームを提供するものであり、
+                本サービスは、キャスト募集のマッチングプラットフォームを提供するものであり、
                 実際の取引や契約の成立について保証するものではありません。
               </p>
               <p>

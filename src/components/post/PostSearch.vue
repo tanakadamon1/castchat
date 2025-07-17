@@ -128,7 +128,7 @@
 
 <script setup lang="ts">
 import { ref, computed, watch } from 'vue'
-import type { PostFilter } from '@/types/post'
+import type { PostFilter, PostCategory } from '@/types/post'
 import BaseSelect from '@/components/ui/BaseSelect.vue'
 
 interface Props {
@@ -173,10 +173,7 @@ const categoryOptions = [
   { label: 'その他', value: 'other' }
 ]
 
-const typeOptions = [
-  { label: 'すべて', value: '' }
-  // 募集タイプは現在使用されていないため、オプションを削除
-]
+// 募集タイプは現在使用されていないため、typeOptions変数を削除
 
 const statusOptions = [
   { label: 'すべて', value: '' },
@@ -195,7 +192,6 @@ const sortOptions = [
 const hasActiveFilters = computed(() => {
   return Boolean(
     filters.value.category ||
-    filters.value.type ||
     filters.value.status ||
     searchQuery.value
   )
@@ -204,13 +200,12 @@ const hasActiveFilters = computed(() => {
 const activeFiltersCount = computed(() => {
   let count = 0
   if (filters.value.category) count++
-  if (filters.value.type) count++
   if (filters.value.status) count++
   if (searchQuery.value) count++
   return count
 })
 
-const quickFilterClasses = (filter: any) => {
+const quickFilterClasses = (filter: { type: string; value: string; label: string }) => {
   const baseClasses = 'px-3 py-1.5 text-sm font-medium rounded-full border transition-colors duration-200'
   const isActive = isQuickFilterActive(filter)
   
@@ -222,34 +217,16 @@ const quickFilterClasses = (filter: any) => {
 }
 
 // Methods
-const isQuickFilterActive = (filter: any) => {
-  if (filter.type === 'type') {
-    return filters.value.type === filter.value
-  }
+const isQuickFilterActive = (filter: { type: string; value: string; label: string }) => {
   if (filter.type === 'category') {
     return filters.value.category === filter.value
-  }
-  if (filter.type === 'special') {
-    // 特別フィルターの処理（例: 締切間近、優先表示など）
-    switch (filter.value) {
-      case 'deadline_soon':
-        return filters.value.specialFilters?.includes('deadline_soon') || false
-      case 'priority':
-        return filters.value.specialFilters?.includes('priority') || false
-      case 'has_images':
-        return filters.value.specialFilters?.includes('has_images') || false
-      default:
-        return false
-    }
   }
   return false
 }
 
-const toggleQuickFilter = (filter: any) => {
-  if (filter.type === 'type') {
-    filters.value.type = filters.value.type === filter.value ? undefined : filter.value
-  } else if (filter.type === 'category') {
-    filters.value.category = filters.value.category === filter.value ? undefined : filter.value
+const toggleQuickFilter = (filter: { type: string; value: string; label: string }) => {
+  if (filter.type === 'category') {
+    filters.value.category = filters.value.category === filter.value ? undefined : filter.value as PostCategory
   }
   
   handleFilterChange()

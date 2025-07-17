@@ -20,7 +20,7 @@
           <span>{{ post.authorName }}</span>
           <span class="mx-2">•</span>
           <Calendar class="w-4 h-4 mr-1" />
-          <span>{{ formatDate(post.startDate || post.createdAt) }}</span>
+          <span>{{ formatDate(post.createdAt) }}</span>
         </div>
       </div>
 
@@ -152,7 +152,7 @@ const emit = defineEmits<{
 }>()
 
 const authStore = useAuthStore()
-const { validate: validateField, getFieldError, hasErrors, errors } = useValidation()
+const { validate: validateField, getFieldError, errors } = useValidation()
 
 // フォームデータ
 const formData = ref({
@@ -166,7 +166,9 @@ const formData = ref({
 const loadUserProfile = async () => {
   // authStore.profileがない場合は動的に取得
   if (!authStore.profile && authStore.user?.id) {
-    await authStore.fetchProfile()
+    if (authStore.user?.id) {
+      await authStore.getUserProfile(authStore.user.id)
+    }
   }
   
   if (authStore.profile?.twitter_username) {

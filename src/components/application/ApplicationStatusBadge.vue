@@ -7,10 +7,10 @@
 
 <script setup lang="ts">
 import { computed } from 'vue'
-import { Clock, CheckCircle, XCircle } from 'lucide-vue-next'
+import { Clock, CheckCircle, XCircle, ArrowLeft } from 'lucide-vue-next'
 
 interface Props {
-  status: 'pending' | 'accepted' | 'rejected'
+  status: 'pending' | 'accepted' | 'rejected' | 'withdrawn'
 }
 
 const props = defineProps<Props>()
@@ -30,6 +30,11 @@ const statusConfig = {
     text: '却下',
     icon: XCircle,
     classes: 'bg-red-100 text-red-800 border-red-200'
+  },
+  withdrawn: {
+    text: '取り下げ',
+    icon: ArrowLeft,
+    classes: 'bg-gray-100 text-gray-800 border-gray-200'
   }
 }
 

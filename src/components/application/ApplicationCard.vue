@@ -67,7 +67,7 @@
       v-if="type === 'sent' && application.message"
       class="mt-4 pt-4 border-t border-gray-200 dark:border-gray-700"
     >
-      <p class="text-sm font-bold text-gray-700 mb-2 dark:text-gray-200">送信したメッセージ</p>
+      <p class="text-sm font-bold text-gray-700 mb-1.5 dark:text-gray-200">送信したメッセージ</p>
       <div class="bg-gray-50 dark:bg-gray-800 rounded-lg p-3">
         <p class="text-sm text-gray-800 dark:text-gray-100 line-clamp-2">
           {{ application.message }}
@@ -78,18 +78,18 @@
     <!-- 応募内容プレビュー（受信した応募のみ詳細表示） -->
     <div
       v-if="type === 'received'"
-      class="mt-4 pt-4 border-t border-gray-200 dark:border-gray-700 space-y-3"
+      class="mt-4 pt-4 border-t border-gray-200 dark:border-gray-700"
     >
-      <div v-if="application.message">
-        <p class="text-sm font-bold text-gray-700 mb-2 dark:text-gray-200">応募メッセージ</p>
+      <div v-if="application.message" class="mb-4">
+        <p class="text-sm font-bold text-gray-700 mb-1.5 dark:text-gray-200">応募メッセージ</p>
         <div class="bg-gray-50 dark:bg-gray-800 rounded-lg p-3">
           <p class="text-sm text-gray-800 dark:text-gray-100 whitespace-pre-wrap">
             {{ application.message }}
           </p>
         </div>
       </div>
-      <div v-if="application.experience">
-        <p class="text-sm font-bold text-gray-700 mb-2 dark:text-gray-200">
+      <div v-if="application.experience" class="mb-4">
+        <p class="text-sm font-bold text-gray-700 mb-1.5 dark:text-gray-200">
           関連する経験・スキル（任意）
         </p>
         <div class="bg-gray-50 dark:bg-gray-800 rounded-lg p-3">
@@ -98,23 +98,23 @@
           </p>
         </div>
       </div>
-      <div v-if="application.availability">
-        <p class="text-sm font-bold text-gray-700 mb-2 dark:text-gray-200">
+      <div v-if="application.availability" class="mb-4">
+        <p class="text-sm font-bold text-gray-700 mb-1.5 dark:text-gray-200">
           参加可能な時間帯（任意）
         </p>
         <div class="bg-gray-50 dark:bg-gray-800 rounded-lg p-3">
           <p class="text-sm text-gray-800 dark:text-gray-100">{{ application.availability }}</p>
         </div>
       </div>
-      <div v-if="application.twitterId">
-        <p class="text-sm font-bold text-gray-700 mb-2 dark:text-gray-200">Twitter ID</p>
+      <div v-if="application.twitterId" class="mb-2">
+        <p class="text-sm font-bold text-gray-700 mb-1.5 dark:text-gray-200">Twitter ID</p>
         <div class="bg-gray-50 dark:bg-gray-800 rounded-lg p-3">
           <p class="text-sm text-gray-800 dark:text-gray-100">
             <a
               :href="`https://twitter.com/${application.twitterId}`"
               target="_blank"
               rel="noopener noreferrer"
-              class="text-blue-600 hover:text-blue-700 dark:text-blue-400 dark:hover:text-blue-300"
+              class="text-blue-600 hover:text-blue-700 dark:text-blue-400 dark:hover:text-blue-300 font-medium"
             >
               @{{ application.twitterId }}
             </a>
@@ -137,7 +137,6 @@
 
 <script setup lang="ts">
 import { ref, computed } from 'vue'
-import { User } from 'lucide-vue-next'
 import BaseButton from '@/components/ui/BaseButton.vue'
 import ApplicationStatusBadge from './ApplicationStatusBadge.vue'
 
@@ -189,9 +188,6 @@ const displayTitle = computed(() => {
     : props.application.postTitle || '募集タイトル'
 })
 
-const displayAvatar = computed(() => {
-  return props.type === 'received' ? props.application.applicantAvatar : null // 送信した応募では投稿者のアバターは表示しない
-})
 
 // イベントハンドラー
 const handleUpdateStatus = (status: string) => {

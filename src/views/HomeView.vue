@@ -16,7 +16,7 @@ const authStore = useAuthStore()
       <div class="mx-auto max-w-2xl py-32 sm:py-48 lg:py-56">
         <div class="text-center">
           <h1 class="text-4xl font-bold tracking-tight text-gray-900 sm:text-6xl">
-            VRChatキャスト募集掲示板
+            castChat
           </h1>
           <p class="mt-6 text-lg leading-8 text-gray-600">
             VRChatでのキャスト募集・応募を簡単に。クリエイターとキャストをつなぐプラットフォームです。
@@ -27,7 +27,7 @@ const authStore = useAuthStore()
               to="/posts"
               variant="primary"
               size="lg"
-              aria-label="VRChatキャスト募集一覧ページを開く"
+              aria-label="キャスト募集一覧ページを開く"
             >
               募集一覧を見る
             </BaseButton>

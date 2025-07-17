@@ -300,11 +300,11 @@ const formatEventTime = (post: Post) => {
   }
   
   if (post.eventFrequency && post.eventWeekday !== undefined && post.eventTime) {
-    const weekday = weekdayLabels[post.eventWeekday]
+    const weekday = weekdayLabels[post.eventWeekday as keyof typeof weekdayLabels]
     const time = post.eventTime
     
     if (post.eventFrequency === 'monthly' && post.eventWeekOfMonth) {
-      const weekOfMonth = weekOfMonthLabels[post.eventWeekOfMonth]
+      const weekOfMonth = weekOfMonthLabels[post.eventWeekOfMonth as keyof typeof weekOfMonthLabels]
       return `毎月${weekOfMonth}${weekday} ${time}`
     } else if (post.eventFrequency === 'biweekly' && post.eventWeekOfMonth) {
       const pattern = post.eventWeekOfMonth === 1 ? '第1・第3' : '第2・第4'
@@ -314,7 +314,7 @@ const formatEventTime = (post: Post) => {
     }
   }
   
-  return eventFrequencyLabels[post.eventFrequency] || ''
+  return eventFrequencyLabels[post.eventFrequency as keyof typeof eventFrequencyLabels] || ''
 }
 </script>
 

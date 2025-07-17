@@ -8,12 +8,14 @@
             to="/" 
             class="flex items-center space-x-3 text-xl font-bold text-gray-900 dark:text-white transition-all duration-200 hover:scale-105"
           >
-            <div class="w-10 h-10 bg-gradient-to-br from-indigo-500 to-purple-600 rounded-xl flex items-center justify-center shadow-lg">
-              <span class="text-white font-bold text-base">VR</span>
-            </div>
+            <img 
+              src="/favcon.png" 
+              alt="Cast Chat" 
+              class="w-10 h-10 object-contain"
+            />
             <div class="flex flex-col">
-              <span class="text-lg leading-none">キャスト募集</span>
-              <span class="text-xs text-gray-500 dark:text-gray-400 font-normal">VRChat Cast</span>
+              <span class="text-lg leading-none font-bold">castChat</span>
+              <span class="text-xs text-gray-500 dark:text-gray-400 font-normal">VRChatキャスト募集</span>
             </div>
           </router-link>
         </div>
@@ -218,7 +220,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed } from 'vue'
+import { ref } from 'vue'
 import { useAuthStore } from '@/stores/auth'
 import { useRouter } from 'vue-router'
 import DarkModeToggle from '@/components/ui/DarkModeToggle.vue'
@@ -229,7 +231,7 @@ const router = useRouter()
 const showUserMenu = ref(false)
 const showMobileMenu = ref(false)
 
-const handleNavClick = (path: string) => {
+const handleNavClick = () => {
   // Close mobile menu if open
   showMobileMenu.value = false
   showUserMenu.value = false

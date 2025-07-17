@@ -84,7 +84,9 @@
       "mcp__supabase__list_edge_functions",
       "Bash(git checkout:*)",
       "Bash(supabase functions env:*)",
-      "Bash(kill:*)"
+      "Bash(kill:*)",
+      "Bash(npm run lint:*)",
+      "Bash(psql:*)"
     ],
     "deny": []
   }

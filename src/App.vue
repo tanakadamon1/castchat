@@ -12,6 +12,12 @@ const authStore = useAuthStore()
 const themeStore = useThemeStore()
 
 // Debug: Log config values on app start
+declare global {
+  interface Window {
+    appConfig: typeof config
+  }
+}
+
 window.appConfig = config
 console.error('App Config Debug:', {
   squareApplicationId: config.squareApplicationId,

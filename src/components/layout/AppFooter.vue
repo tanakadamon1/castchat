@@ -7,12 +7,14 @@
         <!-- About -->
         <div class="col-span-1 md:col-span-2">
           <div class="flex items-center space-x-2 mb-4">
-            <div class="w-8 h-8 bg-indigo-500 rounded-lg flex items-center justify-center">
-              <span class="text-white font-bold text-sm">VR</span>
-            </div>
+            <img 
+              src="/favcon.png" 
+              alt="Cast Chat" 
+              class="w-8 h-8 object-contain"
+            />
             <span
               class="text-xl font-bold text-gray-900 dark:text-white transition-colors duration-200"
-              >キャスト募集</span
+              >castChat</span
             >
           </div>
           <p class="text-gray-600 dark:text-gray-400 text-sm mb-4 transition-colors duration-200">
@@ -128,7 +130,7 @@
       <div class="mt-8 pt-8 border-t border-gray-200 dark:border-gray-700">
         <div class="flex justify-between items-center">
           <p class="text-gray-400 dark:text-gray-500 text-sm">
-            © 2025 VRChatキャスト募集掲示板. All rights reserved.
+            © 2025 castChat. All rights reserved.
           </p>
           <div class="flex space-x-6">
             <router-link

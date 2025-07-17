@@ -149,8 +149,8 @@ export function useInstallPrompt() {
     const manifest = document.querySelector('link[rel="manifest"]') as HTMLLinkElement
     
     return {
-      name: 'VRChatキャスト募集掲示板',
-      shortName: 'キャスト募集',
+      name: 'castChat',
+      shortName: 'castChat',
       description: 'VRChatでのキャスト募集・応募プラットフォーム',
       manifestUrl: manifest?.href,
       features: checkPWAFeatures()

@@ -104,7 +104,7 @@ export const postsApi = {
         eventTime: post.event_time || undefined,
         eventWeekOfMonth: post.event_week_of_month !== null ? post.event_week_of_month : undefined,
         images: post.post_images?.map(img => img.url) || [],
-        isPriority: post.is_priority || false,
+        isPriority: post.is_priority && (!post.priority_expires_at || new Date(post.priority_expires_at) > new Date()),
         priorityExpiresAt: post.priority_expires_at || undefined,
         priorityCost: post.priority_cost || undefined
       }))
@@ -155,7 +155,10 @@ export const postsApi = {
         eventWeekday: post.event_weekday !== null ? post.event_weekday : undefined,
         eventTime: post.event_time || undefined,
         eventWeekOfMonth: post.event_week_of_month !== null ? post.event_week_of_month : undefined,
-        images: post.post_images?.map(img => img.url) || []
+        images: post.post_images?.map(img => img.url) || [],
+        isPriority: post.is_priority && (!post.priority_expires_at || new Date(post.priority_expires_at) > new Date()),
+        priorityExpiresAt: post.priority_expires_at || undefined,
+        priorityCost: post.priority_cost || undefined
       }
 
       return { data: transformedPost }

@@ -45,8 +45,8 @@ export default defineConfig(({ mode }) => {
         includeAssets: ['favicon.ico', 'icons/*.png'],
         manifestFilename: 'manifest.webmanifest',
         manifest: {
-          name: 'VRChatキャスト募集掲示板',
-          short_name: 'CastChat',
+          name: 'castChat',
+          short_name: 'castChat',
           description: 'VRChatコミュニティのためのキャスト募集・応募プラットフォーム',
           theme_color: '#6366f1',
           background_color: '#ffffff',

@@ -6,7 +6,7 @@
           アカウント登録
         </h2>
         <p class="mt-2 text-center text-sm text-gray-600 dark:text-gray-400">
-          VRChatキャスト募集掲示板に参加しよう
+          castChatに参加しよう
         </p>
       </div>
       

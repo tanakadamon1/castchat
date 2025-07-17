@@ -40,7 +40,7 @@ function getBooleanEnvVar(key: string, defaultValue = false): boolean {
 
 export const config: Config = {
   // Application
-  appName: getEnvVar('VITE_APP_NAME', 'VRChatキャスト募集掲示板'),
+  appName: getEnvVar('VITE_APP_NAME', 'castChat'),
   appUrl: getEnvVar('VITE_APP_URL', 'http://localhost:5173'),
   appVersion: getEnvVar('VITE_APP_VERSION', '0.0.0'),
   
