@@ -627,6 +627,7 @@ const previewPost = computed(() => {
     eventWeekday: formData.value.eventWeekday,
     eventTime: formData.value.eventTime,
     eventWeekOfMonth: formData.value.eventWeekOfMonth,
+    images: selectedImages.value.map(img => img.preview), // プレビュー画像を追加
   } as Post
 })
 
