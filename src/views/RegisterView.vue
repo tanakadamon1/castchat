@@ -53,9 +53,9 @@
         <div class="mt-4 text-xs text-gray-500 dark:text-gray-400 text-center">
           <p>
             登録することで、
-            <a href="#" class="text-indigo-600 hover:text-indigo-500">利用規約</a>
+            <router-link to="/terms-of-service" class="text-indigo-600 hover:text-indigo-500">利用規約</router-link>
             および
-            <a href="#" class="text-indigo-600 hover:text-indigo-500">プライバシーポリシー</a>
+            <router-link to="/privacy-policy" class="text-indigo-600 hover:text-indigo-500">プライバシーポリシー</router-link>
             に同意したものとみなされます。
           </p>
         </div>

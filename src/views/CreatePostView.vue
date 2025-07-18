@@ -348,14 +348,14 @@
                 </div>
                 <div v-if="authStore.profile" class="text-sm text-gray-500 dark:text-gray-400 mt-2">
                   現在のコイン残高: <span class="font-medium">{{ authStore.profile.coin_balance || 0 }} コイン</span>
-                  <a 
+                  <button 
                     v-if="(authStore.profile.coin_balance || 0) < 1"
-                    href="#"
-                    @click.prevent="showPurchaseModal = true"
-                    class="ml-2 text-indigo-600 dark:text-indigo-400 hover:text-indigo-800 dark:hover:text-indigo-300"
+                    type="button"
+                    @click="showPurchaseModal = true"
+                    class="ml-2 text-indigo-600 dark:text-indigo-400 hover:text-indigo-800 dark:hover:text-indigo-300 underline"
                   >
                     コインを購入
-                  </a>
+                  </button>
                 </div>
               </label>
             </div>

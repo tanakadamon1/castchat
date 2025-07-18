@@ -231,7 +231,7 @@ const router = useRouter()
 const showUserMenu = ref(false)
 const showMobileMenu = ref(false)
 
-const handleNavClick = () => {
+const handleNavClick = (path?: string) => {
   // Close mobile menu if open
   showMobileMenu.value = false
   showUserMenu.value = false

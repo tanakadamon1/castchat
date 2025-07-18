@@ -110,6 +110,28 @@ const router = createRouter({
       name: 'commercial-transaction',
       component: () => import('../views/CommercialTransactionView.vue'),
     },
+    {
+      path: '/users/:id',
+      name: 'user-profile',
+      redirect: to => {
+        // ユーザープロファイルページは現在プロファイルページにリダイレクト
+        return { name: 'profile' }
+      },
+      meta: { requiresAuth: true },
+    },
+    {
+      path: '/help',
+      name: 'help',
+      redirect: () => {
+        // ヘルプページは現在存在しないため、投稿一覧にリダイレクト
+        return { name: 'posts' }
+      },
+    },
+    {
+      path: '/:pathMatch(.*)*',
+      name: 'not-found',
+      component: () => import('../views/NotFoundView.vue'),
+    },
   ],
 })
 

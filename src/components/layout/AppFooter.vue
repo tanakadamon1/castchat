@@ -21,7 +21,7 @@
             VRChatでのキャスト募集・応募を簡単に。クリエイターとキャストをつなぐプラットフォームです。
           </p>
           <div class="flex space-x-4">
-            <a href="#" class="text-gray-400 hover:text-gray-500">
+            <a href="https://twitter.com/castchat_vrc" target="_blank" rel="noopener noreferrer" class="text-gray-400 hover:text-gray-500">
               <span class="sr-only">Twitter</span>
               <svg class="h-6 w-6" fill="currentColor" viewBox="0 0 24 24">
                 <path
@@ -29,7 +29,7 @@
                 />
               </svg>
             </a>
-            <a href="#" class="text-gray-400 hover:text-gray-500">
+            <a href="https://discord.gg/castchat" target="_blank" rel="noopener noreferrer" class="text-gray-400 hover:text-gray-500">
               <span class="sr-only">Discord</span>
               <svg class="h-6 w-6" fill="currentColor" viewBox="0 0 24 24">
                 <path
@@ -84,12 +84,12 @@
           </h3>
           <ul class="space-y-2">
             <li>
-              <a
-                href="#"
+              <router-link
+                to="/help"
                 class="text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-100 text-sm"
               >
                 ヘルプセンター
-              </a>
+              </router-link>
             </li>
             <li>
               <router-link
@@ -117,7 +117,7 @@
             </li>
             <li>
               <a
-                href="#"
+                href="mailto:support@castchat.vrc.jp"
                 class="text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-100 text-sm"
               >
                 お問い合わせ
