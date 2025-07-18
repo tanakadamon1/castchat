@@ -147,12 +147,6 @@
         </slot>
       </div>
 
-      <!-- ヘルプリンク -->
-      <div v-if="showHelp" class="mt-4">
-        <router-link to="/help" class="text-sm text-indigo-500 hover:text-indigo-600 underline">
-          ヘルプ・FAQ
-        </router-link>
-      </div>
     </div>
   </div>
 </template>
@@ -169,7 +163,6 @@ interface Props {
   showRetry?: boolean
   showHome?: boolean
   showReport?: boolean
-  showHelp?: boolean
   showDetails?: boolean
   fullHeight?: boolean
   errorCode?: string
@@ -198,7 +191,6 @@ const props = withDefaults(defineProps<Props>(), {
   showRetry: true,
   showHome: false,
   showReport: false,
-  showHelp: true,
   showDetails: false,
   fullHeight: false,
   severity: 'medium',
@@ -276,7 +268,7 @@ const message = computed(() => {
   if (props.message) return props.message
 
   const messages = {
-    general: 'しばらく時間をおいてから再度お試しください。問題が続く場合は、お問い合わせください。',
+    general: 'しばらく時間をおいてから再度お試しください。',
     network:
       'インターネット接続を確認してから再度お試しください。Wi-Fiやモバイル通信の状態をご確認ください。',
     'not-found': 'お探しのページまたはデータが見つかりませんでした。URLが正しいかご確認ください。',
@@ -338,7 +330,8 @@ const reportError = () => {
 説明: (何をしていた時にエラーが発生したかご記入ください)
 `)
 
-  window.open(`mailto:support@castchat.jp?subject=${subject}&body=${body}`)
+  // お問い合わせ機能は現在無効化されています
+  console.error('Error report:', { subject, body: errorData })
 }
 
 const formatTimestamp = (timestamp: string | Date) => {

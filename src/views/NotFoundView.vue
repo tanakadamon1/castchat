@@ -45,16 +45,6 @@
 </template>
 
 <script setup lang="ts">
-// 404ページのメタデータ
-import { useHead } from '@vueuse/head'
-
-useHead({
-  title: '404 - ページが見つかりません | castChat',
-  meta: [
-    {
-      name: 'description',
-      content: 'お探しのページは存在しません。castChatでVRChatキャストを探してみましょう。'
-    }
-  ]
-})
+// 404ページ
+// TODO: メタデータの設定は後で追加
 </script>

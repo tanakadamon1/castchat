@@ -85,14 +85,6 @@
           <ul class="space-y-2">
             <li>
               <router-link
-                to="/help"
-                class="text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-100 text-sm"
-              >
-                ヘルプセンター
-              </router-link>
-            </li>
-            <li>
-              <router-link
                 to="/terms-of-service"
                 class="text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-100 text-sm"
               >
@@ -114,14 +106,6 @@
               >
                 特定商取引法に基づく表記
               </router-link>
-            </li>
-            <li>
-              <a
-                href="mailto:support@castchat.vrc.jp"
-                class="text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-100 text-sm"
-              >
-                お問い合わせ
-              </a>
             </li>
           </ul>
         </div>

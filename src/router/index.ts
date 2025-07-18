@@ -120,14 +120,6 @@ const router = createRouter({
       meta: { requiresAuth: true },
     },
     {
-      path: '/help',
-      name: 'help',
-      redirect: () => {
-        // ヘルプページは現在存在しないため、投稿一覧にリダイレクト
-        return { name: 'posts' }
-      },
-    },
-    {
       path: '/:pathMatch(.*)*',
       name: 'not-found',
       component: () => import('../views/NotFoundView.vue'),
