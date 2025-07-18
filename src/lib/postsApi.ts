@@ -29,6 +29,9 @@ export const postsApi = {
     user_id?: string
   }): Promise<PostsResponse> {
     try {
+      // 期限切れの優先表示を更新
+      await supabase.rpc('check_and_expire_priorities')
+      
       const page = filters.offset ? Math.floor(filters.offset / (filters.limit || 10)) + 1 : 1
       
       // ソート設定をマッピング
@@ -119,6 +122,9 @@ export const postsApi = {
   // 単一投稿取得
   async getPost(id: string): Promise<PostResponse> {
     try {
+      // 期限切れの優先表示を更新
+      await supabase.rpc('check_and_expire_priorities')
+      
       const result = await postsService.getPost(id)
 
       if (result.error) {
