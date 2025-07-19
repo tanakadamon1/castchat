@@ -219,8 +219,10 @@ const groupedMessages = computed(() => {
     return groups
   }
   
-  props.messages.forEach(message => {
-    if (!message || !message.created_at) return
+  const messagesList = props.messages
+  for (let i = 0; i < messagesList.length; i++) {
+    const message = messagesList[i]
+    if (!message || !message.created_at) continue
     
     try {
       const date = new Date(message.created_at).toDateString()
@@ -231,7 +233,7 @@ const groupedMessages = computed(() => {
     } catch {
       // Error grouping message
     }
-  })
+  }
   
   return groups
 })

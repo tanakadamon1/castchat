@@ -781,17 +781,18 @@ const addFiles = (files: File[]) => {
 
   const filesToAdd = files.slice(0, remainingSlots)
 
-  filesToAdd.forEach((file) => {
+  for (let i = 0; i < filesToAdd.length; i++) {
+    const file = filesToAdd[i]
     // ファイルサイズチェック (5MB)
     if (file.size > 5 * 1024 * 1024) {
       toast.error(`${file.name} のファイルサイズが5MBを超えています`)
-      return
+      continue
     }
 
     // ファイル形式チェック
     if (!file.type.startsWith('image/')) {
       toast.error(`${file.name} は画像ファイルではありません`)
-      return
+      continue
     }
 
     // プレビュー用のDataURL生成
@@ -805,7 +806,7 @@ const addFiles = (files: File[]) => {
       }
     }
     reader.readAsDataURL(file)
-  })
+  }
 
   if (files.length > remainingSlots) {
     toast.info(`${remainingSlots}枚のみ追加されました（最大3枚まで）`)

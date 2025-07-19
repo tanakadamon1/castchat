@@ -315,11 +315,13 @@ const statusCounts = computed(() => {
     closed: 0,
   }
 
-  allPosts.value.forEach((post) => {
+  const postsList = allPosts.value
+  for (let i = 0; i < postsList.length; i++) {
+    const post = postsList[i]
     if (post.status === 'active') counts.active++
     else if (post.status === 'draft') counts.draft++
     else if (post.status === 'closed') counts.closed++
-  })
+  }
 
   return counts
 })

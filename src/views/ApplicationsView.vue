@@ -323,7 +323,9 @@ const postFilterOptions = computed(() => {
   
   // 配列に変換
   const uniquePostIds: string[] = []
-  postIdSet.forEach(id => uniquePostIds.push(id))
+  for (const id of postIdSet) {
+    uniquePostIds.push(id)
+  }
   
   const options = [{ value: '', label: 'すべての投稿' }]
   
