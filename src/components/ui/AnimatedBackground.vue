@@ -153,47 +153,65 @@ const generateAnimationStyles = () => {
   const styles: string[] = []
   
   try {
+    // 安全な配列のコピーを作成
+    const safeTriangles = triangles.value.slice()
+    const safeSquares = squares.value.slice()
+    const safeCircles = circles.value.slice()
+    const safeDiamonds = diamonds.value.slice()
+
     // 三角形のアニメーション
-    triangles.value.forEach(triangle => {
-      styles.push(`
-        @keyframes float-${triangle.id} {
-          0% { transform: translateY(0px) rotate(${triangle.rotation}deg); }
-          50% { transform: translateY(-20px) rotate(${triangle.rotation + 180}deg); }
-          100% { transform: translateY(0px) rotate(${triangle.rotation + 360}deg); }
-        }
-      `)
-    })
+    for (let i = 0; i < safeTriangles.length; i++) {
+      const triangle = safeTriangles[i]
+      if (triangle && typeof triangle.id === 'number') {
+        styles.push(`
+          @keyframes float-${triangle.id} {
+            0% { transform: translateY(0px) rotate(${triangle.rotation}deg); }
+            50% { transform: translateY(-20px) rotate(${triangle.rotation + 180}deg); }
+            100% { transform: translateY(0px) rotate(${triangle.rotation + 360}deg); }
+          }
+        `)
+      }
+    }
 
     // 四角形のアニメーション
-    squares.value.forEach(square => {
-      styles.push(`
-        @keyframes drift-${square.id} {
-          0% { transform: translateX(0px) rotate(${square.rotation}deg); }
-          50% { transform: translateX(30px) rotate(${square.rotation + 90}deg); }
-          100% { transform: translateX(0px) rotate(${square.rotation + 180}deg); }
-        }
-      `)
-    })
+    for (let i = 0; i < safeSquares.length; i++) {
+      const square = safeSquares[i]
+      if (square && typeof square.id === 'number') {
+        styles.push(`
+          @keyframes drift-${square.id} {
+            0% { transform: translateX(0px) rotate(${square.rotation}deg); }
+            50% { transform: translateX(30px) rotate(${square.rotation + 90}deg); }
+            100% { transform: translateX(0px) rotate(${square.rotation + 180}deg); }
+          }
+        `)
+      }
+    }
 
     // 円形のアニメーション
-    circles.value.forEach(circle => {
-      styles.push(`
-        @keyframes pulse-${circle.id} {
-          0%, 100% { transform: scale(1); opacity: ${circle.opacity}; }
-          50% { transform: scale(1.2); opacity: ${circle.opacity * 0.5}; }
-        }
-      `)
-    })
+    for (let i = 0; i < safeCircles.length; i++) {
+      const circle = safeCircles[i]
+      if (circle && typeof circle.id === 'number') {
+        styles.push(`
+          @keyframes pulse-${circle.id} {
+            0%, 100% { transform: scale(1); opacity: ${circle.opacity}; }
+            50% { transform: scale(1.2); opacity: ${circle.opacity * 0.5}; }
+          }
+        `)
+      }
+    }
 
     // ダイヤモンドのアニメーション
-    diamonds.value.forEach(diamond => {
-      styles.push(`
-        @keyframes rotate-${diamond.id} {
-          0% { transform: rotate(${diamond.rotation}deg); }
-          100% { transform: rotate(${diamond.rotation + 360}deg); }
-        }
-      `)
-    })
+    for (let i = 0; i < safeDiamonds.length; i++) {
+      const diamond = safeDiamonds[i]
+      if (diamond && typeof diamond.id === 'number') {
+        styles.push(`
+          @keyframes rotate-${diamond.id} {
+            0% { transform: rotate(${diamond.rotation}deg); }
+            100% { transform: rotate(${diamond.rotation + 360}deg); }
+          }
+        `)
+      }
+    }
   } catch (error) {
     console.warn('AnimatedBackground: Error generating styles:', error)
   }
@@ -238,13 +256,25 @@ const initShapes = () => {
 
 // 図形を再配置する関数
 const repositionShapes = () => {
-  [...triangles.value, ...squares.value, ...circles.value, ...diamonds.value].forEach(shape => {
-    // 画面外の図形を反対側に移動
-    if (shape.x > 110) shape.x = -10
-    if (shape.x < -10) shape.x = 110
-    if (shape.y > 110) shape.y = -10
-    if (shape.y < -10) shape.y = 110
-  })
+  try {
+    // 各配列を個別に処理して無限ループを防ぐ
+    const allShapes = [
+      ...triangles.value.slice(),
+      ...squares.value.slice(),
+      ...circles.value.slice(),
+      ...diamonds.value.slice()
+    ]
+    
+    allShapes.forEach(shape => {
+      // 画面外の図形を反対側に移動
+      if (shape.x > 110) shape.x = -10
+      if (shape.x < -10) shape.x = 110
+      if (shape.y > 110) shape.y = -10
+      if (shape.y < -10) shape.y = 110
+    })
+  } catch (error) {
+    console.warn('AnimatedBackground: repositioning error:', error)
+  }
 }
 
 let repositionInterval: number | null = null
