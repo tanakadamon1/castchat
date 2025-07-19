@@ -1,5 +1,5 @@
 <template>
-  <div class="min-h-screen bg-transparent py-8">
+  <div class="min-h-screen bg-gray-50 dark:bg-gray-900 py-8">
     <div class="container mx-auto px-4 max-w-4xl">
       <!-- エラー表示 -->
       <div v-if="loadError" class="mb-6 p-4 bg-red-100 text-red-700 rounded">

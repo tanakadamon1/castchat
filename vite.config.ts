@@ -228,9 +228,9 @@ export default defineConfig(({ mode }) => {
       minify: 'terser',
       terserOptions: {
         compress: {
-          drop_console: mode === 'production',
+          drop_console: false, // Temporarily enable for debugging
           drop_debugger: mode === 'production',
-          pure_funcs: mode === 'production' ? ['console.log', 'console.info'] : [],
+          pure_funcs: [],
           passes: 2, // 圧縮パスを增やしてサイズをさらに削減
         },
         mangle: {

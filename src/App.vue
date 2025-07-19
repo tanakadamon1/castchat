@@ -61,15 +61,15 @@ onMounted(async () => {
 <template>
   <div class="min-h-screen flex flex-col transition-colors duration-200 relative bg-gray-50 dark:bg-gray-900">
     <!-- アニメーション背景 -->
-    <!-- <AnimatedBackground /> -->
+    <AnimatedBackground />
     
-    <AppHeader class="relative z-20 bg-transparent" />
+    <AppHeader class="relative z-20" />
     
-    <main class="flex-1 relative z-20 bg-transparent">
+    <main class="flex-1 relative z-20">
       <RouterView />
     </main>
     
-    <AppFooter class="relative z-20 bg-transparent" />
+    <AppFooter class="relative z-20" />
     
     <ToastContainer />
   </div>

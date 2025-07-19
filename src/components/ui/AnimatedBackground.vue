@@ -1,5 +1,5 @@
 <template>
-  <div class="fixed inset-0 pointer-events-none overflow-hidden z-10 bg-gray-50 dark:bg-gray-900">
+  <div class="fixed inset-0 pointer-events-none overflow-hidden z-0">
     <!-- 三角形 -->
     <div 
       v-for="triangle in triangles" 
