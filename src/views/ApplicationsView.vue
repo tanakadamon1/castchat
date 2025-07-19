@@ -514,7 +514,14 @@ const handleWithdraw = async (applicationId: string) => {
     }
 
     // ローカルデータから削除
-    const index = sentApplications.value.findIndex((app) => app.id === applicationId)
+    let index = -1
+    const sentAppsList = sentApplications.value
+    for (let i = 0; i < sentAppsList.length; i++) {
+      if (sentAppsList[i].id === applicationId) {
+        index = i
+        break
+      }
+    }
     if (index !== -1) {
       sentApplications.value.splice(index, 1)
     }
@@ -528,9 +535,14 @@ const handleWithdraw = async (applicationId: string) => {
 
 // データ読み込み関数
 const loadApplications = async () => {
+  console.log('loadApplications started')
+  loading.value = true
+  
   try {
     // 受信した応募を取得
+    console.log('Fetching received applications...')
     const receivedResult = await applicationApi.getReceivedApplications()
+    console.log('Received applications result:', receivedResult)
 
     if (receivedResult.error) {
       errorMessage.value = receivedResult.error
@@ -705,17 +717,44 @@ const loadApplications = async () => {
 
 // 初期化
 onMounted(async () => {
+  console.log('ApplicationsView onMounted started', {
+    isAuthenticated: authStore.isAuthenticated,
+    user: authStore.user,
+    initializing: authStore.initializing,
+    loading: authStore.loading
+  })
+
+  // 認証の初期化を待つ
+  if (authStore.initializing) {
+    console.log('Auth store is initializing, waiting...')
+    let waitTime = 0
+    const maxWaitTime = 5000 // 5秒
+    while (authStore.initializing && waitTime < maxWaitTime) {
+      await new Promise((resolve) => setTimeout(resolve, 100))
+      waitTime += 100
+    }
+    console.log('Auth initialization wait completed', {
+      isAuthenticated: authStore.isAuthenticated,
+      waitTime
+    })
+  }
+
   if (!authStore.isAuthenticated) {
+    console.log('User not authenticated, redirecting to login')
     router.push('/login')
     return
   }
 
+  console.log('Starting to load applications...')
   try {
     await loadApplications()
+    console.log('Applications loaded successfully')
   } catch (err) {
+    console.error('Failed to load applications:', err)
     toast.error('データの取得に失敗しました')
   } finally {
     loading.value = false
+    console.log('ApplicationsView loading completed')
   }
 })
 </script>
