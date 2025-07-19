@@ -8,26 +8,38 @@
             <h1 class="text-3xl font-bold text-gray-900 dark:text-white mb-2">マイ投稿</h1>
             <p class="text-gray-600 dark:text-gray-300">あなたが投稿した募集一覧</p>
           </div>
-          
-          <BaseButton
-            @click="goToCreatePost"
-            class="flex items-center"
-          >
+
+          <BaseButton @click="goToCreatePost" class="flex items-center">
             <svg class="w-4 h-4 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M12 4v16m8-8H4"
+              />
             </svg>
             新規投稿
           </BaseButton>
         </div>
       </div>
-      
+
       <!-- Stats -->
       <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
         <div class="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-6">
           <div class="flex items-center">
             <div class="p-2 bg-blue-100 rounded-lg">
-              <svg class="w-6 h-6 text-blue-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+              <svg
+                class="w-6 h-6 text-blue-600"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
+                />
               </svg>
             </div>
             <div class="ml-4">
@@ -36,12 +48,22 @@
             </div>
           </div>
         </div>
-        
+
         <div class="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-6">
           <div class="flex items-center">
             <div class="p-2 bg-green-100 rounded-lg">
-              <svg class="w-6 h-6 text-green-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+              <svg
+                class="w-6 h-6 text-green-600"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"
+                />
               </svg>
             </div>
             <div class="ml-4">
@@ -50,27 +72,54 @@
             </div>
           </div>
         </div>
-        
+
         <div class="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-6">
           <div class="flex items-center">
             <div class="p-2 bg-yellow-100 rounded-lg">
-              <svg class="w-6 h-6 text-yellow-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
+              <svg
+                class="w-6 h-6 text-yellow-600"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"
+                />
               </svg>
             </div>
             <div class="ml-4">
               <p class="text-sm font-medium text-gray-600 dark:text-gray-400">総応募数</p>
-              <p class="text-2xl font-semibold text-gray-900 dark:text-white">{{ totalApplications }}</p>
+              <p class="text-2xl font-semibold text-gray-900 dark:text-white">
+                {{ totalApplications }}
+              </p>
             </div>
           </div>
         </div>
-        
+
         <div class="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-6">
           <div class="flex items-center">
             <div class="p-2 bg-purple-100 rounded-lg">
-              <svg class="w-6 h-6 text-purple-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+              <svg
+                class="w-6 h-6 text-purple-600"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"
+                />
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"
+                />
               </svg>
             </div>
             <div class="ml-4">
@@ -80,7 +129,7 @@
           </div>
         </div>
       </div>
-      
+
       <!-- Tabs -->
       <div class="mb-6">
         <!-- Tab Navigation -->
@@ -89,12 +138,15 @@
             <button
               v-for="tab in statusTabs"
               :key="tab.value"
-              @click="statusFilter = tab.value; loadPosts()"
+              @click="
+                statusFilter = tab.value
+                loadPosts()
+              "
               :class="[
                 statusFilter === tab.value
                   ? 'border-indigo-500 text-indigo-600 dark:text-indigo-400'
                   : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 dark:text-gray-400 dark:hover:text-gray-300',
-                'whitespace-nowrap py-2 px-1 border-b-2 font-medium text-sm'
+                'whitespace-nowrap py-2 px-1 border-b-2 font-medium text-sm',
               ]"
               :aria-current="statusFilter === tab.value ? 'page' : undefined"
             >
@@ -105,7 +157,7 @@
                   statusFilter === tab.value
                     ? 'bg-indigo-100 text-indigo-600 dark:bg-indigo-900 dark:text-indigo-300'
                     : 'bg-gray-100 text-gray-900 dark:bg-gray-800 dark:text-gray-300',
-                  'hidden ml-2 py-0.5 px-2.5 rounded-full text-xs font-medium md:inline-block'
+                  'hidden ml-2 py-0.5 px-2.5 rounded-full text-xs font-medium md:inline-block',
                 ]"
               >
                 {{ tab.count }}
@@ -113,25 +165,20 @@
             </button>
           </nav>
         </div>
-        
+
         <!-- Sort Filter -->
         <div class="mt-4 flex justify-end">
-          <BaseSelect
-            v-model="sortBy"
-            :options="sortOptions"
-            @change="loadPosts"
-            class="w-48"
-          />
+          <BaseSelect v-model="sortBy" :options="sortOptions" @change="loadPosts" class="w-48" />
         </div>
       </div>
-      
+
       <!-- Loading State -->
       <LoadingSpinner
         v-if="loading && posts.length === 0"
         message="投稿を読み込んでいます..."
         size="lg"
       />
-      
+
       <!-- Error State -->
       <ErrorState
         v-else-if="error && posts.length === 0"
@@ -139,7 +186,7 @@
         :message="error"
         @retry="loadPosts"
       />
-      
+
       <!-- Empty State -->
       <EmptyState
         v-else-if="!loading && posts.length === 0"
@@ -149,12 +196,9 @@
         action-text="新規投稿"
         @action="goToCreatePost"
       />
-      
+
       <!-- Posts Grid -->
-      <div
-        v-else
-        class="space-y-6"
-      >
+      <div v-else class="space-y-6">
         <!-- Posts List -->
         <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
           <PostCard
@@ -169,12 +213,9 @@
             @toggle-status="handleToggleStatus"
           />
         </div>
-        
+
         <!-- Pagination -->
-        <div
-          v-if="totalPages > 1"
-          class="mt-8"
-        >
+        <div v-if="totalPages > 1" class="mt-8">
           <BasePagination
             :current-page="currentPage"
             :total-pages="totalPages"
@@ -185,7 +226,7 @@
         </div>
       </div>
     </div>
-    
+
     <!-- 画像ビューア -->
     <ImageViewer
       :show="showImageViewer"
@@ -193,7 +234,7 @@
       :initial-index="selectedImageIndex"
       @close="closeImageViewer"
     />
-    
+
     <!-- 優先表示モーダル -->
     <PriorityPromotionModal
       :show="showPriorityModal"
@@ -202,7 +243,7 @@
       @success="handlePrioritySuccess"
       @purchase-coins="handlePurchaseCoins"
     />
-    
+
     <!-- コイン購入モーダル -->
     <CoinPurchaseModal
       :show="showCoinPurchaseModal"
@@ -259,7 +300,7 @@ const sortOptions = [
   { label: '新しい順', value: 'newest' },
   { label: '古い順', value: 'oldest' },
   { label: '応募数順', value: 'applications' },
-  { label: '閲覧数順', value: 'views' }
+  { label: '閲覧数順', value: 'views' },
 ]
 
 // 全投稿を保持（タブ用の集計に使用）
@@ -274,15 +315,15 @@ const statusCounts = computed(() => {
     all: allPosts.value.length,
     active: 0,
     draft: 0,
-    closed: 0
+    closed: 0,
   }
-  
-  allPosts.value.forEach(post => {
+
+  allPosts.value.forEach((post) => {
     if (post.status === 'active') counts.active++
     else if (post.status === 'draft') counts.draft++
     else if (post.status === 'closed') counts.closed++
   })
-  
+
   return counts
 })
 
@@ -291,13 +332,19 @@ const statusTabs = computed(() => [
   { label: 'すべて', value: 'all', count: statusCounts.value.all },
   { label: '公開中', value: 'active', count: statusCounts.value.active },
   { label: '下書き', value: 'draft', count: statusCounts.value.draft },
-  { label: '募集終了', value: 'closed', count: statusCounts.value.closed }
+  { label: '募集終了', value: 'closed', count: statusCounts.value.closed },
 ])
 
 const totalPosts = computed(() => total.value)
-const activePosts = computed(() => posts.value.filter(p => p.status === 'active').length)
-const totalApplications = computed(() => posts.value.reduce((sum, p) => sum + (p.applicationsCount || 0), 0))
-const totalViews = computed(() => posts.value.reduce((sum, p) => sum + (p.viewsCount || 0), 0))
+const activePosts = computed(
+  () => Array.from(posts.value).filter((p) => p.status === 'active').length,
+)
+const totalApplications = computed(() =>
+  Array.from(posts.value).reduce((sum, p) => sum + (p.applicationsCount || 0), 0),
+)
+const totalViews = computed(() =>
+  Array.from(posts.value).reduce((sum, p) => sum + (p.viewsCount || 0), 0),
+)
 
 // Methods
 const loadPosts = async (showLoading = true) => {
@@ -305,19 +352,19 @@ const loadPosts = async (showLoading = true) => {
     router.push('/login')
     return
   }
-  
+
   if (showLoading) {
     loading.value = true
   }
   error.value = null
-  
+
   try {
     // 全投稿を取得（タブの件数計算用）
     const allResult = await postsApi.getPosts({
       user_id: authStore.user.id,
-      limit: 1000 // 大きめの値で全件取得
+      limit: 1000, // 大きめの値で全件取得
     })
-    
+
     if (allResult.error) {
       error.value = allResult.error
       posts.value = []
@@ -325,29 +372,34 @@ const loadPosts = async (showLoading = true) => {
       total.value = 0
       return
     }
-    
+
     // 自分の投稿のみフィルタリング
-    allPosts.value = (allResult.data || []).filter(post => post.authorId === authStore.user?.id)
-    
+    allPosts.value = Array.from(
+      (allResult.data || []).filter((post) => post.authorId === authStore.user?.id),
+    )
+
     // 現在のタブに応じてフィルタリング
-    let filteredPosts = allPosts.value
+    let filteredPosts = Array.from(allPosts.value)
     if (statusFilter.value !== 'all') {
-      filteredPosts = allPosts.value.filter(post => post.status === statusFilter.value)
+      filteredPosts = filteredPosts.filter((post) => post.status === statusFilter.value)
     }
-    
-    // ソート適用
+
+    // ソート適用（コピー配列でsort）
     if (sortBy.value === 'newest') {
-      filteredPosts.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())
+      filteredPosts = filteredPosts.sort(
+        (a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime(),
+      )
     } else if (sortBy.value === 'oldest') {
-      filteredPosts.sort((a, b) => new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime())
+      filteredPosts = filteredPosts.sort(
+        (a, b) => new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime(),
+      )
     }
-    
+
     // ページネーション適用
     const startIndex = (currentPage.value - 1) * perPage.value
     const endIndex = startIndex + perPage.value
     posts.value = filteredPosts.slice(startIndex, endIndex)
     total.value = filteredPosts.length
-    
   } catch (err) {
     error.value = 'データの読み込みに失敗しました'
     console.error('Failed to load posts:', err)
@@ -378,10 +430,10 @@ const handleDeletePost = async (postId: string) => {
   if (!confirm('この投稿を削除しますか？この操作は取り消せません。')) {
     return
   }
-  
+
   try {
     const result = await postsApi.deletePost(postId)
-    
+
     if (result.success) {
       toast.success('投稿を削除しました')
       loadPosts()
@@ -396,7 +448,7 @@ const handleDeletePost = async (postId: string) => {
 
 // 画像ビューア関連のハンドラー
 const handleViewImage = (imageUrl: string, index: number) => {
-  const post = posts.value.find(p => p.images?.includes(imageUrl))
+  const post = posts.value.find((p) => p.images?.includes(imageUrl))
   if (post?.images) {
     selectedImages.value = post.images
     selectedImageIndex.value = index
@@ -430,18 +482,16 @@ const handlePurchaseCoins = () => {
 const handleToggleStatus = async (postId: string, newStatus: 'active' | 'closed') => {
   try {
     const result = await postsApi.updatePostStatus(postId, newStatus)
-    
+
     if (result.success) {
       // ローカルの投稿データを更新
-      const postIndex = posts.value.findIndex(p => p.id === postId)
+      const postIndex = posts.value.findIndex((p) => p.id === postId)
       if (postIndex !== -1) {
         posts.value[postIndex].status = newStatus
       }
-      
-      toast.success(
-        newStatus === 'active' ? '募集を再開しました' : '募集を終了しました'
-      )
-      
+
+      toast.success(newStatus === 'active' ? '募集を再開しました' : '募集を終了しました')
+
       // ステータス数の更新のためにloadPostsを呼び出し
       loadPosts(false)
     } else {
@@ -467,11 +517,11 @@ onMounted(async () => {
     let waitTime = 0
     const maxWaitTime = 3000 // 3秒
     while (authStore.initializing && waitTime < maxWaitTime) {
-      await new Promise(resolve => setTimeout(resolve, 100))
+      await new Promise((resolve) => setTimeout(resolve, 100))
       waitTime += 100
     }
   }
-  
+
   loadPosts()
 })
 </script>

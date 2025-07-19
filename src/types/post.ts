@@ -24,9 +24,10 @@ export interface Post {
   isPriority?: boolean // Priority display
   priorityExpiresAt?: string // Priority expiration time
   priorityCost?: number // Cost of priority display
+  viewsCount?: number // 投稿の閲覧数
 }
 
-export type PostCategory = 
+export type PostCategory =
   | 'customer-service' // 接客
   | 'meetings' // 集会
   | 'music-dance' // 音楽・ダンス
@@ -36,19 +37,19 @@ export type PostCategory =
   | 'games' // ゲーム
   | 'other' // その他
 
-export type EventFrequency = 
+export type EventFrequency =
   | 'once' // 単発
   | 'weekly' // 週1
   | 'biweekly' // 隔週
   | 'monthly' // 月1
 
-export type ContactMethod = 
+export type ContactMethod =
   | 'discord' // Discord
   | 'twitter' // Twitter/X
   | 'email' // メール
   | 'vrchat' // VRChat
 
-export type PostStatus = 
+export type PostStatus =
   | 'active' // 募集中
   | 'closed' // 募集終了
   | 'draft' // 下書き
