@@ -4,6 +4,7 @@ import { RouterView } from 'vue-router'
 import AppHeader from './components/layout/AppHeader.vue'
 import AppFooter from './components/layout/AppFooter.vue'
 import ToastContainer from './components/ui/ToastContainer.vue'
+import AnimatedBackground from './components/ui/AnimatedBackground.vue'
 import { useAuthStore } from './stores/auth'
 import { useThemeStore } from './stores/theme'
 import { config } from './config/env'
@@ -58,14 +59,17 @@ onMounted(async () => {
 </script>
 
 <template>
-  <div class="min-h-screen flex flex-col transition-colors duration-200 bg-gray-50 dark:bg-gray-900">
-    <AppHeader />
+  <div class="min-h-screen flex flex-col transition-colors duration-200 relative">
+    <!-- アニメーション背景 -->
+    <AnimatedBackground />
     
-    <main class="flex-1 bg-gray-50 dark:bg-gray-900">
+    <AppHeader class="relative z-20 bg-transparent" />
+    
+    <main class="flex-1 relative z-20 bg-transparent">
       <RouterView />
     </main>
     
-    <AppFooter />
+    <AppFooter class="relative z-20 bg-transparent" />
     
     <ToastContainer />
   </div>
