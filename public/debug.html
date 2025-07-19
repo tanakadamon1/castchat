@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>castChat Debug</title>
+    <style>
+        body { font-family: monospace; margin: 20px; background: #f5f5f5; }
+        .info { background: white; padding: 15px; margin: 10px 0; border-radius: 5px; }
+        .error { background: #fee; border: 1px solid #fcc; }
+        .success { background: #efe; border: 1px solid #cfc; }
+        pre { white-space: pre-wrap; }
+    </style>
+</head>
+<body>
+    <h1>castChat Debug Information</h1>
+    
+    <div class="info">
+        <h3>Environment Check</h3>
+        <p>User Agent: <span id="userAgent"></span></p>
+        <p>Current URL: <span id="currentUrl"></span></p>
+        <p>Timestamp: <span id="timestamp"></span></p>
+    </div>
+
+    <div class="info">
+        <h3>JavaScript Test</h3>
+        <p>Basic JS: <span id="jsTest">Testing...</span></p>
+        <p>ES6 Features: <span id="es6Test">Testing...</span></p>
+    </div>
+
+    <div class="info">
+        <h3>Network Test</h3>
+        <p>Supabase Connection: <span id="supabaseTest">Testing...</span></p>
+    </div>
+
+    <div class="info">
+        <h3>Error Log</h3>
+        <div id="errorLog">No errors captured yet...</div>
+    </div>
+
+    <script>
+        // Basic info
+        document.getElementById('userAgent').textContent = navigator.userAgent;
+        document.getElementById('currentUrl').textContent = window.location.href;
+        document.getElementById('timestamp').textContent = new Date().toISOString();
+
+        // JS Test
+        try {
+            document.getElementById('jsTest').textContent = '✅ Working';
+        } catch (e) {
+            document.getElementById('jsTest').textContent = '❌ Error: ' + e.message;
+        }
+
+        // ES6 Test
+        try {
+            const test = () => 'ES6 Arrow function works';
+            const result = test();
+            document.getElementById('es6Test').textContent = '✅ ' + result;
+        } catch (e) {
+            document.getElementById('es6Test').textContent = '❌ Error: ' + e.message;
+        }
+
+        // Supabase Test
+        fetch('https://ewjfnquypoeyoicmgbnp.supabase.co/rest/v1/', {
+            headers: {
+                'apikey': 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImV3amZucXV5cG9leW9pY21nYm5wIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTEzNDU1MjYsImV4cCI6MjA2NjkyMTUyNn0.546O8Q0S3kIGvLnZ_xK5MrrCFQBhcJ-jwPDaz4KK_Qo'
+            }
+        })
+        .then(response => {
+            if (response.ok) {
+                document.getElementById('supabaseTest').textContent = '✅ Connected (Status: ' + response.status + ')';
+            } else {
+                document.getElementById('supabaseTest').textContent = '⚠️ Response: ' + response.status;
+            }
+        })
+        .catch(error => {
+            document.getElementById('supabaseTest').textContent = '❌ Error: ' + error.message;
+        });
+
+        // Error capture
+        const errorLog = document.getElementById('errorLog');
+        let errorCount = 0;
+
+        function logError(type, error) {
+            errorCount++;
+            const errorDiv = document.createElement('div');
+            errorDiv.className = 'error';
+            errorDiv.innerHTML = `
+                <h4>Error #${errorCount} (${type})</h4>
+                <p><strong>Message:</strong> ${error.message || error}</p>
+                <p><strong>Stack:</strong></p>
+                <pre>${error.stack || 'No stack trace'}</pre>
+                <p><strong>Time:</strong> ${new Date().toISOString()}</p>
+            `;
+            
+            if (errorCount === 1) {
+                errorLog.innerHTML = '';
+            }
+            errorLog.appendChild(errorDiv);
+        }
+
+        window.addEventListener('error', function(event) {
+            logError('Global Error', {
+                message: event.message,
+                filename: event.filename,
+                lineno: event.lineno,
+                colno: event.colno,
+                stack: event.error ? event.error.stack : 'No stack'
+            });
+        });
+
+        window.addEventListener('unhandledrejection', function(event) {
+            logError('Promise Rejection', event.reason);
+        });
+
+        // Try to load Vue/main app components
+        setTimeout(() => {
+            try {
+                const script = document.createElement('script');
+                script.type = 'module';
+                script.src = '/src/main.ts';
+                script.onload = () => {
+                    document.getElementById('errorLog').innerHTML += '<div class="success">Main app script loaded successfully</div>';
+                };
+                script.onerror = (e) => {
+                    logError('Main Script Load', { message: 'Failed to load main.ts', stack: e.toString() });
+                };
+                document.head.appendChild(script);
+            } catch (e) {
+                logError('Script Injection', e);
+            }
+        }, 1000);
+    </script>
+</body>
+</html>
