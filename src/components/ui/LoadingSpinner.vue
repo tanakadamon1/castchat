@@ -153,10 +153,10 @@ const messageClasses = computed(() => {
   }
   
   const variantClasses = {
-    default: 'text-gray-700',
-    success: 'text-emerald-700',
-    warning: 'text-yellow-700',
-    error: 'text-red-700'
+    default: 'text-gray-700 dark:text-gray-300',
+    success: 'text-emerald-700 dark:text-emerald-400',
+    warning: 'text-yellow-700 dark:text-yellow-400',
+    error: 'text-red-700 dark:text-red-400'
   }
   
   return `${variantClasses[props.variant]} ${sizeClasses[props.size]} mt-2 font-medium`

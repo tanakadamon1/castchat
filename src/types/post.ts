@@ -16,7 +16,6 @@ export interface Post {
   applicationsCount: number
   tags: string[]
   images?: string[]
-  maxParticipants?: number
   eventFrequency?: EventFrequency
   eventWeekday?: number // 0=Sunday, 1=Monday, etc.
   eventTime?: string // HH:MM format

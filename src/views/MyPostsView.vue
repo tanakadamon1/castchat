@@ -166,6 +166,7 @@
             @edit-post="handleEditPost"
             @delete-post="handleDeletePost"
             @promote-post="handlePromotePost"
+            @toggle-status="handleToggleStatus"
           />
         </div>
         
@@ -423,6 +424,33 @@ const handlePrioritySuccess = () => {
 const handlePurchaseCoins = () => {
   showPriorityModal.value = false
   showCoinPurchaseModal.value = true
+}
+
+// ステータス変更処理
+const handleToggleStatus = async (postId: string, newStatus: 'active' | 'closed') => {
+  try {
+    const result = await postsApi.updatePostStatus(postId, newStatus)
+    
+    if (result.success) {
+      // ローカルの投稿データを更新
+      const postIndex = posts.value.findIndex(p => p.id === postId)
+      if (postIndex !== -1) {
+        posts.value[postIndex].status = newStatus
+      }
+      
+      toast.success(
+        newStatus === 'active' ? '募集を再開しました' : '募集を終了しました'
+      )
+      
+      // ステータス数の更新のためにloadPostsを呼び出し
+      loadPosts(false)
+    } else {
+      toast.error(result.error || 'ステータスの変更に失敗しました')
+    }
+  } catch (error) {
+    console.error('Status toggle error:', error)
+    toast.error('ステータスの変更に失敗しました')
+  }
 }
 
 const handleCoinPurchaseSuccess = () => {

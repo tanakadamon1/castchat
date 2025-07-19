@@ -149,10 +149,9 @@
     <div class="px-4 py-3 bg-gray-50 dark:bg-gray-700 border-t border-gray-100 dark:border-gray-600">
       <div class="flex items-center justify-between">
         <div class="flex items-center space-x-4 text-sm text-gray-600 dark:text-gray-400">
-          
           <span class="flex items-center">
             <svg class="w-4 h-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 515.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
             </svg>
             {{ post.applicationsCount }} 応募
           </span>
@@ -161,6 +160,32 @@
         <div class="flex items-center space-x-2">
           <!-- 編集・削除ボタン（投稿者のみ） -->
           <div v-if="isAuthor" class="flex items-center space-x-1">
+            <!-- ステータス変更ボタン -->
+            <BaseButton
+              v-if="post.status === 'closed' && post.status !== 'draft'"
+              size="sm"
+              variant="ghost"
+              @click.stop="$emit('toggle-status', post.id, 'active')"
+              :aria-label="`${post.title}の募集を再開する`"
+              class="text-green-600 hover:text-green-700"
+            >
+              <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+              </svg>
+            </BaseButton>
+            <BaseButton
+              v-if="post.status === 'active'"
+              size="sm"
+              variant="ghost"
+              @click.stop="$emit('toggle-status', post.id, 'closed')"
+              :aria-label="`${post.title}の募集を終了する`"
+              class="text-red-600 hover:text-red-700"
+            >
+              <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+              </svg>
+            </BaseButton>
+            
             <!-- Priority Button -->
             <BaseButton
               v-if="!post.isPriority"
@@ -230,6 +255,7 @@ interface Emits {
   (e: 'edit-post', postId: string): void
   (e: 'delete-post', postId: string): void
   (e: 'promote-post', postId: string): void
+  (e: 'toggle-status', postId: string, newStatus: 'active' | 'closed'): void
 }
 
 const props = defineProps<Props>()

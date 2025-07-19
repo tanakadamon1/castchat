@@ -4,7 +4,7 @@
       v-if="label"
       :for="textareaId"
       class="block text-sm font-medium text-gray-700 dark:text-gray-300"
-      :class="{ 'text-red-600': error }"
+      :class="{ 'text-red-600 dark:text-red-400': error }"
     >
       {{ label }}
       <span v-if="required" class="text-red-500">*</span>

@@ -22,8 +22,6 @@ export interface SearchQuery {
   deadline_to?: string
   is_featured?: boolean
   has_images?: boolean
-  recruitment_count_min?: number
-  recruitment_count_max?: number
   world_name?: string
   page?: number
   limit?: number
@@ -72,8 +70,6 @@ export class SearchService {
         deadline_to,
         is_featured,
         has_images,
-        recruitment_count_min,
-        recruitment_count_max,
         world_name,
         page = 1,
         limit = 20,
@@ -142,14 +138,6 @@ export class SearchService {
         supabaseQuery = supabaseQuery.eq('is_featured', is_featured)
       }
 
-      // 募集人数フィルター
-      if (recruitment_count_min !== undefined) {
-        supabaseQuery = supabaseQuery.gte('recruitment_count', recruitment_count_min)
-      }
-
-      if (recruitment_count_max !== undefined) {
-        supabaseQuery = supabaseQuery.lte('recruitment_count', recruitment_count_max)
-      }
 
       // ワールド名フィルター
       if (world_name) {

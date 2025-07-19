@@ -3,7 +3,7 @@
     <label
       v-if="label"
       :for="selectId"
-      class="block text-sm font-medium text-gray-700"
+      class="block text-sm font-medium text-gray-700 dark:text-gray-300"
       :class="{ 'text-red-600': error }"
     >
       {{ label }}
@@ -40,7 +40,7 @@
       
       <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-2">
         <svg
-          class="h-5 w-5 text-gray-400"
+          class="h-5 w-5 text-gray-400 dark:text-gray-500"
           viewBox="0 0 20 20"
           fill="currentColor"
         >
@@ -55,14 +55,14 @@
     
     <p
       v-if="error"
-      class="text-sm text-red-600"
+      class="text-sm text-red-600 dark:text-red-400"
     >
       {{ error }}
     </p>
     
     <p
       v-else-if="hint"
-      class="text-sm text-gray-500"
+      class="text-sm text-gray-500 dark:text-gray-400"
     >
       {{ hint }}
     </p>
@@ -104,15 +104,15 @@ const computedValue = computed({
 
 const selectClasses = computed(() => {
   const baseClasses = [
-    'block w-full rounded-md border-0 py-1.5 pl-3 pr-10 text-gray-900',
+    'block w-full rounded-md border-0 py-1.5 pl-3 pr-10 text-gray-900 dark:text-gray-100',
     'ring-1 ring-inset focus:ring-2 focus:ring-inset focus:ring-indigo-600',
-    'sm:text-sm sm:leading-6 transition-colors duration-200 appearance-none bg-white'
+    'sm:text-sm sm:leading-6 transition-colors duration-200 appearance-none bg-white dark:bg-gray-800'
   ]
   
   const stateClasses = {
-    default: 'ring-gray-300 hover:ring-gray-400',
-    error: 'ring-red-300 hover:ring-red-400 focus:ring-red-600',
-    disabled: 'bg-gray-50 text-gray-500 ring-gray-200 cursor-not-allowed'
+    default: 'ring-gray-300 dark:ring-gray-600 hover:ring-gray-400 dark:hover:ring-gray-500',
+    error: 'ring-red-300 dark:ring-red-600 hover:ring-red-400 dark:hover:ring-red-500 focus:ring-red-600 dark:focus:ring-red-500',
+    disabled: 'bg-gray-50 dark:bg-gray-700 text-gray-500 dark:text-gray-400 ring-gray-200 dark:ring-gray-600 cursor-not-allowed'
   }
   
   let state: keyof typeof stateClasses = 'default'

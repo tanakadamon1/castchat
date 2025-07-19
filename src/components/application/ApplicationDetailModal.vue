@@ -79,10 +79,10 @@
         </div>
 
         <!-- 承認済み/却下済みの場合のメッセージ -->
-        <div v-if="application.status !== 'pending'" class="p-3 bg-blue-50 rounded-lg">
+        <div v-if="application.status !== 'pending'" class="p-3 bg-blue-50 dark:bg-blue-900/20 rounded-lg">
           <div class="flex items-center gap-2">
-            <Info class="w-5 h-5 text-blue-600" />
-            <p class="text-sm text-blue-800">
+            <Info class="w-5 h-5 text-blue-600 dark:text-blue-400" />
+            <p class="text-sm text-blue-800 dark:text-blue-200">
               <span v-if="application.status === 'accepted'"> この応募は承認済みです。 </span>
               <span v-else> この応募は却下されました。 </span>
             </p>

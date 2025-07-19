@@ -236,8 +236,10 @@
         
         <!-- Action Footer -->
         <div class="p-6 bg-gray-50 dark:bg-gray-800 border-t border-gray-200 dark:border-gray-700">
+          <!-- 応募ボタンとシェアボタン -->
           <div class="flex flex-col sm:flex-row gap-4">
             <BaseButton
+              v-if="!isOwner"
               size="lg"
               class="flex-1"
               :disabled="!canApply"
@@ -347,6 +349,12 @@ const applyButtonText = computed(() => {
   if (post.value?.user_id === authStore.user?.id || post.value?.authorId === authStore.user?.id) return '自分の投稿です'
   if (post.value?.status !== 'published' && post.value?.status !== 'active') return '募集は終了しました'
   return 'この募集に応募する'
+})
+
+// 投稿の所有者かチェック
+const isOwner = computed(() => {
+  if (!post.value || !authStore.user) return false
+  return post.value.user_id === authStore.user.id || post.value.authorId === authStore.user.id
 })
 
 const getContactLink = (method: string, value: string) => {

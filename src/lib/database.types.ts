@@ -357,7 +357,6 @@ export type Database = {
           priority_expires_at: string | null
           priority_cost: number | null
           published_at: string | null
-          recruitment_count: number | null
           requirements: string | null
           status: Database["public"]["Enums"]["post_status"]
           title: string
@@ -385,7 +384,6 @@ export type Database = {
           priority_expires_at?: string | null
           priority_cost?: number | null
           published_at?: string | null
-          recruitment_count?: number | null
           requirements?: string | null
           status?: Database["public"]["Enums"]["post_status"]
           title: string
@@ -413,7 +411,6 @@ export type Database = {
           priority_expires_at?: string | null
           priority_cost?: number | null
           published_at?: string | null
-          recruitment_count?: number | null
           requirements?: string | null
           status?: Database["public"]["Enums"]["post_status"]
           title?: string

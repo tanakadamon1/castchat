@@ -90,7 +90,6 @@ export const postsApi = {
         category: (post.post_categories?.slug as any) || 'other',
         status: (post.status === 'published' ? 'active' : post.status === 'draft' ? 'draft' : 'closed') as any,
         deadline: post.deadline || undefined,
-        maxParticipants: post.recruitment_count || 1,
         contactMethod: (post.contact_method as any) || 'form',
         contactValue: post.contact_value || '',
         requirements: post.requirements ? post.requirements.split(',').map(r => r.trim()) : [],
@@ -145,7 +144,6 @@ export const postsApi = {
         category: (post.post_categories?.slug as any) || 'other',
         status: (post.status === 'published' ? 'active' : post.status === 'draft' ? 'draft' : 'closed') as any,
         deadline: post.deadline || undefined,
-        maxParticipants: post.recruitment_count || 1,
         contactMethod: (post.contact_method as any) || 'form',
         contactValue: post.contact_value || '',
         requirements: post.requirements ? post.requirements.split(',').map(r => r.trim()) : [],
@@ -205,7 +203,6 @@ export const postsApi = {
         title: postData.title,
         description: postData.description,
         requirements: postData.requirements?.join ? postData.requirements.join(', ') : (typeof postData.requirements === 'string' ? postData.requirements : ''),
-        recruitment_count: postData.maxParticipants || 1,
         deadline: postData.deadline ? new Date(postData.deadline).toISOString().split('T')[0] : null,
         contact_method: postData.contactMethod || null,
         contact_value: postData.contactValue || null,
@@ -287,7 +284,6 @@ export const postsApi = {
         category: postData.category, // 元のカテゴリ値を使用
         status: 'active' as any,
         deadline: finalPost.deadline || undefined,
-        maxParticipants: finalPost.recruitment_count || 1,
         contactMethod: postData.contactMethod,
         contactValue: postData.contactValue,
         requirements: postData.requirements || [],
@@ -345,7 +341,6 @@ export const postsApi = {
         title: postData.title,
         description: postData.description,
         requirements: postData.requirements?.join ? postData.requirements.join(', ') : (typeof postData.requirements === 'string' ? postData.requirements : ''),
-        recruitment_count: postData.maxParticipants || 1,
         deadline: postData.deadline ? new Date(postData.deadline).toISOString().split('T')[0] : null,
         contact_method: postData.contactMethod || null,
         contact_value: postData.contactValue || null,
@@ -426,7 +421,6 @@ export const postsApi = {
         category: postData.category,
         status: 'active' as any,
         deadline: updatedPost.deadline || undefined,
-        maxParticipants: updatedPost.recruitment_count || 1,
         contactMethod: postData.contactMethod,
         contactValue: postData.contactValue,
         requirements: postData.requirements || [],
@@ -483,7 +477,6 @@ export const postsApi = {
         title: postData.title || '無題の下書き',
         description: postData.description || '',
         requirements: postData.requirements?.join ? postData.requirements.join(', ') : (typeof postData.requirements === 'string' ? postData.requirements : ''),
-        recruitment_count: postData.maxParticipants || 1,
         deadline: postData.deadline ? new Date(postData.deadline).toISOString().split('T')[0] : null,
         contact_method: postData.contactMethod || null,
         contact_value: postData.contactValue || null,
@@ -565,7 +558,6 @@ export const postsApi = {
         category: postData.category,
         status: 'draft' as any,
         deadline: result.data.deadline || undefined,
-        maxParticipants: result.data.recruitment_count || 1,
         contactMethod: postData.contactMethod,
         contactValue: postData.contactValue,
         requirements: postData.requirements || [],
@@ -591,6 +583,64 @@ export const postsApi = {
     }
   },
 
+  // ステータス変更
+  async updatePostStatus(postId: string, status: 'active' | 'closed'): Promise<{ success: boolean; error?: string }> {
+    try {
+      const authStore = useAuthStore()
+      
+      if (!authStore.user?.id) {
+        return { success: false, error: 'ログインが必要です' }
+      }
+
+      // データベース用のステータスに変換
+      const dbStatus = status === 'active' ? 'published' : 'closed'
+      
+      // 投稿の所有者確認
+      const { data: post, error: fetchError } = await supabase
+        .from('posts')
+        .select('user_id')
+        .eq('id', postId)
+        .single()
+
+      if (fetchError) {
+        return { success: false, error: '投稿が見つかりません' }
+      }
+
+      if (post.user_id !== authStore.user.id) {
+        return { success: false, error: '投稿の編集権限がありません' }
+      }
+
+      // ステータス更新
+      const updateData: any = {
+        status: dbStatus,
+        updated_at: new Date().toISOString()
+      }
+
+      // 募集終了時はclosed_atを設定
+      if (status === 'closed') {
+        updateData.closed_at = new Date().toISOString()
+      } else {
+        // 募集再開時はclosed_atをクリア
+        updateData.closed_at = null
+      }
+
+      const { error: updateError } = await supabase
+        .from('posts')
+        .update(updateData)
+        .eq('id', postId)
+
+      if (updateError) {
+        console.error('Status update error:', updateError)
+        return { success: false, error: 'ステータスの更新に失敗しました' }
+      }
+
+      return { success: true }
+    } catch (error) {
+      console.error('Unexpected status update error:', error)
+      return { success: false, error: `予期しないエラー: ${error?.message || 'Unknown error'}` }
+    }
+  },
+
   // デバッグ用: 最小限のテスト投稿
   async testCreatePost(): Promise<PostResponse> {
     try {
@@ -606,7 +656,6 @@ export const postsApi = {
         title: 'テスト投稿フロントエンド',
         description: 'フロントエンドからのテスト投稿です。',
         requirements: null,
-        recruitment_count: 1,
         deadline: null
       }
 

@@ -1,8 +1,8 @@
 <template>
   <div :class="containerClasses">
     <div class="text-center">
-      <div class="mx-auto flex items-center justify-center w-12 h-12 rounded-full bg-gray-100">
-        <svg class="w-6 h-6 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+      <div class="mx-auto flex items-center justify-center w-12 h-12 rounded-full bg-gray-100 dark:bg-gray-800">
+        <svg class="w-6 h-6 text-gray-400 dark:text-gray-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
           <path
             v-if="type === 'search'"
             stroke-linecap="round"
@@ -27,11 +27,11 @@
         </svg>
       </div>
 
-      <h3 class="mt-4 text-lg font-medium text-gray-900">
+      <h3 class="mt-4 text-lg font-medium text-gray-900 dark:text-gray-100">
         {{ title }}
       </h3>
 
-      <p class="mt-2 text-sm text-gray-600 max-w-md mx-auto">
+      <p class="mt-2 text-sm text-gray-600 dark:text-gray-400 max-w-md mx-auto">
         {{ message }}
       </p>
 

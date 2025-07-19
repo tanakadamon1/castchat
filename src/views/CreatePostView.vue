@@ -202,21 +202,6 @@
               </div>
             </div>
 
-            <!-- 募集人数 -->
-            <div>
-              <BaseInput
-                v-model="formData.maxParticipants"
-                type="number"
-                label="最大募集人数"
-                placeholder="例：5"
-                min="1"
-                max="100"
-                :error="getFieldError('maxParticipants')"
-                @blur="
-                  validateField('maxParticipants', formData.maxParticipants, participantsRules)
-                "
-              />
-            </div>
           </div>
         </div>
 
@@ -317,12 +302,12 @@
         </div>
 
         <!-- プレビューセクション -->
-        <div class="bg-white rounded-lg shadow-sm border p-6 mb-8">
-          <h2 class="text-xl font-semibold text-gray-900 mb-4">プレビュー</h2>
+        <div class="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-6 mb-8">
+          <h2 class="text-xl font-semibold text-gray-900 dark:text-gray-100 mb-4">プレビュー</h2>
 
-          <div class="border rounded-lg p-4 bg-gray-50">
+          <div class="border border-gray-200 dark:border-gray-700 rounded-lg p-4 bg-gray-50 dark:bg-gray-900">
             <PostCard v-if="previewPost" :post="previewPost" :preview="true" />
-            <div v-else class="text-center text-gray-500 py-8">
+            <div v-else class="text-center text-gray-500 dark:text-gray-400 py-8">
               フォームに入力すると投稿のプレビューが表示されます
             </div>
           </div>
@@ -338,7 +323,7 @@
                 id="priority-display"
                 v-model="formData.enablePriority"
                 type="checkbox"
-                class="mt-1 h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300 dark:border-gray-600 rounded"
+                class="mt-1 h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 rounded"
               />
               <label for="priority-display" class="flex-1 cursor-pointer">
                 <div class="font-medium text-gray-900 dark:text-gray-100">優先表示を有効にする</div>
@@ -358,6 +343,37 @@
                   </button>
                 </div>
               </label>
+            </div>
+          </div>
+        </div>
+
+        <!-- 募集ステータス管理（編集時のみ） -->
+        <div v-if="isEditing && !isDraftMode" class="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-6 mb-8">
+          <h2 class="text-xl font-semibold text-gray-900 dark:text-gray-100 mb-4">募集ステータス</h2>
+          
+          <div class="space-y-4">
+            <div>
+              <BaseSelect
+                v-model="formData.status"
+                label="募集ステータス"
+                :options="statusOptions"
+                @change="handleStatusChange"
+              />
+            </div>
+            
+            <div class="text-sm text-gray-600 dark:text-gray-400">
+              <div v-if="formData.status === 'active'" class="flex items-center text-green-600 dark:text-green-400">
+                <svg class="w-4 h-4 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+                募集中 - 応募を受け付けています
+              </div>
+              <div v-else-if="formData.status === 'closed'" class="flex items-center text-red-600 dark:text-red-400">
+                <svg class="w-4 h-4 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                </svg>
+                募集終了 - 新しい応募は受け付けていません
+              </div>
             </div>
           </div>
         </div>
@@ -577,11 +593,11 @@ const formData = ref({
   eventWeekday: undefined as number | undefined, // 曜日
   eventTime: '', // 時間
   eventWeekOfMonth: undefined as number | undefined, // 第何週
-  maxParticipants: undefined as number | undefined,
   contactMethod: 'twitter' as ContactMethod,
   contactInfo: '',
   deadline: '',
   enablePriority: false, // 優先表示フラグ
+  status: 'active' as 'active' | 'closed', // 募集ステータス
 })
 
 // 画像アップロード関連
@@ -621,7 +637,6 @@ const previewPost = computed(() => {
     applicationsCount: 0,
     createdAt: new Date().toISOString(),
     updatedAt: new Date().toISOString(),
-    maxParticipants: formData.value.maxParticipants || 1,
     eventFrequency: formData.value.eventFrequency as EventFrequency,
     eventSpecificDate: formData.value.eventSpecificDate,
     eventWeekday: formData.value.eventWeekday,
@@ -672,6 +687,11 @@ const biweeklyOptions = [
   { value: 2, label: '第2・第4週' },
 ]
 
+const statusOptions = [
+  { value: 'active', label: '募集中' },
+  { value: 'closed', label: '募集終了' },
+]
+
 // 連絡方法は Twitter ID 固定
 
 // バリデーションルール
@@ -694,11 +714,6 @@ const requiredRules = {
   message: 'この項目は必須です',
 }
 
-const participantsRules = {
-  required: true,
-  custom: (value: any) => value >= 1 && value <= 100,
-  message: '募集人数は1人以上100人以下で入力してください',
-}
 
 // フォームバリデーション
 const isFormValid = computed(() => {
@@ -732,6 +747,11 @@ const validateContactInfo = () => {
   const info = formData.value.contactInfo
   const rules: Record<string, unknown> = { required: true, ...commonRules.twitter }
   validateField('contactInfo', info, rules)
+}
+
+// ステータス変更処理
+const handleStatusChange = (newStatus: string) => {
+  formData.value.status = newStatus as 'active' | 'closed'
 }
 
 // 画像アップロード関連のメソッド
@@ -918,8 +938,7 @@ const handleSaveDraft = async () => {
       description: formData.value.description,
       requirements: formData.value.requirements ? [formData.value.requirements] : [],
       deadline: formData.value.deadline || undefined,
-      maxParticipants: formData.value.maxParticipants || 1,
-      contactMethod: 'twitter' as ContactMethod,
+        contactMethod: 'twitter' as ContactMethod,
       contactValue: formData.value.contactInfo,
       eventFrequency: formData.value.eventFrequency,
       eventSpecificDate: formData.value.eventSpecificDate || undefined,
@@ -975,11 +994,11 @@ const handleClearDraft = async () => {
       eventWeekday: undefined,
       eventTime: '',
       eventWeekOfMonth: undefined,
-      maxParticipants: undefined,
       contactMethod: 'twitter' as ContactMethod,
       contactInfo: '',
       deadline: '',
       enablePriority: false,
+      status: 'active' as 'active' | 'closed',
     }
     
     // プロフィールからTwitterIDを再設定
@@ -1045,7 +1064,6 @@ const submitPost = async () => {
     description: formData.value.description,
     requirements: formData.value.requirements ? [formData.value.requirements] : [],
     deadline: formData.value.deadline || undefined,
-    maxParticipants: formData.value.maxParticipants || 1,
     contactMethod: 'twitter' as ContactMethod,
     contactValue: formData.value.contactInfo,
     eventFrequency: formData.value.eventFrequency as EventFrequency,
@@ -1056,6 +1074,7 @@ const submitPost = async () => {
     tags: [],
     images: imageUrls,
     enablePriority: formData.value.enablePriority, // 優先表示フラグを追加
+    status: formData.value.status, // 募集ステータスを追加
   }
   
   // 送信前の最終チェック
@@ -1161,11 +1180,11 @@ onMounted(async () => {
           eventWeekday: postData.eventWeekday,
           eventTime: postData.eventTime || '',
           eventWeekOfMonth: postData.eventWeekOfMonth,
-          maxParticipants: postData.maxParticipants || undefined,
           contactMethod: postData.contactMethod,
           contactInfo: postData.contactValue || '',
           deadline: postData.deadline || '',
           enablePriority: postData.enablePriority || false,
+          status: (postData.status === 'active' || postData.status === 'closed') ? postData.status : 'active',
         }
         
         // 画像データの読み込み

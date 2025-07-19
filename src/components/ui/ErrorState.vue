@@ -213,10 +213,10 @@ const containerClasses = computed(() => {
 
 const iconContainerClasses = computed(() => {
   const severityClasses = {
-    low: 'bg-indigo-100',
-    medium: 'bg-yellow-100',
-    high: 'bg-orange-100',
-    critical: 'bg-red-100',
+    low: 'bg-indigo-100 dark:bg-indigo-900',
+    medium: 'bg-yellow-100 dark:bg-yellow-900',
+    high: 'bg-orange-100 dark:bg-orange-900',
+    critical: 'bg-red-100 dark:bg-red-900',
   }
 
   return `mx-auto flex items-center justify-center w-16 h-16 rounded-full ${severityClasses[props.severity]}`
@@ -224,10 +224,10 @@ const iconContainerClasses = computed(() => {
 
 const iconClasses = computed(() => {
   const severityClasses = {
-    low: 'text-indigo-500',
-    medium: 'text-yellow-600',
-    high: 'text-orange-600',
-    critical: 'text-red-600',
+    low: 'text-indigo-500 dark:text-indigo-400',
+    medium: 'text-yellow-600 dark:text-yellow-400',
+    high: 'text-orange-600 dark:text-orange-400',
+    critical: 'text-red-600 dark:text-red-400',
   }
 
   return `w-8 h-8 ${severityClasses[props.severity]}`
@@ -235,17 +235,17 @@ const iconClasses = computed(() => {
 
 const titleClasses = computed(() => {
   const severityClasses = {
-    low: 'text-gray-900',
-    medium: 'text-gray-900',
-    high: 'text-orange-900',
-    critical: 'text-red-900',
+    low: 'text-gray-900 dark:text-gray-100',
+    medium: 'text-gray-900 dark:text-gray-100',
+    high: 'text-orange-900 dark:text-orange-200',
+    critical: 'text-red-900 dark:text-red-200',
   }
 
   return `mt-6 text-xl font-semibold ${severityClasses[props.severity]}`
 })
 
 const messageClasses = computed(() => {
-  return 'mt-3 text-gray-600 leading-relaxed'
+  return 'mt-3 text-gray-600 dark:text-gray-400 leading-relaxed'
 })
 
 const title = computed(() => {

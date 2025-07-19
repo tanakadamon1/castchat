@@ -28,7 +28,6 @@ export interface PostCreateData {
   category_id: string
   requirements?: string
   world_name?: string
-  recruitment_count?: number
   deadline?: string
   post_type?: string
   contact_method?: string
@@ -47,7 +46,6 @@ export interface PostUpdateData {
   category_id?: string
   requirements?: string
   world_name?: string
-  recruitment_count?: number
   deadline?: string
   post_type?: string
   contact_method?: string
@@ -125,19 +123,6 @@ export class PostsService {
         }
       }
 
-      if (postData.recruitment_count) {
-        const countValidation = validator.recruitmentCount(postData.recruitment_count)
-        if (!countValidation.isValid) {
-          return {
-            data: null,
-            error: errorHandler.createError(
-              ErrorCode.VALIDATION_INVALID_FORMAT,
-              'Invalid recruitment count',
-              countValidation.errors.join(', ')
-            )
-          }
-        }
-      }
 
       if (postData.deadline) {
         const deadlineValidation = validator.deadline(postData.deadline)
@@ -161,7 +146,6 @@ export class PostsService {
         category_id: postData.category_id,
         requirements: postData.requirements || null,
         world_name: postData.world_name || null,
-        recruitment_count: postData.recruitment_count || 1,
         deadline: postData.deadline || null,
         post_type: postData.post_type || 'volunteer',
         contact_method: postData.contact_method || null,
@@ -292,7 +276,6 @@ export class PostsService {
       if (updateData.category_id !== undefined) updatePayload.category_id = updateData.category_id
       if (updateData.requirements !== undefined) updatePayload.requirements = updateData.requirements
       if (updateData.world_name !== undefined) updatePayload.world_name = updateData.world_name
-      if (updateData.recruitment_count !== undefined) updatePayload.recruitment_count = updateData.recruitment_count
       if (updateData.deadline !== undefined) updatePayload.deadline = updateData.deadline
       if (updateData.post_type !== undefined) updatePayload.post_type = updateData.post_type
       if (updateData.contact_method !== undefined) updatePayload.contact_method = updateData.contact_method

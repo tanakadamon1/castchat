@@ -104,6 +104,7 @@
               @edit-post="handleEditPost"
               @delete-post="handleDeletePost"
               @promote-post="handlePromotePost"
+              @toggle-status="handleToggleStatus"
             />
           </TransitionGroup>
         </div>
@@ -157,6 +158,7 @@ import type { Post, PostFilter } from '@/types/post'
 import PostCard from '@/components/post/PostCard.vue'
 import PostSearch from '@/components/post/PostSearch.vue'
 import BaseButton from '@/components/ui/BaseButton.vue'
+import { useSEO } from '@/composables/useSEO'
 import BasePagination from '@/components/ui/BasePagination.vue'
 import LoadingSpinner from '@/components/ui/LoadingSpinner.vue'
 import ErrorState from '@/components/ui/ErrorState.vue'
@@ -171,6 +173,16 @@ import { useScreenReader } from '@/composables/useScreenReader'
 
 const router = useRouter()
 const toast = useToast()
+
+// SEO設定
+useSEO({
+  title: '募集一覧 - castChat',
+  description: 'VRChatでのキャスト募集・参加者募集の一覧。写真撮影、動画制作、イベント開催などの企画に最適なキャストを見つけよう。',
+  keywords: ['VRChat', 'キャスト募集', '募集一覧', '写真撮影', '動画制作', 'イベント'],
+  ogTitle: '募集一覧 - castChat',
+  ogDescription: 'VRChatでのキャスト募集・参加者募集の一覧',
+  canonicalUrl: 'https://castchat.jp/posts'
+})
 
 // アクセシビリティ
 const postsContainerRef = ref<HTMLElement | null>(null)
@@ -337,6 +349,30 @@ const handleCoinPurchaseSuccess = () => {
   // 優先表示モーダルを再度表示
   showCoinPurchaseModal.value = false
   showPriorityModal.value = true
+}
+
+// ステータス変更処理
+const handleToggleStatus = async (postId: string, newStatus: 'active' | 'closed') => {
+  try {
+    const result = await postsApi.updatePostStatus(postId, newStatus)
+    
+    if (result.success) {
+      // ローカルの投稿データを更新
+      const postIndex = posts.value.findIndex(p => p.id === postId)
+      if (postIndex !== -1) {
+        posts.value[postIndex].status = newStatus
+      }
+      
+      toast.success(
+        newStatus === 'active' ? '募集を再開しました' : '募集を終了しました'
+      )
+    } else {
+      toast.error(result.error || 'ステータスの変更に失敗しました')
+    }
+  } catch (error) {
+    console.error('Status toggle error:', error)
+    toast.error('ステータスの変更に失敗しました')
+  }
 }
 
 // Watch for filter changes - immediate: false を追加してマウント時の実行を防ぐ

@@ -263,25 +263,6 @@ export class Validator {
     }
   }
 
-  recruitmentCount(count: number): ValidationResult {
-    const errors: string[] = []
-    
-    if (count === undefined || count === null) {
-      errors.push('募集人数は必須です')
-    } else {
-      if (!Number.isInteger(count) || count < 1) {
-        errors.push('募集人数は1以上の整数で入力してください')
-      }
-      if (count > 100) {
-        errors.push('募集人数は100人以下で入力してください')
-      }
-    }
-
-    return {
-      isValid: errors.length === 0,
-      errors
-    }
-  }
 
   deadline(deadline: string): ValidationResult {
     const errors: string[] = []

@@ -1,23 +1,23 @@
 <template>
-  <div class="min-h-screen bg-gray-50">
+  <div class="min-h-screen bg-gray-50 dark:bg-gray-900">
     <!-- ヘッダー -->
-    <div class="bg-white border-b">
+    <div class="bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700">
       <div class="container mx-auto px-4 py-6">
         <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
           <div>
-            <h1 class="text-2xl font-bold text-gray-900">応募管理</h1>
-            <p class="text-gray-600 mt-1">あなたの投稿への応募と、応募した募集を管理できます</p>
+            <h1 class="text-2xl font-bold text-gray-900 dark:text-gray-100">応募管理</h1>
+            <p class="text-gray-600 dark:text-gray-400 mt-1">あなたの投稿への応募と、応募した募集を管理できます</p>
           </div>
 
           <!-- タブ切り替え -->
-          <div class="flex bg-gray-100 rounded-lg p-1">
+          <div class="flex bg-gray-100 dark:bg-gray-700 rounded-lg p-1">
             <button
               @click="activeTab = 'received'"
               :class="[
                 'px-4 py-2 rounded-md text-sm font-medium transition-colors',
                 activeTab === 'received'
-                  ? 'bg-white text-indigo-600 shadow-sm'
-                  : 'text-gray-600 hover:text-gray-900',
+                  ? 'bg-white dark:bg-gray-600 text-indigo-600 dark:text-indigo-400 shadow-sm'
+                  : 'text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-gray-100',
               ]"
             >
               受信した応募 ({{ receivedApplications.length }})
@@ -27,8 +27,8 @@
               :class="[
                 'px-4 py-2 rounded-md text-sm font-medium transition-colors',
                 activeTab === 'sent'
-                  ? 'bg-white text-indigo-600 shadow-sm'
-                  : 'text-gray-600 hover:text-gray-900',
+                  ? 'bg-white dark:bg-gray-600 text-indigo-600 dark:text-indigo-400 shadow-sm'
+                  : 'text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-gray-100',
               ]"
             >
               送信した応募 ({{ sentApplications.length }})
@@ -66,7 +66,7 @@
       <!-- 受信した応募 -->
       <div v-if="activeTab === 'received'">
         <!-- フィルター -->
-        <div class="mb-6 bg-white rounded-lg border p-4">
+        <div class="mb-6 bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 p-4">
           <div class="flex flex-col sm:flex-row gap-4">
             <div class="flex-1">
               <BaseSelect
@@ -123,7 +123,7 @@
       <!-- 送信した応募 -->
       <div v-if="activeTab === 'sent'">
         <!-- フィルター -->
-        <div class="mb-6 bg-white rounded-lg border p-4">
+        <div class="mb-6 bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 p-4">
           <div class="flex flex-col sm:flex-row gap-4">
             <div class="flex-1">
               <BaseSelect

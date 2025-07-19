@@ -115,6 +115,10 @@ export default defineConfig(({ mode }) => {
       outDir: 'dist',
       assetsDir: 'assets',
       sourcemap: mode === 'development',
+      // パフォーマンス最適化
+      cssCodeSplit: true,
+      reportCompressedSize: false,
+      chunkSizeWarningLimit: 1000,
       rollupOptions: {
         output: {
           manualChunks: (id) => {
@@ -227,6 +231,15 @@ export default defineConfig(({ mode }) => {
           drop_console: mode === 'production',
           drop_debugger: mode === 'production',
           pure_funcs: mode === 'production' ? ['console.log', 'console.info'] : [],
+          passes: 2, // 圧縮パスを增やしてサイズをさらに削減
+        },
+        mangle: {
+          properties: {
+            regex: /^_/,
+          },
+        },
+        format: {
+          comments: false,
         },
       },
     },

@@ -1,2 +1,10 @@
 User-agent: *
-Disallow: /
+Allow: /
+
+# 管理者専用ページは除外
+Disallow: /admin/
+Disallow: /dashboard/
+Disallow: /api/
+
+# サイトマップの場所
+Sitemap: https://castchat.jp/sitemap.xml
