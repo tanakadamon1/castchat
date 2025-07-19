@@ -8,6 +8,8 @@ export interface ScreenReaderOptions {
 
 export function useScreenReader() {
   const announcements = ref<string[]>([])
+  const recentMessages = new Set<string>()
+  let messageCleanupTimeout: number | null = null
 
   // ライブリージョンを作成または取得
   const createLiveRegion = (
@@ -53,6 +55,21 @@ export function useScreenReader() {
   ) => {
     if (!message.trim()) return
 
+    // 同じメッセージが最近送信された場合は無視（無限ループ防止）
+    if (recentMessages.has(message)) {
+      return
+    }
+
+    recentMessages.add(message)
+    
+    // 3秒後にメッセージを重複チェックリストから削除
+    if (messageCleanupTimeout) {
+      clearTimeout(messageCleanupTimeout)
+    }
+    messageCleanupTimeout = window.setTimeout(() => {
+      recentMessages.clear()
+    }, 3000)
+
     const liveRegion = createLiveRegion('global-announcer', options)
     
     // 前回のメッセージをクリア
@@ -61,11 +78,14 @@ export function useScreenReader() {
     // 少し遅延させてからメッセージを設定（スクリーンリーダーの確実な読み上げのため）
     setTimeout(() => {
       liveRegion.textContent = message
-      announcements.value.push(message)
+      
+      // Vue reactivity を避けるため、直接配列を操作する
+      const currentAnnouncements = announcements.value
+      currentAnnouncements.push(message)
       
       // 古いアナウンスを削除（最新50件のみ保持）
-      if (announcements.value.length > 50) {
-        announcements.value = announcements.value.slice(-50)
+      if (currentAnnouncements.length > 50) {
+        announcements.value = currentAnnouncements.slice(-50)
       }
     }, 100)
   }
