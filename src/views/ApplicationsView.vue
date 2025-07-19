@@ -198,6 +198,12 @@
   </div>
 </template>
 
+<script lang="ts">
+export default {
+  name: 'ApplicationsView'
+}
+</script>
+
 <script setup lang="ts">
 import { ref, computed, onMounted } from 'vue'
 import { useRouter } from 'vue-router'

@@ -151,6 +151,12 @@
   </div>
 </template>
 
+<script lang="ts">
+export default {
+  name: 'PostsView'
+}
+</script>
+
 <script setup lang="ts">
 import { ref, reactive, onMounted, computed, shallowRef, watch } from 'vue'
 import { useRouter } from 'vue-router'
