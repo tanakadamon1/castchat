@@ -4,7 +4,7 @@ import { RouterView } from 'vue-router'
 import AppHeader from './components/layout/AppHeader.vue'
 import AppFooter from './components/layout/AppFooter.vue'
 import ToastContainer from './components/ui/ToastContainer.vue'
-import AnimatedBackground from './components/ui/AnimatedBackground.vue'
+// import AnimatedBackground from './components/ui/AnimatedBackground.vue'
 import { useAuthStore } from './stores/auth'
 import { useThemeStore } from './stores/theme'
 import { config } from './config/env'
@@ -60,8 +60,8 @@ onMounted(async () => {
 
 <template>
   <div class="min-h-screen flex flex-col transition-colors duration-200 relative bg-gray-50 dark:bg-gray-900">
-    <!-- アニメーション背景 -->
-    <AnimatedBackground />
+    <!-- アニメーション背景 - 無限ループ問題により一時的に無効化 -->
+    <!-- <AnimatedBackground /> -->
     
     <AppHeader class="relative z-20" />
     
