@@ -240,12 +240,14 @@ const loadPosts = async (showLoading = true) => {
     })
     
     if (result.error) {
+      console.error('Posts API Error:', result.error)
       error.value = result.error
       posts.value = []
       total.value = 0
       return
     }
     
+    console.log('Posts loaded:', result.data?.length, 'total:', result.total)
     posts.value = result.data || []
     total.value = result.total
     
