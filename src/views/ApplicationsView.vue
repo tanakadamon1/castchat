@@ -332,7 +332,13 @@ const postFilterOptions = computed(() => {
   
   for (let i = 0; i < uniquePostIds.length; i++) {
     const postId = uniquePostIds[i]
-    const app = applications.find((a) => a.postId === postId)
+    let app = null
+    for (let j = 0; j < applications.length; j++) {
+      if (applications[j].postId === postId) {
+        app = applications[j]
+        break
+      }
+    }
     options.push({
       value: postId,
       label: app?.postTitle || `投稿 ${postId}`,
