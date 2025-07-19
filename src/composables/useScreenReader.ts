@@ -1,4 +1,4 @@
-import { ref, nextTick } from 'vue'
+import { ref } from 'vue'
 
 export interface ScreenReaderOptions {
   politeness?: 'polite' | 'assertive' | 'off'
@@ -6,10 +6,16 @@ export interface ScreenReaderOptions {
   relevant?: 'additions' | 'removals' | 'text' | 'all'
 }
 
+// グローバルな状態管理（Vue reactivity の外側）
+const globalState = {
+  recentMessages: new Set<string>(),
+  messageCleanupTimeout: null as number | null,
+  announcements: [] as string[]
+}
+
 export function useScreenReader() {
-  const announcements = ref<string[]>([])
-  const recentMessages = new Set<string>()
-  let messageCleanupTimeout: number | null = null
+  // Vue reactivity を使わない、プレーンな配列で状態管理
+  const announcements = ref<string[]>([...globalState.announcements])
 
   // ライブリージョンを作成または取得
   const createLiveRegion = (
@@ -56,38 +62,43 @@ export function useScreenReader() {
     if (!message.trim()) return
 
     // 同じメッセージが最近送信された場合は無視（無限ループ防止）
-    if (recentMessages.has(message)) {
+    if (globalState.recentMessages.has(message)) {
       return
     }
 
-    recentMessages.add(message)
+    globalState.recentMessages.add(message)
     
     // 3秒後にメッセージを重複チェックリストから削除
-    if (messageCleanupTimeout) {
-      clearTimeout(messageCleanupTimeout)
+    if (globalState.messageCleanupTimeout) {
+      clearTimeout(globalState.messageCleanupTimeout)
     }
-    messageCleanupTimeout = window.setTimeout(() => {
-      recentMessages.clear()
+    globalState.messageCleanupTimeout = window.setTimeout(() => {
+      globalState.recentMessages.clear()
     }, 3000)
 
-    const liveRegion = createLiveRegion('global-announcer', options)
-    
-    // 前回のメッセージをクリア
-    liveRegion.textContent = ''
-    
-    // 少し遅延させてからメッセージを設定（スクリーンリーダーの確実な読み上げのため）
-    setTimeout(() => {
-      liveRegion.textContent = message
+    try {
+      const liveRegion = createLiveRegion('global-announcer', options)
       
-      // Vue reactivity を避けるため、直接配列を操作する
-      const currentAnnouncements = announcements.value
-      currentAnnouncements.push(message)
+      // 前回のメッセージをクリア
+      liveRegion.textContent = ''
       
-      // 古いアナウンスを削除（最新50件のみ保持）
-      if (currentAnnouncements.length > 50) {
-        announcements.value = currentAnnouncements.slice(-50)
-      }
-    }, 100)
+      // 少し遅延させてからメッセージを設定（スクリーンリーダーの確実な読み上げのため）
+      setTimeout(() => {
+        liveRegion.textContent = message
+        
+        // グローバル状態に直接追加（Vue reactivity の外側）
+        globalState.announcements.push(message)
+        
+        // 古いアナウンスを削除（最新50件のみ保持）
+        if (globalState.announcements.length > 50) {
+          globalState.announcements = globalState.announcements.slice(-50)
+        }
+        
+        // Vue の state は更新しない（無限ループを防ぐため）
+      }, 100)
+    } catch (error) {
+      console.warn('Screen reader announce error:', error)
+    }
   }
 
   // 緊急メッセージのアナウンス
