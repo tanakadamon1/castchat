@@ -239,16 +239,32 @@ const injectStyles = () => {
 // 初期化
 const initShapes = () => {
   // 三角形を6個生成
-  triangles.value = Array.from({ length: 6 }, (_, i) => createShape(i))
+  const newTriangles = []
+  for (let i = 0; i < 6; i++) {
+    newTriangles.push(createShape(i))
+  }
+  triangles.value = newTriangles
   
   // 四角形を8個生成
-  squares.value = Array.from({ length: 8 }, (_, i) => createShape(i + 10))
+  const newSquares = []
+  for (let i = 0; i < 8; i++) {
+    newSquares.push(createShape(i + 10))
+  }
+  squares.value = newSquares
   
   // 円形を5個生成
-  circles.value = Array.from({ length: 5 }, (_, i) => createShape(i + 20))
+  const newCircles = []
+  for (let i = 0; i < 5; i++) {
+    newCircles.push(createShape(i + 20))
+  }
+  circles.value = newCircles
   
   // ダイヤモンドを4個生成
-  diamonds.value = Array.from({ length: 4 }, (_, i) => createShape(i + 30))
+  const newDiamonds = []
+  for (let i = 0; i < 4; i++) {
+    newDiamonds.push(createShape(i + 30))
+  }
+  diamonds.value = newDiamonds
 
   // アニメーションスタイルを挿入
   injectStyles()
@@ -257,21 +273,24 @@ const initShapes = () => {
 // 図形を再配置する関数
 const repositionShapes = () => {
   try {
-    // 各配列を個別に処理して無限ループを防ぐ
-    const allShapes = [
-      ...triangles.value.slice(),
-      ...squares.value.slice(),
-      ...circles.value.slice(),
-      ...diamonds.value.slice()
-    ]
+    // 各配列を個別に処理
+    const processShapes = (shapes: Shape[]) => {
+      for (let i = 0; i < shapes.length; i++) {
+        const shape = shapes[i]
+        if (shape) {
+          // 画面外の図形を反対側に移動
+          if (shape.x > 110) shape.x = -10
+          if (shape.x < -10) shape.x = 110
+          if (shape.y > 110) shape.y = -10
+          if (shape.y < -10) shape.y = 110
+        }
+      }
+    }
     
-    allShapes.forEach(shape => {
-      // 画面外の図形を反対側に移動
-      if (shape.x > 110) shape.x = -10
-      if (shape.x < -10) shape.x = 110
-      if (shape.y > 110) shape.y = -10
-      if (shape.y < -10) shape.y = 110
-    })
+    processShapes(triangles.value)
+    processShapes(squares.value)
+    processShapes(circles.value)
+    processShapes(diamonds.value)
   } catch (error) {
     console.warn('AnimatedBackground: repositioning error:', error)
   }

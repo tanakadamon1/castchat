@@ -311,19 +311,32 @@ const statusFilterOptions = [
 ]
 
 const postFilterOptions = computed(() => {
-  const applications = [...receivedApplications.value]
-  const uniquePostIds = Array.from(new Set(applications.map((app) => app.postId)))
+  const applications = receivedApplications.value
+  const postIdSet = new Set<string>()
   
-  return [
-    { value: '', label: 'すべての投稿' },
-    ...uniquePostIds.map((postId) => {
-      const app = applications.find((a) => a.postId === postId)
-      return {
-        value: postId,
-        label: app?.postTitle || `投稿 ${postId}`,
-      }
-    }),
-  ]
+  // Setに追加
+  for (let i = 0; i < applications.length; i++) {
+    if (applications[i].postId) {
+      postIdSet.add(applications[i].postId)
+    }
+  }
+  
+  // 配列に変換
+  const uniquePostIds: string[] = []
+  postIdSet.forEach(id => uniquePostIds.push(id))
+  
+  const options = [{ value: '', label: 'すべての投稿' }]
+  
+  for (let i = 0; i < uniquePostIds.length; i++) {
+    const postId = uniquePostIds[i]
+    const app = applications.find((a) => a.postId === postId)
+    options.push({
+      value: postId,
+      label: app?.postTitle || `投稿 ${postId}`,
+    })
+  }
+  
+  return options
 })
 
 // フィルター適用
