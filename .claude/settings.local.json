@@ -88,7 +88,8 @@
       "Bash(npm run lint:*)",
       "Bash(psql:*)",
       "Bash(mv:*)",
-      "Bash(convert:*)"
+      "Bash(convert:*)",
+      "Bash(git fetch:*)"
     ],
     "deny": []
   }

@@ -1,0 +1,426 @@
+diff --git a/index.html b/index.html
+index d55cfee..c5068bc 100644
+--- a/index.html
++++ b/index.html
+@@ -45,13 +45,43 @@
+     <script>
+       // グローバルエラーハンドリング
+       window.addEventListener('error', function (event) {
+-        console.error('Global error:', event.error)
+-        document.getElementById('fallback').style.display = 'block'
++        console.error('Global error:', {
++          message: event.message,
++          filename: event.filename,
++          lineno: event.lineno,
++          colno: event.colno,
++          error: event.error,
++          stack: event.error?.stack
++        })
++        
++        // エラー詳細を表示
++        const fallback = document.getElementById('fallback')
++        const errorInfo = document.createElement('div')
++        errorInfo.style.cssText = 'margin-top: 1rem; padding: 1rem; background: #fee2e2; border-radius: 0.375rem; text-align: left; font-size: 0.875rem; color: #dc2626;'
++        errorInfo.innerHTML = `
++          <strong>エラー詳細:</strong><br>
++          ファイル: ${event.filename}<br>
++          行: ${event.lineno}:${event.colno}<br>
++          メッセージ: ${event.message}<br>
++          ${event.error?.stack ? `<br><strong>スタック:</strong><br><pre style="white-space: pre-wrap; font-size: 0.75rem;">${event.error.stack}</pre>` : ''}
++        `
++        fallback.appendChild(errorInfo)
++        fallback.style.display = 'block'
+       })
+ 
+       window.addEventListener('unhandledrejection', function (event) {
+         console.error('Unhandled promise rejection:', event.reason)
+-        document.getElementById('fallback').style.display = 'block'
++        
++        const fallback = document.getElementById('fallback')
++        const errorInfo = document.createElement('div')
++        errorInfo.style.cssText = 'margin-top: 1rem; padding: 1rem; background: #fef3c7; border-radius: 0.375rem; text-align: left; font-size: 0.875rem; color: #d97706;'
++        errorInfo.innerHTML = `
++          <strong>Promise エラー:</strong><br>
++          ${event.reason?.message || event.reason || 'Unknown promise rejection'}<br>
++          ${event.reason?.stack ? `<br><strong>スタック:</strong><br><pre style="white-space: pre-wrap; font-size: 0.75rem;">${event.reason.stack}</pre>` : ''}
++        `
++        fallback.appendChild(errorInfo)
++        fallback.style.display = 'block'
+       })
+     </script>
+   </body>
+diff --git a/src/components/FallbackApp.vue b/src/components/FallbackApp.vue
+new file mode 100644
+index 0000000..6dd8f07
+--- /dev/null
++++ b/src/components/FallbackApp.vue
+@@ -0,0 +1,46 @@
++<template>
++  <div class="min-h-screen bg-gray-50 dark:bg-gray-900 flex items-center justify-center">
++    <div class="max-w-md w-full space-y-8 p-8">
++      <div class="text-center">
++        <h1 class="text-3xl font-bold text-gray-900 dark:text-gray-100 mb-4">
++          castChat
++        </h1>
++        <p class="text-gray-600 dark:text-gray-400 mb-6">
++          VRChatキャスト募集プラットフォーム
++        </p>
++        
++        <div class="bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-800 rounded-lg p-4 mb-6">
++          <div class="flex">
++            <div class="ml-3">
++              <h3 class="text-sm font-medium text-yellow-800 dark:text-yellow-200">
++                メンテナンス中
++              </h3>
++              <div class="mt-2 text-sm text-yellow-700 dark:text-yellow-300">
++                <p>現在システムのアップデート中です。しばらくお待ちください。</p>
++              </div>
++            </div>
++          </div>
++        </div>
++
++        <div class="space-y-4">
++          <button
++            @click="reload"
++            class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-medium py-2 px-4 rounded-lg transition-colors duration-200"
++          >
++            ページを再読み込み
++          </button>
++          
++          <div class="text-xs text-gray-500 dark:text-gray-400">
++            問題が続く場合は、ブラウザのキャッシュをクリアしてください
++          </div>
++        </div>
++      </div>
++    </div>
++  </div>
++</template>
++
++<script setup lang="ts">
++const reload = () => {
++  window.location.reload()
++}
++</script>
+\ No newline at end of file
+diff --git a/src/config/env.ts b/src/config/env.ts
+index 942719d..e5c1e75 100644
+--- a/src/config/env.ts
++++ b/src/config/env.ts
+@@ -21,11 +21,17 @@ interface Config {
+ }
+ 
+ function getEnvVar(key: string, defaultValue?: string): string {
+-  const value = import.meta.env[key] || defaultValue
+-  if (!value) {
+-    throw new Error(`Environment variable ${key} is required but not set`)
++  try {
++    const value = import.meta.env[key] || defaultValue
++    if (!value) {
++      console.warn(`Environment variable ${key} is not set, using default: ${defaultValue}`)
++      return defaultValue || ''
++    }
++    return value
++  } catch (error) {
++    console.error(`Error reading environment variable ${key}:`, error)
++    return defaultValue || ''
+   }
+-  return value
+ }
+ 
+ function getOptionalEnvVar(key: string, defaultValue?: string): string | undefined {
+@@ -38,31 +44,55 @@ function getBooleanEnvVar(key: string, defaultValue = false): boolean {
+   return value === 'true' || value === '1'
+ }
+ 
+-export const config: Config = {
+-  // Application
+-  appName: getEnvVar('VITE_APP_NAME', 'castChat'),
+-  appUrl: getEnvVar('VITE_APP_URL', 'http://localhost:5173'),
+-  appVersion: getEnvVar('VITE_APP_VERSION', '0.0.0'),
+-  
+-  // Supabase
+-  supabaseUrl: getEnvVar('VITE_SUPABASE_URL', 'https://ewjfnquypoeyoicmgbnp.supabase.co'),
+-  supabaseAnonKey: getEnvVar(
+-    'VITE_SUPABASE_ANON_KEY',
+-    'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImV3amZucXV5cG9leW9pY21nYm5wIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTEzNDU1MjYsImV4cCI6MjA2NjkyMTUyNn0.546O8Q0S3kIGvLnZ_xK5MrrCFQBhcJ-jwPDaz4KK_Qo'
+-  ),
+-  
+-  // Square Payment
+-  squareApplicationId: getOptionalEnvVar('VITE_SQUARE_APPLICATION_ID'),
+-  squareLocationId: getOptionalEnvVar('VITE_SQUARE_LOCATION_ID'),
+-  squareEnvironment: (getOptionalEnvVar('VITE_SQUARE_ENVIRONMENT', 'sandbox') as 'sandbox' | 'production'),
+-  
+-  // Feature flags
+-  enableAnalytics: getBooleanEnvVar('VITE_ENABLE_ANALYTICS'),
+-  enablePwa: getBooleanEnvVar('VITE_ENABLE_PWA'),
+-  enablePremium: getBooleanEnvVar('VITE_ENABLE_PREMIUM'),
+-  debugMode: getBooleanEnvVar('VITE_DEBUG_MODE')
++// Safe config creation with fallbacks
++function createConfig(): Config {
++  try {
++    return {
++      // Application
++      appName: getEnvVar('VITE_APP_NAME', 'castChat'),
++      appUrl: getEnvVar('VITE_APP_URL', 'https://www.castchat.jp'),
++      appVersion: getEnvVar('VITE_APP_VERSION', '1.0.0'),
++      
++      // Supabase
++      supabaseUrl: getEnvVar('VITE_SUPABASE_URL', 'https://ewjfnquypoeyoicmgbnp.supabase.co'),
++      supabaseAnonKey: getEnvVar(
++        'VITE_SUPABASE_ANON_KEY',
++        'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImV3amZucXV5cG9leW9pY21nYm5wIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTEzNDU1MjYsImV4cCI6MjA2NjkyMTUyNn0.546O8Q0S3kIGvLnZ_xK5MrrCFQBhcJ-jwPDaz4KK_Qo'
++      ),
++      
++      // Square Payment
++      squareApplicationId: getOptionalEnvVar('VITE_SQUARE_APPLICATION_ID'),
++      squareLocationId: getOptionalEnvVar('VITE_SQUARE_LOCATION_ID'),
++      squareEnvironment: (getOptionalEnvVar('VITE_SQUARE_ENVIRONMENT', 'sandbox') as 'sandbox' | 'production'),
++      
++      // Feature flags
++      enableAnalytics: getBooleanEnvVar('VITE_ENABLE_ANALYTICS'),
++      enablePwa: getBooleanEnvVar('VITE_ENABLE_PWA'),
++      enablePremium: getBooleanEnvVar('VITE_ENABLE_PREMIUM'),
++      debugMode: getBooleanEnvVar('VITE_DEBUG_MODE')
++    }
++  } catch (error) {
++    console.error('Error creating config, using fallback values:', error)
++    // Return minimal fallback config
++    return {
++      appName: 'castChat',
++      appUrl: 'https://www.castchat.jp',
++      appVersion: '1.0.0',
++      supabaseUrl: 'https://ewjfnquypoeyoicmgbnp.supabase.co',
++      supabaseAnonKey: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImV3amZucXV5cG9leW9pY21nYm5wIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTEzNDU1MjYsImV4cCI6MjA2NjkyMTUyNn0.546O8Q0S3kIGvLnZ_xK5MrrCFQBhcJ-jwPDaz4KK_Qo',
++      squareApplicationId: undefined,
++      squareLocationId: undefined,
++      squareEnvironment: 'sandbox',
++      enableAnalytics: false,
++      enablePwa: true,
++      enablePremium: false,
++      debugMode: false
++    }
++  }
+ }
+ 
++export const config: Config = createConfig()
++
+ // Development helpers
+ export const isDevelopment = import.meta.env.DEV
+ export const isProduction = import.meta.env.PROD
+diff --git a/src/lib/supabase.ts b/src/lib/supabase.ts
+index 0d2b5df..230518e 100644
+--- a/src/lib/supabase.ts
++++ b/src/lib/supabase.ts
+@@ -1,12 +1,55 @@
+ import { createClient } from '@supabase/supabase-js'
+ import { config } from '@/config/env'
+ 
+-export const supabase = createClient(config.supabaseUrl, config.supabaseAnonKey, {
+-  auth: {
+-    autoRefreshToken: true,
+-    persistSession: true,
+-    detectSessionInUrl: true,
+-    flowType: 'pkce',
+-    debug: false, // デバッグモードを無効化
+-  },
+-})
++// Safe Supabase client creation
++function createSupabaseClient() {
++  try {
++    console.log('Creating Supabase client with config:', {
++      url: config.supabaseUrl,
++      anonKeyLength: config.supabaseAnonKey?.length,
++      anonKeyStart: config.supabaseAnonKey?.substring(0, 10) + '...'
++    })
++
++    if (!config.supabaseUrl) {
++      throw new Error('Supabase URL is not configured')
++    }
++    
++    if (!config.supabaseAnonKey) {
++      throw new Error('Supabase anonymous key is not configured')
++    }
++
++    return createClient(config.supabaseUrl, config.supabaseAnonKey, {
++      auth: {
++        autoRefreshToken: true,
++        persistSession: true,
++        detectSessionInUrl: true,
++        flowType: 'pkce',
++        debug: false, // デバッグモードを無効化
++      },
++    })
++  } catch (error) {
++    console.error('Failed to create Supabase client:', error)
++    console.error('Config values:', {
++      supabaseUrl: config.supabaseUrl,
++      hasAnonKey: !!config.supabaseAnonKey,
++      configKeys: Object.keys(config)
++    })
++    
++    // Fallback client with default values
++    return createClient(
++      'https://ewjfnquypoeyoicmgbnp.supabase.co',
++      'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImV3amZucXV5cG9leW9pY21nYm5wIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTEzNDU1MjYsImV4cCI6MjA2NjkyMTUyNn0.546O8Q0S3kIGvLnZ_xK5MrrCFQBhcJ-jwPDaz4KK_Qo',
++      {
++        auth: {
++          autoRefreshToken: true,
++          persistSession: true,
++          detectSessionInUrl: true,
++          flowType: 'pkce',
++          debug: false,
++        },
++      }
++    )
++  }
++}
++
++export const supabase = createSupabaseClient()
+diff --git a/src/main.ts b/src/main.ts
+index 214e767..dacf39a 100644
+--- a/src/main.ts
++++ b/src/main.ts
+@@ -25,14 +25,27 @@ try {
+   app.mount('#app')
+ } catch (error) {
+   console.error('Failed to initialize app:', error)
++  console.error('Error stack:', error instanceof Error ? error.stack : 'No stack trace')
++  console.error('Environment:', {
++    NODE_ENV: import.meta.env.MODE,
++    BASE_URL: import.meta.env.BASE_URL,
++    PROD: import.meta.env.PROD,
++    DEV: import.meta.env.DEV
++  })
++  
+   // エラー画面を表示
+   const appElement = document.getElementById('app')
+   if (appElement) {
+     appElement.innerHTML = `
+       <div style="min-height: 100vh; display: flex; align-items: center; justify-content: center; background-color: #f3f4f6;">
+-        <div style="text-align: center; padding: 2rem;">
++        <div style="text-align: center; padding: 2rem; max-width: 600px;">
+           <h1 style="font-size: 1.5rem; font-weight: bold; color: #111827; margin-bottom: 0.5rem;">castChat</h1>
+           <p style="color: #6b7280; margin-bottom: 1rem;">アプリケーションの読み込み中にエラーが発生しました。</p>
++          <div style="background: #fee2e2; color: #dc2626; padding: 1rem; border-radius: 0.5rem; margin-bottom: 1rem; text-align: left; font-size: 0.875rem;">
++            <strong>エラー詳細:</strong><br>
++            ${error instanceof Error ? error.message : String(error)}<br>
++            ${error instanceof Error && error.stack ? `<br><pre style="white-space: pre-wrap; font-size: 0.75rem; overflow-x: auto;">${error.stack}</pre>` : ''}
++          </div>
+           <button onclick="window.location.reload()" style="background-color: #4f46e5; color: white; padding: 0.5rem 1rem; border-radius: 0.375rem; border: none; cursor: pointer;">
+             ページを再読み込み
+           </button>
+diff --git a/src/views/MyPostsView.vue b/src/views/MyPostsView.vue
+index ed02d8c..7ff8b41 100644
+--- a/src/views/MyPostsView.vue
++++ b/src/views/MyPostsView.vue
+@@ -165,7 +165,7 @@
+ 
+         <!-- Sort Filter -->
+         <div class="mt-4 flex justify-end">
+-          <BaseSelect v-model="sortBy" :options="sortOptions" @change="loadPosts" class="w-48" />
++          <BaseSelect v-model="sortBy" :options="sortOptions" @change="handleSortChange" class="w-48" />
+         </div>
+       </div>
+ 
+@@ -333,17 +333,38 @@ const statusTabs = computed(() => [
+ ])
+ 
+ const totalPosts = computed(() => total.value)
+-const activePosts = computed(
+-  () => Array.from(posts.value).filter((p) => p.status === 'active').length,
+-)
+-const totalApplications = computed(() =>
+-  Array.from(posts.value).reduce((sum, p) => sum + (p.applicationsCount || 0), 0),
+-)
+-const totalViews = computed(() =>
+-  Array.from(posts.value).reduce((sum, p) => sum + (p.viewsCount || 0), 0),
+-)
++const activePosts = computed(() => {
++  const postsList = posts.value
++  let count = 0
++  for (let i = 0; i < postsList.length; i++) {
++    if (postsList[i].status === 'active') {
++      count++
++    }
++  }
++  return count
++})
++const totalApplications = computed(() => {
++  const postsList = posts.value
++  let sum = 0
++  for (let i = 0; i < postsList.length; i++) {
++    sum += postsList[i].applicationsCount || 0
++  }
++  return sum
++})
++const totalViews = computed(() => {
++  const postsList = posts.value
++  let sum = 0
++  for (let i = 0; i < postsList.length; i++) {
++    sum += postsList[i].viewsCount || 0
++  }
++  return sum
++})
+ 
+ // Methods
++const handleSortChange = () => {
++  loadPosts(true)
++}
++
+ const loadPosts = async (showLoading = true) => {
+   if (!authStore.user?.id) {
+     router.push('/login')
+@@ -371,23 +392,33 @@ const loadPosts = async (showLoading = true) => {
+     }
+ 
+     // 自分の投稿のみフィルタリング
+-    allPosts.value = Array.from(
+-      (allResult.data || []).filter((post) => post.authorId === authStore.user?.id),
+-    )
++    const allPostsData = allResult.data || []
++    const filteredPosts = []
++    for (let i = 0; i < allPostsData.length; i++) {
++      if (allPostsData[i].authorId === authStore.user?.id) {
++        filteredPosts.push(allPostsData[i])
++      }
++    }
++    allPosts.value = filteredPosts
+ 
+     // 現在のタブに応じてフィルタリング
+-    let filteredPosts = Array.from(allPosts.value)
+-    if (statusFilter.value !== 'all') {
+-      filteredPosts = filteredPosts.filter((post) => post.status === statusFilter.value)
++    let displayPosts = []
++    const allPostsList = allPosts.value
++    
++    for (let i = 0; i < allPostsList.length; i++) {
++      const post = allPostsList[i]
++      if (statusFilter.value === 'all' || post.status === statusFilter.value) {
++        displayPosts.push(post)
++      }
+     }
+ 
+-    // ソート適用（コピー配列でsort）
++    // ソート適用
+     if (sortBy.value === 'newest') {
+-      filteredPosts = filteredPosts.sort(
++      displayPosts.sort(
+         (a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime(),
+       )
+     } else if (sortBy.value === 'oldest') {
+-      filteredPosts = filteredPosts.sort(
++      displayPosts.sort(
+         (a, b) => new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime(),
+       )
+     }
+@@ -395,8 +426,8 @@ const loadPosts = async (showLoading = true) => {
+     // ページネーション適用
+     const startIndex = (currentPage.value - 1) * perPage.value
+     const endIndex = startIndex + perPage.value
+-    posts.value = filteredPosts.slice(startIndex, endIndex)
+-    total.value = filteredPosts.length
++    posts.value = displayPosts.slice(startIndex, endIndex)
++    total.value = displayPosts.length
+   } catch (err) {
+     error.value = 'データの読み込みに失敗しました'
+     console.error('Failed to load posts:', err)
