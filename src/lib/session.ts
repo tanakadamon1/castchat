@@ -120,19 +120,19 @@ export class SessionManager {
       const sessionState = await this.getCurrentSession()
       
       if (sessionState.session && this.shouldRefreshSession(sessionState.session)) {
-        console.log('Auto-refreshing session')
+        // Auto-refreshing session
         await this.refreshSession()
       }
     }, intervalMs)
 
-    console.log('Session monitoring started')
+    // Session monitoring started
   }
 
   stopSessionMonitoring(): void {
     if (this.sessionCheckInterval) {
       clearInterval(this.sessionCheckInterval)
       this.sessionCheckInterval = null
-      console.log('Session monitoring stopped')
+      // Session monitoring stopped
     }
   }
 
@@ -147,7 +147,7 @@ export class SessionManager {
         return { error }
       }
 
-      console.log('Signed out successfully')
+      // Signed out successfully
       return { error: null }
     } catch (error) {
       console.error('Sign out error:', error)

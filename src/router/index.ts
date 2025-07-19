@@ -127,25 +127,11 @@ router.beforeEach(async (to, from, next) => {
   const authStore = useAuthStore()
   const navigationId = Date.now() + Math.random()
   
-  console.log('🔴 Router navigation guard', {
-    to: to.path,
-    from: from.path,
-    requiresAuth: to.meta.requiresAuth,
-    isAuthenticated: authStore.isAuthenticated,
-    user: authStore.user?.id,
-    navigationId
-  })
+  // Router navigation guard
   
-  // ApplicationsViewへの特別なデバッグ
+  // ApplicationsViewへのナビゲーション
   if (to.path === '/applications') {
-    console.log('🔴 Navigation to ApplicationsView', {
-      authStore: {
-        isAuthenticated: authStore.isAuthenticated,
-        user: authStore.user,
-        loading: authStore.loading,
-        initializing: authStore.initializing
-      }
-    })
+    // 特別なチェックは不要
   }
 
   try {
@@ -163,7 +149,7 @@ router.beforeEach(async (to, from, next) => {
 
       // 初期化後も認証されていない場合はログインページにリダイレクト
       if (!authStore.isAuthenticated) {
-        console.log('🔴 User not authenticated, redirecting to login', to.path)
+        // User not authenticated, redirecting to login
         next({ name: 'login', query: { redirect: to.fullPath } })
         return
       }
@@ -171,12 +157,12 @@ router.beforeEach(async (to, from, next) => {
 
     // 既にログインしている場合はログインページからリダイレクト
     if (to.name === 'login' && authStore.isAuthenticated) {
-      console.log('🔴 User already authenticated, redirecting from login')
+      // User already authenticated, redirecting from login
       next({ name: 'home' })
       return
     }
 
-    console.log('🔴 Navigation allowed, calling next()', to.path)
+    // Navigation allowed, calling next()
     next()
   } catch (error) {
     console.error(`[NAV-${navigationId}] Navigation guard error:`, error)

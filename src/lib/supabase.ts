@@ -4,11 +4,7 @@ import { config } from '@/config/env'
 // Safe Supabase client creation
 function createSupabaseClient() {
   try {
-    console.log('Creating Supabase client with config:', {
-      url: config.supabaseUrl,
-      anonKeyLength: config.supabaseAnonKey?.length,
-      anonKeyStart: config.supabaseAnonKey?.substring(0, 10) + '...'
-    })
+    // Creating Supabase client
 
     if (!config.supabaseUrl) {
       throw new Error('Supabase URL is not configured')

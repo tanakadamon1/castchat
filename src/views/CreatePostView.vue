@@ -471,16 +471,16 @@ const clearDraft = () => {
 
 // サーバー側の下書き削除
 const deleteDraft = async (id: string) => {
-  console.log('下書き削除処理開始:', id)
+  // 下書き削除処理開始
   try {
     const result = await postsApi.deletePost(id)
-    console.log('削除API結果:', result)
+    // 削除API結果
     if (result.error) {
       console.error('下書き削除エラー:', result.error)
       return false
     }
     if (result.success) {
-      console.log('下書き削除成功:', id)
+      // 下書き削除成功
       return true
     }
     return false
@@ -492,11 +492,11 @@ const deleteDraft = async (id: string) => {
 
 // 全ての下書きをクリア（サーバー側のみ）
 const clearAllDrafts = async () => {
-  console.log('clearAllDrafts 開始 - 編集モード:', isEditing.value, 'postId:', postId.value)
+  // clearAllDrafts 開始
   
   // サーバー側の下書きのみ削除
   if (draftId.value) {
-    console.log('サーバー側下書き削除:', draftId.value)
+    // サーバー側下書き削除
     await deleteDraft(draftId.value)
     draftId.value = null
   }
@@ -509,11 +509,11 @@ const clearAllDrafts = async () => {
 // ユーザーの全ての下書きを削除
 const deleteAllUserDrafts = async () => {
   if (!authStore.user?.id) {
-    console.log('ユーザーIDが見つかりません')
+    // ユーザーIDが見つかりません
     return
   }
   
-  console.log('ユーザーの下書き検索開始:', authStore.user.id)
+  // ユーザーの下書き検索開始
   
   try {
     // ユーザーの下書きを全て取得
@@ -523,7 +523,7 @@ const deleteAllUserDrafts = async () => {
       limit: 100
     })
     
-    console.log('下書き検索結果:', result)
+    // 下書き検索結果
     
     if (result.data && result.data.length > 0) {
       const draftList = []
@@ -531,7 +531,7 @@ const deleteAllUserDrafts = async () => {
         const d = result.data[i]
         draftList.push({ id: d.id, title: d.title })
       }
-      console.log(`${result.data.length}件の下書きが見つかりました:`, draftList)
+      // 下書きが見つかりました
       
       let deletedCount = 0
       let failedCount = 0
@@ -540,7 +540,7 @@ const deleteAllUserDrafts = async () => {
       const drafts = result.data
       for (let i = 0; i < drafts.length; i++) {
         const draft = drafts[i]
-        console.log(`下書き削除試行: ${draft.id} - ${draft.title}`)
+        // 下書き削除試行
         const success = await deleteDraft(draft.id)
         if (success) {
           deletedCount++
@@ -549,23 +549,23 @@ const deleteAllUserDrafts = async () => {
         }
       }
       
-      console.log(`下書き削除結果: 成功${deletedCount}件, 失敗${failedCount}件`)
+      // 下書き削除結果
       
       // 削除後に再度検索して確認
-      console.log('削除後の確認検索を実行中...')
+      // 削除後の確認検索を実行中
       const verifyResult = await postsApi.getPosts({
         user_id: authStore.user.id,
         status: 'draft',
         limit: 100
       })
-      console.log('削除後の下書き数:', verifyResult.data?.length || 0)
+      // 削除後の下書き数を確認
       if (verifyResult.data && verifyResult.data.length > 0) {
         const remainingDrafts = []
         for (let i = 0; i < verifyResult.data.length; i++) {
           const d = verifyResult.data[i]
           remainingDrafts.push({ id: d.id, title: d.title })
         }
-        console.log('まだ残っている下書き:', remainingDrafts)
+        // まだ残っている下書きあり
       }
       
       if (deletedCount > 0) {
@@ -575,7 +575,7 @@ const deleteAllUserDrafts = async () => {
         toast.error(`${failedCount}件の下書き削除に失敗しました`)
       }
     } else {
-      console.log('削除対象の下書きが見つかりませんでした')
+      // 削除対象の下書きが見つかりません
     }
   } catch (error) {
     console.error('下書き一括削除エラー:', error)
@@ -1110,13 +1110,13 @@ const submitPost = async () => {
     return result.data
   } else if (isDraftMode.value) {
     // 下書きから公開処理
-    console.log('下書きから公開処理:', draftId.value)
+    // 下書きから公開処理
     const result = await postsApi.updatePost(draftId.value!, { ...postData, status: 'published' })
     if (result.error) {
       throw new Error(result.error)
     }
     // 下書きから公開への移行なので、draftIdをクリアして公開投稿に変換
-    console.log('下書きから公開完了、draftIdクリア')
+    // 下書きから公開完了
     draftId.value = null
     return result.data
   } else {
@@ -1172,9 +1172,9 @@ onMounted(async () => {
     try {
       const postData = await loadPost()
       if (postData) {
-        console.log('編集対象の投稿データ:', postData)
-        console.log('eventSpecificDate値:', postData.eventSpecificDate)
-        console.log('eventFrequency値:', postData.eventFrequency)
+        // 編集対象の投稿データを読み込み
+        // eventSpecificDate値を確認
+        // eventFrequency値を確認
         formData.value = {
           title: postData.title,
           category: postData.category,
@@ -1191,7 +1191,7 @@ onMounted(async () => {
               const hours = String(date.getHours()).padStart(2, '0')
               const minutes = String(date.getMinutes()).padStart(2, '0')
               const converted = `${year}-${month}-${day}T${hours}:${minutes}`
-              console.log('日時変換:', postData.eventSpecificDate, '->', converted)
+              // 日時変換完了
               return converted
             }
             return ''
@@ -1223,7 +1223,7 @@ onMounted(async () => {
         // 下書きの場合はdraftIdを設定
         if (postData.status === 'draft') {
           draftId.value = postData.id
-          console.log('下書き編集モード開始:', { draftId: draftId.value, postId: postId.value })
+          // 下書き編集モード開始
         }
         
         loadError.value = null

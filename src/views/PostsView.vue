@@ -242,7 +242,7 @@ const loadPosts = async (showLoading = true) => {
       return
     }
 
-    console.log('Posts loaded:', result.data?.length, 'total:', result.total)
+    // Posts loaded
     posts.value = result.data || []
     total.value = result.total
 

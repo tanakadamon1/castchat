@@ -205,7 +205,7 @@ export default {
 </script>
 
 <script setup lang="ts">
-console.log('🔴 ApplicationsView script setup started!')
+// ApplicationsView script setup started
 import { ref, computed, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 import { useAuthStore } from '@/stores/auth'
@@ -549,14 +549,14 @@ const handleWithdraw = async (applicationId: string) => {
 
 // データ読み込み関数
 const loadApplications = async () => {
-  console.log('loadApplications started')
+  // loadApplications started
   loading.value = true
   
   try {
     // 受信した応募を取得
-    console.log('Fetching received applications...')
+    // Fetching received applications
     const receivedResult = await applicationApi.getReceivedApplications()
-    console.log('Received applications result:', receivedResult)
+    // Received applications result
 
     if (receivedResult.error) {
       errorMessage.value = receivedResult.error
@@ -739,44 +739,36 @@ const loadApplications = async () => {
 
 // 初期化
 onMounted(async () => {
-  console.log('ApplicationsView onMounted started', {
-    isAuthenticated: authStore.isAuthenticated,
-    user: authStore.user,
-    initializing: authStore.initializing,
-    loading: authStore.loading
-  })
+  // ApplicationsView onMounted started
 
   // 認証の初期化を待つ
   if (authStore.initializing) {
-    console.log('Auth store is initializing, waiting...')
+    // Auth store is initializing, waiting...
     let waitTime = 0
     const maxWaitTime = 5000 // 5秒
     while (authStore.initializing && waitTime < maxWaitTime) {
       await new Promise((resolve) => setTimeout(resolve, 100))
       waitTime += 100
     }
-    console.log('Auth initialization wait completed', {
-      isAuthenticated: authStore.isAuthenticated,
-      waitTime
-    })
+    // Auth initialization wait completed
   }
 
   if (!authStore.isAuthenticated) {
-    console.log('User not authenticated, redirecting to login')
+    // User not authenticated, redirecting to login
     router.push('/login')
     return
   }
 
-  console.log('Starting to load applications...')
+  // Starting to load applications
   try {
     await loadApplications()
-    console.log('Applications loaded successfully')
+    // Applications loaded successfully
   } catch (err) {
     console.error('Failed to load applications:', err)
     toast.error('データの取得に失敗しました')
   } finally {
     loading.value = false
-    console.log('ApplicationsView loading completed')
+    // ApplicationsView loading completed
   }
 })
 </script>

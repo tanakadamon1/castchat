@@ -587,7 +587,7 @@ export class PostsService {
       // 期限切れ優先表示の自動更新を実行
       const expiredCount = await this.updateExpiredPriorities()
       if (expiredCount > 0) {
-        console.log(`期限切れ優先表示投稿 ${expiredCount} 件を更新しました`)
+        // 期限切れ優先表示投稿を更新しました
       }
 
       // ソート - 有効な優先表示を最初に、その後指定されたソート順
