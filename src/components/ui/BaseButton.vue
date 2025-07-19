@@ -113,12 +113,19 @@ const buttonClasses = computed(() => {
   
   const widthClasses = props.fullWidth ? 'w-full' : ''
   
-  return [
+  const allClasses = [
     ...baseClasses,
     sizeClasses[props.size],
     ...variantClasses[props.variant],
     widthClasses
-  ].filter(Boolean).join(' ')
+  ]
+  const filteredClasses = []
+  for (let i = 0; i < allClasses.length; i++) {
+    if (allClasses[i]) {
+      filteredClasses.push(allClasses[i])
+    }
+  }
+  return filteredClasses.join(' ')
 })
 
 const handleClick = (event: MouseEvent) => {

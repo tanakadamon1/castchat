@@ -32,6 +32,9 @@ export function useSEO(config: SEOConfig = {}) {
 
   const finalConfig = { ...defaultConfig, ...config }
 
+  // キーワードを事前に結合
+  const keywordsString = finalConfig.keywords ? finalConfig.keywords.join(', ') : ''
+  
   const head = useHead({
     title: finalConfig.title,
     meta: [
@@ -41,7 +44,7 @@ export function useSEO(config: SEOConfig = {}) {
       },
       {
         name: 'keywords',
-        content: finalConfig.keywords?.join(', ') || '',
+        content: keywordsString,
       },
       // Open Graph
       {

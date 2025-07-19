@@ -209,7 +209,14 @@ const isFormValid = computed(() => {
     /^@?[A-Za-z0-9_]{1,15}$/.test(formData.value.twitterId)
   
   // 実際のエラーがあるかチェック（空のエラー配列は無視）
-  const actualErrors = Object.values(errors.value).filter(errorArray => errorArray && errorArray.length > 0)
+  const errorValues = Object.values(errors.value)
+  const actualErrors = []
+  for (let i = 0; i < errorValues.length; i++) {
+    const errorArray = errorValues[i]
+    if (errorArray && errorArray.length > 0) {
+      actualErrors.push(errorArray)
+    }
+  }
   const hasActualErrors = actualErrors.length > 0
   
   const isValid = !hasActualErrors && messageValid && twitterIdValid

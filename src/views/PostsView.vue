@@ -360,7 +360,14 @@ const handleToggleStatus = async (postId: string, newStatus: 'active' | 'closed'
 
     if (result.success) {
       // ローカルの投稿データを更新
-      const postIndex = posts.value.findIndex((p) => p.id === postId)
+      const postsList = posts.value
+      let postIndex = -1
+      for (let i = 0; i < postsList.length; i++) {
+        if (postsList[i].id === postId) {
+          postIndex = i
+          break
+        }
+      }
       if (postIndex !== -1) {
         posts.value[postIndex].status = newStatus
       }

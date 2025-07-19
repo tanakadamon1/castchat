@@ -526,13 +526,20 @@ const deleteAllUserDrafts = async () => {
     console.log('下書き検索結果:', result)
     
     if (result.data && result.data.length > 0) {
-      console.log(`${result.data.length}件の下書きが見つかりました:`, result.data.map(d => ({ id: d.id, title: d.title })))
+      const draftList = []
+      for (let i = 0; i < result.data.length; i++) {
+        const d = result.data[i]
+        draftList.push({ id: d.id, title: d.title })
+      }
+      console.log(`${result.data.length}件の下書きが見つかりました:`, draftList)
       
       let deletedCount = 0
       let failedCount = 0
       
       // 下書きを削除
-      for (const draft of result.data) {
+      const drafts = result.data
+      for (let i = 0; i < drafts.length; i++) {
+        const draft = drafts[i]
         console.log(`下書き削除試行: ${draft.id} - ${draft.title}`)
         const success = await deleteDraft(draft.id)
         if (success) {
@@ -553,7 +560,12 @@ const deleteAllUserDrafts = async () => {
       })
       console.log('削除後の下書き数:', verifyResult.data?.length || 0)
       if (verifyResult.data && verifyResult.data.length > 0) {
-        console.log('まだ残っている下書き:', verifyResult.data.map(d => ({ id: d.id, title: d.title })))
+        const remainingDrafts = []
+        for (let i = 0; i < verifyResult.data.length; i++) {
+          const d = verifyResult.data[i]
+          remainingDrafts.push({ id: d.id, title: d.title })
+        }
+        console.log('まだ残っている下書き:', remainingDrafts)
       }
       
       if (deletedCount > 0) {
@@ -642,7 +654,13 @@ const previewPost = computed(() => {
     eventWeekday: formData.value.eventWeekday,
     eventTime: formData.value.eventTime,
     eventWeekOfMonth: formData.value.eventWeekOfMonth,
-    images: selectedImages.value.map(img => img.preview), // プレビュー画像を追加
+    images: (() => {
+      const previews = []
+      for (let i = 0; i < selectedImages.value.length; i++) {
+        previews.push(selectedImages.value[i].preview)
+      }
+      return previews
+    })(), // プレビュー画像を追加
   } as Post
 })
 
@@ -1190,11 +1208,16 @@ onMounted(async () => {
         
         // 画像データの読み込み
         if (postData.images && postData.images.length > 0) {
-          selectedImages.value = postData.images.map((url, index) => ({
-            file: null as any, // 既存画像の場合はファイルオブジェクトは無い
-            preview: url, // 既存画像のURLをプレビューとして使用
-            uploaded: { url, path: '' } // 既にアップロード済みとしてマーク
-          }))
+          const imageList = []
+          for (let i = 0; i < postData.images.length; i++) {
+            const url = postData.images[i]
+            imageList.push({
+              file: null as any, // 既存画像の場合はファイルオブジェクトは無い
+              preview: url, // 既存画像のURLをプレビューとして使用
+              uploaded: { url, path: '' } // 既にアップロード済みとしてマーク
+            })
+          }
+          selectedImages.value = imageList
         }
         
         // 下書きの場合はdraftIdを設定

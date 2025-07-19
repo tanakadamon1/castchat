@@ -652,9 +652,13 @@ const loadApplications = async () => {
       errorMessage.value = sentResult.error
     } else {
       // データを ApplicationCard で使用する形式に変換
-      sentApplications.value = (sentResult.data || []).map((app: unknown) => {
-        if (typeof app !== 'object' || app === null)
-          return {
+      const sentData = sentResult.data || []
+      const processedSent = []
+      
+      for (let i = 0; i < sentData.length; i++) {
+        const app = sentData[i]
+        if (typeof app !== 'object' || app === null) {
+          processedSent.push({
             id: '',
             postId: '',
             postTitle: '募集タイトル',
@@ -667,7 +671,9 @@ const loadApplications = async () => {
             respondedAt: null,
             createdAt: '',
             updatedAt: '',
-          }
+          })
+          continue
+        }
         const a = app as Record<string, unknown>
         // posts.title
         let postTitle = '募集タイトル'
@@ -698,7 +704,7 @@ const loadApplications = async () => {
         if (typeof a.responded_at === 'string') {
           respondedAt = a.responded_at
         }
-        return {
+        processedSent.push({
           id: typeof a.id === 'string' ? a.id : '',
           postId: typeof a.post_id === 'string' ? a.post_id : '',
           postTitle,
@@ -721,8 +727,10 @@ const loadApplications = async () => {
           twitterId: typeof a.twitter_id === 'string' ? a.twitter_id : undefined,
           createdAt: typeof a.created_at === 'string' ? a.created_at : '',
           updatedAt: typeof a.updated_at === 'string' ? a.updated_at : '',
-        }
-      })
+        })
+      }
+      
+      sentApplications.value = processedSent
     }
   } catch (err) {
     errorMessage.value = 'データの読み込みに失敗しました'
