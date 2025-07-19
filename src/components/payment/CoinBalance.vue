@@ -79,6 +79,7 @@ export default {
 import { ref, onMounted } from 'vue'
 import { CoinApi } from '@/lib/coinApi'
 import BaseButton from '@/components/ui/BaseButton.vue'
+import { useAuthStore } from '@/stores/auth'
 import type { CoinTransaction } from '@/types/coin'
 
 const emit = defineEmits<{
@@ -86,14 +87,24 @@ const emit = defineEmits<{
   'view-history': []
 }>()
 
+const authStore = useAuthStore()
 const coinBalance = ref(0)
 const recentTransactions = ref<CoinTransaction[]>([])
 
 onMounted(async () => {
-  await loadData()
+  // 認証済みの場合のみデータを読み込む
+  if (authStore.isAuthenticated) {
+    await loadData()
+  }
 })
 
 async function loadData() {
+  // 認証チェック
+  if (!authStore.isAuthenticated) {
+    console.warn('Not authenticated - skipping coin data load')
+    return
+  }
+
   try {
     const [balance, transactions] = await Promise.all([
       CoinApi.getCoinBalance(),
@@ -103,7 +114,11 @@ async function loadData() {
     coinBalance.value = balance
     recentTransactions.value = transactions
   } catch (error) {
-    console.error('Failed to load coin data:', error)
+    console.error('Failed to load coin balance:', error)
+    // 認証エラーの場合はエラーを表示しない（静かに失敗）
+    if (error instanceof Error && error.message.includes('Not authenticated')) {
+      console.warn('User not authenticated for coin balance')
+    }
   }
 }
 

@@ -87,7 +87,8 @@
       "Bash(kill:*)",
       "Bash(npm run lint:*)",
       "Bash(psql:*)",
-      "Bash(mv:*)"
+      "Bash(mv:*)",
+      "Bash(convert:*)"
     ],
     "deny": []
   }

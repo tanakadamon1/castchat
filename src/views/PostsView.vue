@@ -199,8 +199,8 @@ useKeyboardNavigation(postsContainerRef, {
   focusableSelector: '[data-post-card], button, [href]'
 })
 
-// State - パフォーマンス最適化のためshallowRefを使用
-const posts = shallowRef<Post[]>([])
+// State - 通常のrefに変更して無限ループを防ぐ
+const posts = ref<Post[]>([])
 const loading = ref(false)
 const error = ref<string | null>(null)
 const total = ref(0)

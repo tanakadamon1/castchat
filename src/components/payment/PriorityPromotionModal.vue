@@ -133,6 +133,7 @@ export default {
 <script setup lang="ts">
 import { ref, onMounted } from 'vue'
 import { useToast } from '@/composables/useToast'
+import { useAuthStore } from '@/stores/auth'
 import { CoinApi } from '@/lib/coinApi'
 import { config } from '@/config/env'
 import BaseModal from '@/components/ui/BaseModal.vue'
@@ -151,6 +152,7 @@ const emit = defineEmits<{
 }>()
 
 const { addToast } = useToast()
+const authStore = useAuthStore()
 
 const processing = ref(false)
 const coinBalance = ref(0)
@@ -159,14 +161,27 @@ const coinBalance = ref(0)
 const isSquareConfigured = ref(!!config.squareApplicationId)
 
 onMounted(async () => {
-  await loadCoinBalance()
+  // 認証済みの場合のみコイン残高を読み込む
+  if (authStore.isAuthenticated) {
+    await loadCoinBalance()
+  }
 })
 
 async function loadCoinBalance() {
+  // 認証チェック
+  if (!authStore.isAuthenticated) {
+    console.warn('Not authenticated - skipping coin balance load')
+    return
+  }
+
   try {
     coinBalance.value = await CoinApi.getCoinBalance()
   } catch (error) {
     console.error('Failed to load coin balance:', error)
+    // 認証エラーの場合は静かに失敗
+    if (error instanceof Error && error.message.includes('Not authenticated')) {
+      console.warn('User not authenticated for coin balance')
+    }
   }
 }
 
