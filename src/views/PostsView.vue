@@ -190,9 +190,13 @@ useSEO({
   canonicalUrl: 'https://castchat.jp/posts'
 })
 
-// アクセシビリティ
+// アクセシビリティ - 一時的に無効化
 const postsContainerRef = ref<HTMLElement | null>(null)
-const { announcePageLoad, announceListInfo, announceLoading, announceLoadComplete } = useScreenReader()
+// const { announcePageLoad, announceListInfo, announceLoading, announceLoadComplete } = useScreenReader()
+const announcePageLoad = () => {}
+const announceListInfo = () => {}
+const announceLoading = () => {}
+const announceLoadComplete = () => {}
 useKeyboardNavigation(postsContainerRef, {
   loop: true,
   autoFocus: false,
