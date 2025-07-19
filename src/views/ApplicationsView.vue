@@ -522,9 +522,13 @@ const loadApplications = async () => {
       errorMessage.value = receivedResult.error
     } else {
       // データを ApplicationCard で使用する形式に変換
-      receivedApplications.value = (receivedResult.data || []).map((app: unknown) => {
-        if (typeof app !== 'object' || app === null)
-          return {
+      const receivedData = receivedResult.data || []
+      const processedReceived = []
+      
+      for (let i = 0; i < receivedData.length; i++) {
+        const app = receivedData[i]
+        if (typeof app !== 'object' || app === null) {
+          processedReceived.push({
             id: '',
             postId: '',
             postTitle: '募集タイトル',
@@ -537,7 +541,10 @@ const loadApplications = async () => {
             respondedAt: null,
             createdAt: '',
             updatedAt: '',
-          }
+          })
+          continue
+        }
+        
         const a = app as Record<string, unknown>
         // posts.title
         let postTitle = '募集タイトル'
@@ -568,7 +575,8 @@ const loadApplications = async () => {
         if (typeof a.responded_at === 'string') {
           respondedAt = a.responded_at
         }
-        return {
+        
+        processedReceived.push({
           id: typeof a.id === 'string' ? a.id : '',
           postId: typeof a.post_id === 'string' ? a.post_id : '',
           postTitle,
@@ -591,8 +599,10 @@ const loadApplications = async () => {
           twitterId: typeof a.twitter_id === 'string' ? a.twitter_id : undefined,
           createdAt: typeof a.created_at === 'string' ? a.created_at : '',
           updatedAt: typeof a.updated_at === 'string' ? a.updated_at : '',
-        }
-      })
+        })
+      }
+      
+      receivedApplications.value = processedReceived
     }
 
     // 送信した応募を取得
