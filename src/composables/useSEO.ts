@@ -32,7 +32,7 @@ export function useSEO(config: SEOConfig = {}) {
 
   const finalConfig = { ...defaultConfig, ...config }
 
-  useHead({
+  const head = useHead({
     title: finalConfig.title,
     meta: [
       {
@@ -41,7 +41,7 @@ export function useSEO(config: SEOConfig = {}) {
       },
       {
         name: 'keywords',
-        content: finalConfig.keywords.join(', '),
+        content: finalConfig.keywords?.join(', ') || '',
       },
       // Open Graph
       {
@@ -97,8 +97,7 @@ export function useSEO(config: SEOConfig = {}) {
   })
 
   return {
-    updateSEO: (newConfig: Partial<SEOConfig>) => {
-      return useSEO({ ...config, ...newConfig })
-    },
+    head,
+    // 無限ループを防ぐため、updateSEO を削除
   }
 }
