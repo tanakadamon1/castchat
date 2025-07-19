@@ -186,7 +186,14 @@ const handleSendMessage = async () => {
 
     // メッセージをローカルリストに追加（リアルタイムで受信される場合は重複回避）
     if (result.data) {
-      const existingMessage = messages.value.find(msg => msg.id === result.data!.id)
+      let existingMessage = null
+      const messagesList = messages.value
+      for (let i = 0; i < messagesList.length; i++) {
+        if (messagesList[i].id === result.data!.id) {
+          existingMessage = messagesList[i]
+          break
+        }
+      }
       if (!existingMessage) {
         messages.value.push(result.data)
       }
@@ -234,7 +241,14 @@ const handleFileSelect = async (file: File) => {
 
       // メッセージをローカルリストに追加
       if (result.data) {
-        const existingMessage = messages.value.find(msg => msg.id === result.data!.id)
+        let existingMessage = null
+        const messagesList = messages.value
+        for (let i = 0; i < messagesList.length; i++) {
+          if (messagesList[i].id === result.data!.id) {
+            existingMessage = messagesList[i]
+            break
+          }
+        }
         if (!existingMessage) {
           messages.value.push(result.data)
         }
@@ -275,7 +289,14 @@ const setupRealtimeSubscription = () => {
           const newMessage = payload.new as Message
           
           // 重複チェック
-          const existingMessage = messages.value.find(msg => msg.id === newMessage.id)
+          let existingMessage = null
+          const messagesList = messages.value
+          for (let i = 0; i < messagesList.length; i++) {
+            if (messagesList[i].id === newMessage.id) {
+              existingMessage = messagesList[i]
+              break
+            }
+          }
           if (!existingMessage) {
             messages.value.push(newMessage)
             
@@ -311,7 +332,14 @@ const setupRealtimeSubscription = () => {
       (payload: RealtimePostgresChangesPayload<any>) => {
         if (payload.new) {
           const updatedMessage = payload.new as Message
-          const index = messages.value.findIndex(msg => msg.id === updatedMessage.id)
+          let index = -1
+          const messagesList = messages.value
+          for (let i = 0; i < messagesList.length; i++) {
+            if (messagesList[i].id === updatedMessage.id) {
+              index = i
+              break
+            }
+          }
           if (index !== -1) {
             messages.value[index] = updatedMessage
           }

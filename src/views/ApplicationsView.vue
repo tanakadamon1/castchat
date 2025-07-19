@@ -448,7 +448,14 @@ const handleUpdateStatus = async (applicationId: string, status: string) => {
     }
 
     // ローカルデータを更新
-    const application = receivedApplications.value.find((app) => app.id === applicationId)
+    let application = null
+    const appsList = receivedApplications.value
+    for (let i = 0; i < appsList.length; i++) {
+      if (appsList[i].id === applicationId) {
+        application = appsList[i]
+        break
+      }
+    }
     if (application && result.data) {
       application.status = result.data.status
       application.respondedAt = result.data.responded_at
@@ -468,7 +475,14 @@ const handleViewProfile = (userId: string) => {
 
 const handleSendMessage = (userId: string) => {
   // メッセージモーダルを開く
-  const user = receivedApplications.value.find((app) => app.applicantId === userId)
+  let user = null
+  const appsList = receivedApplications.value
+  for (let i = 0; i < appsList.length; i++) {
+    if (appsList[i].applicantId === userId) {
+      user = appsList[i]
+      break
+    }
+  }
 
   if (user) {
     selectedRecipient.value = {

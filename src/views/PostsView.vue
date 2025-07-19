@@ -309,7 +309,14 @@ const handleDeletePost = async (postId: string) => {
 
 // 画像ビューア関連のハンドラー
 const handleViewImage = (imageUrl: string, index: number) => {
-  const post = posts.value.find((p) => p.images?.includes(imageUrl))
+  let post = null
+  const postsList = posts.value
+  for (let i = 0; i < postsList.length; i++) {
+    if (postsList[i].images?.includes(imageUrl)) {
+      post = postsList[i]
+      break
+    }
+  }
   if (post?.images) {
     selectedImages.value = post.images
     selectedImageIndex.value = index
