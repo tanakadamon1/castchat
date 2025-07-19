@@ -1,5 +1,5 @@
 <template>
-  <div class="min-h-screen bg-gray-50 dark:bg-gray-900">
+  <div class="min-h-screen">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
       <!-- Header -->
       <div class="mb-8">
@@ -138,10 +138,7 @@
             <button
               v-for="tab in statusTabs"
               :key="tab.value"
-              @click="
-                statusFilter = tab.value
-                loadPosts()
-              "
+              @click="() => { statusFilter = tab.value; loadPosts() }"
               :class="[
                 statusFilter === tab.value
                   ? 'border-indigo-500 text-indigo-600 dark:text-indigo-400'

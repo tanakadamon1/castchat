@@ -1,5 +1,5 @@
 <template>
-  <div class="min-h-screen bg-gray-50 dark:bg-gray-900">
+  <div class="min-h-screen">
     <!-- ヘッダー -->
     <div class="bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700">
       <div class="container mx-auto px-4 py-6">
