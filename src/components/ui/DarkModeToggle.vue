@@ -8,7 +8,9 @@
       :class="{ 'button-dark': themeStore.isDark }"
       :aria-label="`現在のテーマ: ${themeStore.currentLabel}。クリックして切り替え`"
     >
-      <component :is="currentIconComponent" class="toggle-icon" />
+      <Sun v-if="themeStore.theme === 'light'" class="toggle-icon" />
+      <Moon v-else-if="themeStore.theme === 'dark'" class="toggle-icon" />
+      <Monitor v-else class="toggle-icon" />
       <span class="toggle-text">{{ themeStore.currentLabel }}</span>
     </button>
 
@@ -20,7 +22,9 @@
       :class="{ 'button-compact-dark': themeStore.isDark }"
       :aria-label="`現在のテーマ: ${themeStore.currentLabel}。クリックして切り替え`"
     >
-      <component :is="currentIconComponent" class="toggle-icon-compact" />
+      <Sun v-if="themeStore.theme === 'light'" class="toggle-icon-compact" />
+      <Moon v-else-if="themeStore.theme === 'dark'" class="toggle-icon-compact" />
+      <Monitor v-else class="toggle-icon-compact" />
     </button>
 
     <!-- Theme Dropdown (optional) -->
@@ -35,7 +39,9 @@
           'item-dark': themeStore.isDark 
         }"
       >
-        <component :is="theme.icon" class="item-icon" />
+        <Sun v-if="theme.value === 'light'" class="item-icon" />
+        <Moon v-else-if="theme.value === 'dark'" class="item-icon" />
+        <Monitor v-else class="item-icon" />
         <span class="item-label">{{ theme.label }}</span>
         <span v-if="themeStore.theme === theme.value" class="item-check">✓</span>
       </button>
@@ -61,19 +67,11 @@ const props = withDefaults(defineProps<Props>(), {
 const themeStore = useThemeStore()
 
 const themes = computed(() => [
-  { value: 'light' as Theme, icon: Sun, label: 'ライトモード' },
-  { value: 'system' as Theme, icon: Monitor, label: 'システム設定' },
-  { value: 'dark' as Theme, icon: Moon, label: 'ダークモード' }
+  { value: 'light' as Theme, label: 'ライトモード' },
+  { value: 'system' as Theme, label: 'システム設定' },
+  { value: 'dark' as Theme, label: 'ダークモード' }
 ])
 
-const currentIconComponent = computed(() => {
-  const iconMap = {
-    light: Sun,
-    dark: Moon,
-    system: Monitor
-  }
-  return iconMap[themeStore.theme]
-})
 
 const selectTheme = (theme: Theme) => {
   themeStore.setTheme(theme)

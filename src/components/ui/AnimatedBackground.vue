@@ -146,62 +146,70 @@ const createShape = (id: number): Shape => ({
 const generateAnimationStyles = () => {
   const styles: string[] = []
   
-  // 三角形のアニメーション
-  triangles.value.forEach(triangle => {
-    styles.push(`
-      @keyframes float-${triangle.id} {
-        0% { transform: translateY(0px) rotate(${triangle.rotation}deg); }
-        50% { transform: translateY(-20px) rotate(${triangle.rotation + 180}deg); }
-        100% { transform: translateY(0px) rotate(${triangle.rotation + 360}deg); }
-      }
-    `)
-  })
+  try {
+    // 三角形のアニメーション
+    triangles.value.forEach(triangle => {
+      styles.push(`
+        @keyframes float-${triangle.id} {
+          0% { transform: translateY(0px) rotate(${triangle.rotation}deg); }
+          50% { transform: translateY(-20px) rotate(${triangle.rotation + 180}deg); }
+          100% { transform: translateY(0px) rotate(${triangle.rotation + 360}deg); }
+        }
+      `)
+    })
 
-  // 四角形のアニメーション
-  squares.value.forEach(square => {
-    styles.push(`
-      @keyframes drift-${square.id} {
-        0% { transform: translateX(0px) rotate(${square.rotation}deg); }
-        50% { transform: translateX(30px) rotate(${square.rotation + 90}deg); }
-        100% { transform: translateX(0px) rotate(${square.rotation + 180}deg); }
-      }
-    `)
-  })
+    // 四角形のアニメーション
+    squares.value.forEach(square => {
+      styles.push(`
+        @keyframes drift-${square.id} {
+          0% { transform: translateX(0px) rotate(${square.rotation}deg); }
+          50% { transform: translateX(30px) rotate(${square.rotation + 90}deg); }
+          100% { transform: translateX(0px) rotate(${square.rotation + 180}deg); }
+        }
+      `)
+    })
 
-  // 円形のアニメーション
-  circles.value.forEach(circle => {
-    styles.push(`
-      @keyframes pulse-${circle.id} {
-        0%, 100% { transform: scale(1); opacity: ${circle.opacity}; }
-        50% { transform: scale(1.2); opacity: ${circle.opacity * 0.5}; }
-      }
-    `)
-  })
+    // 円形のアニメーション
+    circles.value.forEach(circle => {
+      styles.push(`
+        @keyframes pulse-${circle.id} {
+          0%, 100% { transform: scale(1); opacity: ${circle.opacity}; }
+          50% { transform: scale(1.2); opacity: ${circle.opacity * 0.5}; }
+        }
+      `)
+    })
 
-  // ダイヤモンドのアニメーション
-  diamonds.value.forEach(diamond => {
-    styles.push(`
-      @keyframes rotate-${diamond.id} {
-        0% { transform: rotate(${diamond.rotation}deg); }
-        100% { transform: rotate(${diamond.rotation + 360}deg); }
-      }
-    `)
-  })
+    // ダイヤモンドのアニメーション
+    diamonds.value.forEach(diamond => {
+      styles.push(`
+        @keyframes rotate-${diamond.id} {
+          0% { transform: rotate(${diamond.rotation}deg); }
+          100% { transform: rotate(${diamond.rotation + 360}deg); }
+        }
+      `)
+    })
+  } catch (error) {
+    console.warn('AnimatedBackground: Error generating styles:', error)
+  }
 
   return styles.join('\n')
 }
 
 // スタイルを挿入
 const injectStyles = () => {
-  const existingStyle = document.getElementById('animated-background-styles')
-  if (existingStyle) {
-    existingStyle.remove()
-  }
+  try {
+    const existingStyle = document.getElementById('animated-background-styles')
+    if (existingStyle) {
+      existingStyle.remove()
+    }
 
-  const styleElement = document.createElement('style')
-  styleElement.id = 'animated-background-styles'
-  styleElement.textContent = generateAnimationStyles()
-  document.head.appendChild(styleElement)
+    const styleElement = document.createElement('style')
+    styleElement.id = 'animated-background-styles'
+    styleElement.textContent = generateAnimationStyles()
+    document.head.appendChild(styleElement)
+  } catch (error) {
+    console.warn('AnimatedBackground: Error injecting styles:', error)
+  }
 }
 
 // 初期化
@@ -236,10 +244,14 @@ const repositionShapes = () => {
 let repositionInterval: number | null = null
 
 onMounted(() => {
-  initShapes()
-  
-  // 定期的に図形の位置を調整
-  repositionInterval = window.setInterval(repositionShapes, 1000)
+  try {
+    initShapes()
+    
+    // 定期的に図形の位置を調整
+    repositionInterval = window.setInterval(repositionShapes, 1000)
+  } catch (error) {
+    console.warn('AnimatedBackground: Error during mount:', error)
+  }
 })
 
 onUnmounted(() => {
