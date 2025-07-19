@@ -162,7 +162,7 @@
           <div v-if="isAuthor" class="flex items-center space-x-1">
             <!-- ステータス変更ボタン -->
             <BaseButton
-              v-if="post.status === 'closed' && post.status !== 'draft'"
+              v-if="post.status === 'closed'"
               size="sm"
               variant="ghost"
               @click.stop="$emit('toggle-status', post.id, 'active')"

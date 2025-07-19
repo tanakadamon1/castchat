@@ -1,5 +1,6 @@
 <template>
-  <div class="container mx-auto px-4 py-8">
+  <div class="min-h-screen relative z-10">
+    <div class="container mx-auto px-4 py-8">
     <!-- Header -->
     <div class="mb-8">
       <h1 class="text-3xl font-bold text-gray-900 dark:text-gray-100">
@@ -234,6 +235,7 @@
         </BaseButton>
       </div>
     </div>
+  </div>
   </div>
 </template>
 

@@ -1,5 +1,5 @@
 <template>
-  <div class="min-h-screen">
+  <div class="min-h-screen relative z-10">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
       <!-- Header -->
       <div class="mb-8">
@@ -84,7 +84,7 @@
           </div>
           <TransitionGroup name="post-list" tag="div" class="contents">
             <PostCard
-              v-for="(post, index) in postsCopy"
+              v-for="(post, index) in posts"
               :key="post.id"
               :post="post"
               :style="{ '--delay': index * 50 + 'ms' }"
@@ -201,8 +201,6 @@ const filters = ref<PostFilter>({
   status: 'active', // デフォルトで募集中のみ表示
 })
 
-// postsのコピーをcomputedで用意
-const postsCopy = computed(() => Array.from(posts.value))
 
 // 画像ビューア関連
 const showImageViewer = ref(false)
