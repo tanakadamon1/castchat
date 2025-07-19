@@ -59,9 +59,9 @@ onMounted(async () => {
 </script>
 
 <template>
-  <div class="min-h-screen flex flex-col transition-colors duration-200 relative">
+  <div class="min-h-screen flex flex-col transition-colors duration-200 relative bg-gray-50 dark:bg-gray-900">
     <!-- アニメーション背景 -->
-    <AnimatedBackground />
+    <!-- <AnimatedBackground /> -->
     
     <AppHeader class="relative z-20 bg-transparent" />
     
