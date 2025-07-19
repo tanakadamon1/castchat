@@ -53,6 +53,12 @@
   </div>
 </template>
 
+<script lang="ts">
+export default {
+  name: 'BaseTextarea'
+}
+</script>
+
 <script setup lang="ts">
 import { computed, useId } from 'vue'
 

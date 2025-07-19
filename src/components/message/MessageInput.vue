@@ -57,6 +57,12 @@
   </div>
 </template>
 
+<script lang="ts">
+export default {
+  name: 'MessageInput'
+}
+</script>
+
 <script setup lang="ts">
 import { ref, computed, watch, nextTick } from 'vue'
 import { ImageIcon } from 'lucide-vue-next'

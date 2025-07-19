@@ -174,6 +174,12 @@
   </div>
 </template>
 
+<script lang="ts">
+export default {
+  name: 'MessageChat'
+}
+</script>
+
 <script setup lang="ts">
 import { ref, computed, onMounted, onUnmounted, nextTick, watch } from 'vue'
 import { ArrowLeft } from 'lucide-vue-next'

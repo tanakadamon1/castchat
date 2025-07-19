@@ -129,6 +129,12 @@
   </BaseModal>
 </template>
 
+<script lang="ts">
+export default {
+  name: 'ApplicationModal'
+}
+</script>
+
 <script setup lang="ts">
 import { ref, computed, onMounted } from 'vue'
 import { X, User, Calendar, Info } from 'lucide-vue-next'

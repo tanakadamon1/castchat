@@ -79,6 +79,12 @@
   </BaseModal>
 </template>
 
+<script lang="ts">
+export default {
+  name: 'ImageViewer'
+}
+</script>
+
 <script setup lang="ts">
 import { ref, computed, watch, onMounted, onUnmounted } from 'vue'
 import { X, ChevronLeft, ChevronRight, Download } from 'lucide-vue-next'

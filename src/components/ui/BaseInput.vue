@@ -67,6 +67,12 @@
   </div>
 </template>
 
+<script lang="ts">
+export default {
+  name: 'BaseInput'
+}
+</script>
+
 <script setup lang="ts">
 import { computed, useId } from 'vue'
 

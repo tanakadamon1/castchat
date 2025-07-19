@@ -126,6 +126,12 @@
   </BaseModal>
 </template>
 
+<script lang="ts">
+export default {
+  name: 'CoinPurchaseModal'
+}
+</script>
+
 <script setup lang="ts">
 import { ref, onMounted, onUnmounted, watch, nextTick, computed } from 'vue'
 import { useToast } from '@/composables/useToast'

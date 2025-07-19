@@ -91,6 +91,12 @@
   </div>
 </template>
 
+<script lang="ts">
+export default {
+  name: 'MessageList'
+}
+</script>
+
 <script setup lang="ts">
 import { computed } from 'vue'
 import { User, MessageCircle } from 'lucide-vue-next'

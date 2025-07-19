@@ -135,6 +135,12 @@
   </div>
 </template>
 
+<script lang="ts">
+export default {
+  name: 'ApplicationCard'
+}
+</script>
+
 <script setup lang="ts">
 import { ref, computed } from 'vue'
 import BaseButton from '@/components/ui/BaseButton.vue'

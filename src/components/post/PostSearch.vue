@@ -126,6 +126,12 @@
   </div>
 </template>
 
+<script lang="ts">
+export default {
+  name: 'PostSearch'
+}
+</script>
+
 <script setup lang="ts">
 import { ref, computed, watch } from 'vue'
 import type { PostFilter, PostCategory } from '@/types/post'

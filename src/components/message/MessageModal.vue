@@ -58,6 +58,12 @@
   </BaseModal>
 </template>
 
+<script lang="ts">
+export default {
+  name: 'MessageModal'
+}
+</script>
+
 <script setup lang="ts">
 import { ref, computed, onMounted, watch, onUnmounted, nextTick } from 'vue'
 import { User, MessageCircle } from 'lucide-vue-next'

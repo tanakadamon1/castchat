@@ -5,6 +5,12 @@
   </span>
 </template>
 
+<script lang="ts">
+export default {
+  name: 'UserStatusBadge'
+}
+</script>
+
 <script setup lang="ts">
 import { computed } from 'vue'
 import { Circle, Clock, Minus } from 'lucide-vue-next'

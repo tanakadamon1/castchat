@@ -93,6 +93,12 @@
   </BaseModal>
 </template>
 
+<script lang="ts">
+export default {
+  name: 'ApplicationDetailModal'
+}
+</script>
+
 <script setup lang="ts">
 import { computed } from 'vue'
 import { X, User, CheckCircle, XCircle, Info } from 'lucide-vue-next'

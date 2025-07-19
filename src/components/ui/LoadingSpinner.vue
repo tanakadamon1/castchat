@@ -84,6 +84,12 @@
   </div>
 </template>
 
+<script lang="ts">
+export default {
+  name: 'LoadingSpinner'
+}
+</script>
+
 <script setup lang="ts">
 import { computed } from 'vue'
 import { Check } from 'lucide-vue-next'

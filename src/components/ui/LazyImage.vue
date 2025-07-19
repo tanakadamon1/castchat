@@ -44,6 +44,12 @@
   </div>
 </template>
 
+<script lang="ts">
+export default {
+  name: 'LazyImage'
+}
+</script>
+
 <script setup lang="ts">
 import { useLazyImage } from '@/composables/useLazyImage'
 

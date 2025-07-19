@@ -64,6 +64,12 @@
   </Transition>
 </template>
 
+<script lang="ts">
+export default {
+  name: 'BaseToast'
+}
+</script>
+
 <script setup lang="ts">
 import { computed, onMounted, onUnmounted, markRaw } from 'vue'
 import {

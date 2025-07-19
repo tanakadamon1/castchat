@@ -136,6 +136,12 @@
   </footer>
 </template>
 
+<script lang="ts">
+export default {
+  name: 'AppFooter'
+}
+</script>
+
 <script setup lang="ts">
 // Footer component - no additional logic needed for now
 </script>

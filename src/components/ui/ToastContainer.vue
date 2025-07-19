@@ -19,6 +19,12 @@
   </Teleport>
 </template>
 
+<script lang="ts">
+export default {
+  name: 'ToastContainer'
+}
+</script>
+
 <script setup lang="ts">
 import BaseToast from './BaseToast.vue'
 import { useToast } from '@/composables/useToast'

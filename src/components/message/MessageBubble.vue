@@ -102,6 +102,12 @@
   </BaseModal>
 </template>
 
+<script lang="ts">
+export default {
+  name: 'MessageBubble'
+}
+</script>
+
 <script setup lang="ts">
 import { ref, computed } from 'vue'
 import { User, Check } from 'lucide-vue-next'

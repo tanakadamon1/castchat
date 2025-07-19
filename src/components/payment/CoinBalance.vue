@@ -69,6 +69,12 @@
   </div>
 </template>
 
+<script lang="ts">
+export default {
+  name: 'CoinBalance'
+}
+</script>
+
 <script setup lang="ts">
 import { ref, onMounted } from 'vue'
 import { CoinApi } from '@/lib/coinApi'

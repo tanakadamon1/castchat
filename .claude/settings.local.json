@@ -86,7 +86,8 @@
       "Bash(supabase functions env:*)",
       "Bash(kill:*)",
       "Bash(npm run lint:*)",
-      "Bash(psql:*)"
+      "Bash(psql:*)",
+      "Bash(mv:*)"
     ],
     "deny": []
   }

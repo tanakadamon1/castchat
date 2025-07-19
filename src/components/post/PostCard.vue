@@ -237,6 +237,12 @@
   </article>
 </template>
 
+<script lang="ts">
+export default {
+  name: 'PostCard'
+}
+</script>
+
 <script setup lang="ts">
 import { computed } from 'vue'
 import type { Post } from '@/types/post'

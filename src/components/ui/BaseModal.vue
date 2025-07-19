@@ -77,6 +77,12 @@
   </Teleport>
 </template>
 
+<script lang="ts">
+export default {
+  name: 'BaseModal'
+}
+</script>
+
 <script setup lang="ts">
 import { computed, onMounted, onUnmounted } from 'vue'
 
