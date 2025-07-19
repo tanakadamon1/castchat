@@ -45,13 +45,43 @@
     <script>
       // グローバルエラーハンドリング
       window.addEventListener('error', function (event) {
-        console.error('Global error:', event.error)
-        document.getElementById('fallback').style.display = 'block'
+        console.error('Global error:', {
+          message: event.message,
+          filename: event.filename,
+          lineno: event.lineno,
+          colno: event.colno,
+          error: event.error,
+          stack: event.error?.stack
+        })
+        
+        // エラー詳細を表示
+        const fallback = document.getElementById('fallback')
+        const errorInfo = document.createElement('div')
+        errorInfo.style.cssText = 'margin-top: 1rem; padding: 1rem; background: #fee2e2; border-radius: 0.375rem; text-align: left; font-size: 0.875rem; color: #dc2626;'
+        errorInfo.innerHTML = `
+          <strong>エラー詳細:</strong><br>
+          ファイル: ${event.filename}<br>
+          行: ${event.lineno}:${event.colno}<br>
+          メッセージ: ${event.message}<br>
+          ${event.error?.stack ? `<br><strong>スタック:</strong><br><pre style="white-space: pre-wrap; font-size: 0.75rem;">${event.error.stack}</pre>` : ''}
+        `
+        fallback.appendChild(errorInfo)
+        fallback.style.display = 'block'
       })
 
       window.addEventListener('unhandledrejection', function (event) {
         console.error('Unhandled promise rejection:', event.reason)
-        document.getElementById('fallback').style.display = 'block'
+        
+        const fallback = document.getElementById('fallback')
+        const errorInfo = document.createElement('div')
+        errorInfo.style.cssText = 'margin-top: 1rem; padding: 1rem; background: #fef3c7; border-radius: 0.375rem; text-align: left; font-size: 0.875rem; color: #d97706;'
+        errorInfo.innerHTML = `
+          <strong>Promise エラー:</strong><br>
+          ${event.reason?.message || event.reason || 'Unknown promise rejection'}<br>
+          ${event.reason?.stack ? `<br><strong>スタック:</strong><br><pre style="white-space: pre-wrap; font-size: 0.75rem;">${event.reason.stack}</pre>` : ''}
+        `
+        fallback.appendChild(errorInfo)
+        fallback.style.display = 'block'
       })
     </script>
   </body>
