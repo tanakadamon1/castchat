@@ -310,20 +310,26 @@ const statusFilterOptions = [
   { value: 'rejected', label: '却下' },
 ]
 
-const postFilterOptions = computed(() => [
-  { value: '', label: 'すべての投稿' },
-  ...Array.from(new Set(receivedApplications.value.map((app) => app.postId))).map((postId) => {
-    const app = receivedApplications.value.find((a) => a.postId === postId)
-    return {
-      value: postId,
-      label: app?.postTitle || `投稿 ${postId}`,
-    }
-  }),
-])
+const postFilterOptions = computed(() => {
+  const applications = [...receivedApplications.value]
+  const uniquePostIds = Array.from(new Set(applications.map((app) => app.postId)))
+  
+  return [
+    { value: '', label: 'すべての投稿' },
+    ...uniquePostIds.map((postId) => {
+      const app = applications.find((a) => a.postId === postId)
+      return {
+        value: postId,
+        label: app?.postTitle || `投稿 ${postId}`,
+      }
+    }),
+  ]
+})
 
 // フィルター適用
 const filteredReceivedApplications = computed(() => {
-  return receivedApplications.value.filter((app) => {
+  const applications = [...receivedApplications.value]
+  return applications.filter((app) => {
     if (receivedFilters.value.status && app.status !== receivedFilters.value.status) {
       return false
     }
@@ -335,7 +341,8 @@ const filteredReceivedApplications = computed(() => {
 })
 
 const filteredSentApplications = computed(() => {
-  return sentApplications.value.filter((app) => {
+  const applications = [...sentApplications.value]
+  return applications.filter((app) => {
     if (sentFilters.value.status && app.status !== sentFilters.value.status) {
       return false
     }
