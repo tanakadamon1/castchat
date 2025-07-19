@@ -97,6 +97,12 @@
   </div>
 </template>
 
+<script lang="ts">
+export default {
+  name: 'AnimatedBackground'
+}
+</script>
+
 <script setup lang="ts">
 import { ref, onMounted, onUnmounted } from 'vue'
 

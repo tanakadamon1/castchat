@@ -49,6 +49,12 @@
   </div>
 </template>
 
+<script lang="ts">
+export default {
+  name: 'DarkModeToggle'
+}
+</script>
+
 <script setup lang="ts">
 import { computed } from 'vue'
 import { Sun, Moon, Monitor } from 'lucide-vue-next'
