@@ -313,19 +313,16 @@ const statusFilterOptions = [
 
 const postFilterOptions = computed(() => {
   const applications = receivedApplications.value
-  const postIdSet = new Set<string>()
-  
-  // Setに追加
-  for (let i = 0; i < applications.length; i++) {
-    if (applications[i].postId) {
-      postIdSet.add(applications[i].postId)
-    }
-  }
-  
-  // 配列に変換
   const uniquePostIds: string[] = []
-  for (const id of postIdSet) {
-    uniquePostIds.push(id)
+  const seenIds: Record<string, boolean> = {}
+  
+  // 重複を避けながら配列に追加
+  for (let i = 0; i < applications.length; i++) {
+    const postId = applications[i].postId
+    if (postId && !seenIds[postId]) {
+      seenIds[postId] = true
+      uniquePostIds.push(postId)
+    }
   }
   
   const options = [{ value: '', label: 'すべての投稿' }]
@@ -350,32 +347,42 @@ const postFilterOptions = computed(() => {
 
 // フィルター適用
 const filteredReceivedApplications = computed(() => {
-  const applications = [...receivedApplications.value]
-  return applications.filter((app) => {
+  const applications = receivedApplications.value
+  const filtered = []
+  
+  for (let i = 0; i < applications.length; i++) {
+    const app = applications[i]
     if (receivedFilters.value.status && app.status !== receivedFilters.value.status) {
-      return false
+      continue
     }
     if (receivedFilters.value.postId && app.postId !== receivedFilters.value.postId) {
-      return false
+      continue
     }
-    return true
-  })
+    filtered.push(app)
+  }
+  
+  return filtered
 })
 
 const filteredSentApplications = computed(() => {
-  const applications = [...sentApplications.value]
-  return applications.filter((app) => {
+  const applications = sentApplications.value
+  const filtered = []
+  
+  for (let i = 0; i < applications.length; i++) {
+    const app = applications[i]
     if (sentFilters.value.status && app.status !== sentFilters.value.status) {
-      return false
+      continue
     }
     if (
       sentFilters.value.search &&
       !app.postTitle.toLowerCase().includes(sentFilters.value.search.toLowerCase())
     ) {
-      return false
+      continue
     }
-    return true
-  })
+    filtered.push(app)
+  }
+  
+  return filtered
 })
 
 // フィルター関数
