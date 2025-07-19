@@ -165,7 +165,7 @@
 
         <!-- Sort Filter -->
         <div class="mt-4 flex justify-end">
-          <BaseSelect v-model="sortBy" :options="sortOptions" @change="loadPosts" class="w-48" />
+          <BaseSelect v-model="sortBy" :options="sortOptions" @change="handleSortChange" class="w-48" />
         </div>
       </div>
 
@@ -333,17 +333,38 @@ const statusTabs = computed(() => [
 ])
 
 const totalPosts = computed(() => total.value)
-const activePosts = computed(
-  () => Array.from(posts.value).filter((p) => p.status === 'active').length,
-)
-const totalApplications = computed(() =>
-  Array.from(posts.value).reduce((sum, p) => sum + (p.applicationsCount || 0), 0),
-)
-const totalViews = computed(() =>
-  Array.from(posts.value).reduce((sum, p) => sum + (p.viewsCount || 0), 0),
-)
+const activePosts = computed(() => {
+  const postsList = posts.value
+  let count = 0
+  for (let i = 0; i < postsList.length; i++) {
+    if (postsList[i].status === 'active') {
+      count++
+    }
+  }
+  return count
+})
+const totalApplications = computed(() => {
+  const postsList = posts.value
+  let sum = 0
+  for (let i = 0; i < postsList.length; i++) {
+    sum += postsList[i].applicationsCount || 0
+  }
+  return sum
+})
+const totalViews = computed(() => {
+  const postsList = posts.value
+  let sum = 0
+  for (let i = 0; i < postsList.length; i++) {
+    sum += postsList[i].viewsCount || 0
+  }
+  return sum
+})
 
 // Methods
+const handleSortChange = () => {
+  loadPosts(true)
+}
+
 const loadPosts = async (showLoading = true) => {
   if (!authStore.user?.id) {
     router.push('/login')
@@ -371,23 +392,33 @@ const loadPosts = async (showLoading = true) => {
     }
 
     // 自分の投稿のみフィルタリング
-    allPosts.value = Array.from(
-      (allResult.data || []).filter((post) => post.authorId === authStore.user?.id),
-    )
+    const allPostsData = allResult.data || []
+    const filteredPosts = []
+    for (let i = 0; i < allPostsData.length; i++) {
+      if (allPostsData[i].authorId === authStore.user?.id) {
+        filteredPosts.push(allPostsData[i])
+      }
+    }
+    allPosts.value = filteredPosts
 
     // 現在のタブに応じてフィルタリング
-    let filteredPosts = Array.from(allPosts.value)
-    if (statusFilter.value !== 'all') {
-      filteredPosts = filteredPosts.filter((post) => post.status === statusFilter.value)
+    let displayPosts = []
+    const allPostsList = allPosts.value
+    
+    for (let i = 0; i < allPostsList.length; i++) {
+      const post = allPostsList[i]
+      if (statusFilter.value === 'all' || post.status === statusFilter.value) {
+        displayPosts.push(post)
+      }
     }
 
-    // ソート適用（コピー配列でsort）
+    // ソート適用
     if (sortBy.value === 'newest') {
-      filteredPosts = filteredPosts.sort(
+      displayPosts.sort(
         (a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime(),
       )
     } else if (sortBy.value === 'oldest') {
-      filteredPosts = filteredPosts.sort(
+      displayPosts.sort(
         (a, b) => new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime(),
       )
     }
@@ -395,8 +426,8 @@ const loadPosts = async (showLoading = true) => {
     // ページネーション適用
     const startIndex = (currentPage.value - 1) * perPage.value
     const endIndex = startIndex + perPage.value
-    posts.value = filteredPosts.slice(startIndex, endIndex)
-    total.value = filteredPosts.length
+    posts.value = displayPosts.slice(startIndex, endIndex)
+    total.value = displayPosts.length
   } catch (err) {
     error.value = 'データの読み込みに失敗しました'
     console.error('Failed to load posts:', err)
